@@ -1415,35 +1415,66 @@
     ====================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- =====================================================
+     MERAMU JAVASCRIPT
+====================================================== -->
+
+<!-- 1. SUPABASE CLIENT
+     WAJIB sebelum adapter Supabase lainnya -->
+<script src="../js/supabase.js"></script>
+
+
+<!-- 2. BATCH DETAIL CORE -->
 <script src="../js/batch-detail.js"></script>
+
+
+<!-- 3. BATCH DETAIL → SUPABASE -->
 <script src="../js/batch-detail-supabase.js"></script>
+
+
+<!-- 4. FERMENTATION LOG → SUPABASE -->
 <script src="../js/batch-detail-fermentation-supabase.js"></script>
+
+
+<!-- 5. SUPABASE REALTIME -->
 <script src="../js/supabase-realtime.js"></script>
+
+
+<!-- 6. SHARED COMPONENT LOADER -->
 <script src="../js/component-loader.js"></script>
+
+
+<!-- 7. GLOBAL APP CONTROLLER -->
 <script src="../js/app.js"></script>
 
-    <script>
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            () => {
+<script>
 
-                if(window.initBatchDetail){
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
 
-                    window.initBatchDetail();
+        if(
+            window.initBatchDetail
+        ){
 
-                }
+            window.initBatchDetail();
 
-                if(window.lucide){
+        }
 
-                    lucide.createIcons();
 
-                }
+        if(
+            window.lucide
+        ){
 
-            }
-        );
+            lucide.createIcons();
 
-    </script>
+        }
+
+    }
+);
+
+</script>
 
 
 </body>
