@@ -1,0 +1,501 @@
+/* =========================================================
+   MERAMU RESPONSIVE v2.0
+   Clean • TailAdmin Style • No Conflict
+========================================================= */
+
+/* =========================================================
+   DEFAULT (Desktop)
+========================================================= */
+
+.desktop-brand{
+    display:none;
+}
+
+.topbar-mobile{
+    display:none;
+}
+
+/* =========================================================
+   TABLET (≤1024px)
+========================================================= */
+
+@media (max-width:1024px){
+
+  /* Layout */
+  .app-shell{
+    grid-template-columns:1fr;
+  }
+
+  .content{
+    padding:24px;
+  }
+
+  /* Sidebar jadi drawer */
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:-100%;
+    width:280px;
+    height:100vh;
+    background:#fff;
+    z-index:1000;
+    transition:left .28s ease;
+    box-shadow:0 24px 60px rgba(0,0,0,.18);
+  }
+
+  .sidebar.show{
+    left:0;
+  }
+
+  /* Overlay */
+  .sidebar-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(17,24,39,.35);
+    backdrop-filter:blur(4px);
+    opacity:0;
+    visibility:hidden;
+    transition:.25s;
+    z-index:999;
+  }
+
+  .sidebar-overlay.show{
+    opacity:1;
+    visibility:visible;
+  }
+
+}
+
+/* =========================================================
+   MOBILE (≤768px)
+========================================================= */
+
+@media (max-width:768px){
+
+  /* ---------- Layout ---------- */
+
+  .content{
+    padding:68px 16px 20px;
+  }
+
+  /* Wrapper topbar jangan makan tinggi */
+  #topbar-container{
+    display:contents;
+  }
+
+  #hero-container{
+    display:block;
+    margin:0;
+    padding:0;
+  }
+
+  /* ---------- Desktop Topbar OFF ---------- */
+
+  .desktop-topbar{
+    display:none !important;
+  }
+
+  /* ---------- Mobile Topbar ---------- */
+
+  .topbar-mobile{
+
+    display:grid;
+
+    grid-template-columns:44px 1fr 44px;
+
+    align-items:center;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+    right:0;
+
+    height:64px;
+
+    padding:0 16px;
+
+    background:#FCFCFB;
+
+    border-bottom:1px solid rgba(4,103,56,.08);
+
+    z-index:1200;
+
+  }
+
+  /* ---------- Hamburger ---------- */
+
+  .mobile-btn{
+
+    width:40px;
+    height:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:none;
+    border:none;
+
+    color:#475569;
+
+    cursor:pointer;
+
+  }
+
+  .mobile-btn:hover{
+    color:#046738;
+  }
+
+  /* ---------- Brand ---------- */
+
+  .mobile-brand{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:10px;
+
+    text-decoration:none;
+
+  }
+
+  .mobile-brand-icon{
+
+    width:30px;
+    height:30px;
+
+    object-fit:contain;
+
+  }
+
+  .mobile-brand-text{
+
+    height:30px;
+    width:auto;
+
+    object-fit:contain;
+
+  }
+
+  /* ---------- Hero ---------- */
+
+  .hero{
+
+    margin:6px 0 0;
+
+    width:100%;
+
+    padding:24px;
+
+    border-radius:24px;
+
+  }
+
+  .hero h2{
+
+    font-size:18px;
+
+    line-height:1.35;
+
+    letter-spacing:-.02em;
+
+    margin-bottom:12px;
+
+  }
+
+  .hero p{
+
+    font-size:13px;
+
+    line-height:1.8;
+
+    color:#64748B;
+
+  }
+
+  /* ---------- Sidebar Menu ---------- */
+
+  .menu{
+    gap:6px;
+  }
+
+  .menu a{
+
+    height:48px;
+
+    padding:0 14px;
+
+    gap:12px;
+
+    border-radius:14px;
+
+    font-size:14px;
+
+  }
+
+  .menu a i{
+
+    width:20px;
+    min-width:20px;
+
+  }
+
+  /* ---------- Search ---------- */
+
+  .search-box{
+
+    height:44px;
+
+    padding:0 14px;
+
+  }
+
+  .search-box input{
+    font-size:13px;
+  }
+
+  .shortcut-key{
+    display:none;
+  }
+
+  /* ---------- Profile ---------- */
+
+  .profile{
+
+    width:46px;
+
+    height:40px;
+
+    padding:4px;
+
+    gap:0;
+
+    justify-content:center;
+
+  }
+
+  .profile img{
+
+    width:30px;
+    height:30px;
+
+  }
+
+  .profile span,
+  .profile i{
+    display:none;
+  }
+
+}
+
+/* =========================================================
+   DESKTOP (≥769px)
+========================================================= */
+
+@media (min-width:769px){
+
+  .topbar-mobile{
+    display:none !important;
+  }
+
+  .desktop-brand{
+    display:none !important;
+  }
+
+}
+
+/* =========================================
+   MOBILE LAYOUT FIX (FINAL)
+========================================= */
+
+@media (max-width:768px){
+
+  /* Grid jadi satu kolom tanpa row kosong */
+  .app-shell{
+    display:block;
+  }
+
+  /* Wrapper sidebar jangan mengambil ruang */
+  #sidebar-container{
+    display:contents;
+    height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  /* Sidebar tetap drawer */
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:-100%;
+    width:280px;
+    height:100vh;
+    z-index:1000;
+    transition:left .28s ease;
+  }
+
+  .sidebar.show{
+    left:0;
+  }
+
+  /* Topbar nempel di atas */
+  .topbar-mobile{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:64px;
+    z-index:1200;
+  }
+
+  /* Wrapper topbar juga jangan makan tinggi */
+  #topbar-container{
+    display:contents;
+  }
+
+  /* Konten mulai tepat di bawah topbar */
+  .content{
+    display:block;
+    padding:76px 16px 20px;
+    min-height:100vh;
+  }
+
+  /* Hero langsung muncul */
+  #hero-container{
+    margin:0;
+    padding:0;
+  }
+
+  .hero{
+    margin:12px 0 0;
+  }
+}
+
+/* =========================================
+   KPI RESPONSIVE
+========================================= */
+
+@media (max-width:1024px){
+
+    .kpi-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media (max-width:640px){
+
+    .kpi-grid{
+        gap:14px;
+    }
+
+    .kpi-card{
+        padding:18px;
+        border-radius:20px;
+    }
+
+    .kpi-icon{
+        width:42px;
+        height:42px;
+    }
+
+    .kpi-icon i{
+        width:20px;
+        height:20px;
+    }
+
+    .kpi-label{
+        font-size:12px;
+    }
+
+    .kpi-value{
+        font-size:24px;
+    }
+
+    .kpi-caption{
+        font-size:11px;
+    }
+
+}
+
+/* =========================================
+   QUICK ACTIONS RESPONSIVE
+========================================= */
+
+@media(max-width:1024px){
+
+    .quick-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:640px){
+
+    .quick-section{
+        margin-top:22px;
+    }
+
+    .section-header h3{
+        font-size:18px;
+    }
+
+    .section-header span{
+        font-size:12px;
+    }
+
+    .quick-grid{
+        gap:14px;
+    }
+
+    .quick-card{
+        padding:18px;
+        border-radius:20px;
+    }
+
+    .quick-icon{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+    }
+
+    .quick-icon i{
+        width:20px;
+        height:20px;
+    }
+
+    .quick-text h4{
+        font-size:14px;
+    }
+
+    .quick-text p{
+        font-size:11px;
+    }
+
+}
+
+/* Production Timeline */
+
+@media(max-width:1024px){
+
+    .timeline-board{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:640px){
+
+    .timeline-board{
+        grid-template-columns:1fr;
+        gap:14px;
+    }
+
+    .timeline-column{
+        padding:16px;
+        border-radius:20px;
+    }
+
+}

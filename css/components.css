@@ -1,0 +1,37 @@
+.card{
+
+background:white;
+
+border-radius:24px;
+
+box-shadow:
+0 2px 8px rgba(17,24,39,.04),
+0 12px 28px rgba(17,24,39,.06);
+
+}
+
+.btn-primary{
+
+background:#046738;
+
+color:white;
+
+padding:12px 20px;
+
+border:none;
+
+border-radius:16px;
+
+cursor:pointer;
+
+font-weight:600;
+
+transition:.25s;
+
+}
+
+.btn-primary:hover{
+
+background:#03542E;
+
+}

@@ -1,0 +1,58 @@
+<section class="inventory-section">
+
+    <div class="inventory-header">
+
+        <div>
+            <div class="section-eyebrow">
+                <i data-lucide="package"></i>
+                INVENTORY
+            </div>
+
+            <h3>Inventory Snapshot</h3>
+
+            <p>Ringkasan stok bahan dan packaging.</p>
+        </div>
+
+        <button class="inventory-link">
+            Lihat Semua
+            <i data-lucide="arrow-up-right"></i>
+        </button>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="inventory-summary">
+
+        <div class="inventory-summary-item">
+            <strong id="inventorySafe">0</strong>
+            <span>Stok Aman</span>
+        </div>
+
+        <div class="inventory-summary-item warning">
+            <strong id="inventoryLow">0</strong>
+            <span>Menipis</span>
+        </div>
+
+        <div class="inventory-summary-item danger">
+            <strong id="inventoryEmpty">0</strong>
+            <span>Habis</span>
+        </div>
+
+        <div class="inventory-summary-item">
+            <strong id="inventoryTotal">0</strong>
+            <span>Total Item</span>
+        </div>
+
+    </div>
+
+
+    <!-- INVENTORY LIST -->
+
+    <div
+        id="inventorySnapshotList"
+        class="inventory-list">
+    </div>
+
+</section>

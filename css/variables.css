@@ -1,0 +1,55 @@
+:root{
+
+/* BRAND */
+
+--primary:#046738;
+--primary-light:#E8F5EE;
+--primary-dark:#034D2A;
+
+/* BACKGROUND */
+
+--bg:#FCFCFB;
+--surface:#FFFFFF;
+--surface-2:#F8FAF8;
+
+/* TEXT */
+
+--text:#111827;
+--text-soft:#64748B;
+
+/* BORDER */
+
+--border:#E8F5EE;
+
+/* STATUS */
+
+--success:#16A34A;
+--warning:#F59E0B;
+--danger:#DC2626;
+--info:#2563EB;
+
+/* RADIUS */
+
+--radius-sm:12px;
+--radius-md:18px;
+--radius-lg:24px;
+--radius-xl:32px;
+
+/* SHADOW */
+
+--shadow-soft:
+0 6px 20px rgba(17,24,39,.04);
+
+--shadow-card:
+0 12px 30px rgba(17,24,39,.06);
+
+/* SIDEBAR */
+
+--sidebar-width:280px;
+--sidebar-collapse:88px;
+
+/* HEADER */
+
+--header-height:72px;
+
+}

@@ -1,0 +1,52 @@
+<div id="batchSheet" class="batch-sheet">
+
+  <div class="batch-sheet-backdrop"></div>
+
+  <div class="batch-sheet-panel">
+
+    <div class="sheet-handle"></div>
+
+    <div class="sheet-header">
+      <div>
+        <h3>Semua Batch</h3>
+        <p id="sheet-subtitle">0 batch</p>
+      </div>
+
+      <button id="closeBatchSheet" class="sheet-close">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="sheet-search">
+
+      <i data-lucide="search"></i>
+
+      <input
+        id="batchSearch"
+        type="text"
+        placeholder="Cari kode batch..."
+      >
+
+    </div>
+
+    <div class="sheet-filter">
+
+      <button class="filter-btn active" data-filter="all">
+        Semua
+      </button>
+
+      <button class="filter-btn" data-filter="direct">
+        Direct
+      </button>
+
+      <button class="filter-btn" data-filter="kombucha">
+        Kombucha
+      </button>
+
+    </div>
+
+    <div id="sheetList" class="sheet-list"></div>
+
+  </div>
+
+</div>

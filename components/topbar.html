@@ -1,0 +1,198 @@
+<!-- =========================================================
+     MERAMU TOPBAR v2.1
+     Desktop + Mobile
+     Shared Component
+========================================================= -->
+
+
+<!-- =========================================================
+     DESKTOP TOPBAR
+========================================================= -->
+
+<header class="topbar desktop-topbar">
+
+    <div class="topbar-left">
+
+
+        <!-- Sidebar Toggle -->
+
+        <button
+            id="sidebarToggle"
+            class="square-btn"
+            aria-label="Toggle Sidebar"
+            type="button"
+        >
+
+            <i data-lucide="menu"></i>
+
+        </button>
+
+
+        <!-- Desktop Brand
+             Logo sengaja disembunyikan melalui CSS -->
+
+        <a
+            href="#"
+            class="desktop-brand"
+            aria-hidden="true"
+        >
+
+            <img
+                src=""
+                alt=""
+                class="topbar-brand-icon"
+                data-asset="branding/logo-icon.png"
+            >
+
+            <img
+                src=""
+                alt=""
+                class="topbar-brand-text"
+                data-asset="branding/logo-text.png"
+            >
+
+        </a>
+
+
+        <!-- Search -->
+
+        <div class="search-box">
+
+            <i data-lucide="search"></i>
+
+            <input
+                type="text"
+                placeholder="Search or type command..."
+                aria-label="Search"
+            >
+
+            <span class="shortcut-key">
+                ⌘ K
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TOPBAR RIGHT
+    ====================================================== -->
+
+    <div class="topbar-right">
+
+
+        <!-- Dark Mode -->
+
+        <button
+            class="circle-btn"
+            aria-label="Dark Mode"
+            type="button"
+        >
+
+            <i data-lucide="moon"></i>
+
+        </button>
+
+
+        <!-- Notification -->
+
+        <button
+            class="circle-btn notification-btn"
+            aria-label="Notifications"
+            type="button"
+        >
+
+            <i data-lucide="bell"></i>
+
+            <span class="notification-dot"></span>
+
+        </button>
+
+
+        <!-- Profile -->
+
+        <button
+            class="profile"
+            aria-label="Profile"
+            type="button"
+        >
+
+           <img
+    src=""
+    alt="Arif"
+    data-asset="images/profile.jpg"
+>
+
+            <span>
+                Ananda Arif Putra
+            </span>
+
+            <i data-lucide="chevron-down"></i>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     MOBILE TOPBAR
+========================================================= -->
+
+<header class="topbar-mobile">
+
+
+    <!-- Hamburger -->
+
+    <button
+        id="mobileSidebarToggle"
+        class="mobile-btn"
+        aria-label="Open Sidebar"
+        type="button"
+    >
+
+        <i data-lucide="menu"></i>
+
+    </button>
+
+
+    <!-- Center Logo -->
+
+    <a
+        href="#"
+        class="mobile-brand"
+    >
+
+        <img
+            src=""
+            alt="MERAMU"
+            class="mobile-brand-icon"
+            data-asset="branding/logo-icon.png"
+        >
+
+        <img
+            src=""
+            alt="MERAMU"
+            class="mobile-brand-text"
+            data-asset="branding/logo-text.png"
+        >
+
+    </a>
+
+
+    <!-- More -->
+
+    <button
+        class="mobile-btn"
+        aria-label="More"
+        type="button"
+    >
+
+        <i data-lucide="ellipsis"></i>
+
+    </button>
+
+</header>

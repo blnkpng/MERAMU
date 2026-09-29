@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>MERAMU • Botanical Beverage System</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/branding/favicon-32.png">
+
+  <!-- Tailwind (sementara untuk utility class) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Icon -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <!-- Overlay (muncul saat sidebar mobile dibuka) -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- =============================
+       APP SHELL
+       Desktop : Sidebar | Content
+       Mobile  : Drawer Sidebar
+  ============================== -->
+  <div id="appShell" class="app-shell">
+
+    <!-- Sidebar akan di-load dari components/sidebar.html -->
+    <aside id="sidebar-container"></aside>
+
+    <!-- Konten -->
+    <main class="content">
+
+      <!-- Topbar Desktop & Mobile -->
+      <div id="topbar-container"></div>
+
+      <!-- Hero Dashboard -->
+      <div id="hero-container"></div>
+      <div id="kpi-container"></div>
+      <div id="live-production-container"></div>
+      <div id="quick-container"></div>
+      <div id="inventory-snapshot-container"></div>
+      <div id="timeline-container"></div>
+      <div id="batch-sheet-container"></div>
+      
+      <!-- Content selanjutnya -->
+      <section id="dashboard-content"></section>
+
+    </main>
+
+  </div>
+
+  <!-- Component Loader -->
+   <script src="js/live-production.js"></script>
+  <script src="js/component-loader.js"></script>
+
+  <!-- Main App -->
+  <script src="js/timeline.js"></script>
+    <script src="js/app.js"></script>
+
+  <script>
+    // Render semua icon Lucide setelah component selesai dimuat
+    window.addEventListener("load", () => {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+
+</body>
+</html>

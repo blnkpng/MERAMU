@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Fermentation Calendar • MERAMU</title>
+
+    <link
+        rel="icon"
+        href="../assets/branding/favicon-32.png"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/variables.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR OVERLAY -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay">
+    </div>
+
+
+    <!-- APP SHELL -->
+
+    <div class="app-shell">
+
+
+        <!-- SIDEBAR -->
+
+        <div id="sidebar-container"></div>
+
+
+        <!-- CONTENT -->
+
+        <main class="content">
+
+
+            <!-- TOPBAR -->
+
+            <div id="topbar-container"></div>
+
+
+            <!-- PAGE -->
+
+            <section class="page-wrapper fermentation-page">
+
+
+                <div class="fermentation-page-content">
+
+
+                    <!-- =================================================
+                         PAGE HEADER
+                    ================================================== -->
+
+                    <div class="page-header">
+
+                        <div>
+
+                            <div class="section-eyebrow">
+
+                                <span class="live-dot"></span>
+
+                                PRODUCTION
+
+                            </div>
+
+
+                            <h1>
+                                Fermentation Calendar
+                            </h1>
+
+
+                            <p>
+                                Pantau jadwal F1 dan F2 seluruh batch
+                                secara terpusat.
+                            </p>
+
+                        </div>
+
+
+                        <div class="page-header-actions">
+
+                            <button
+                                class="page-btn secondary"
+                                type="button"
+                            >
+
+                                <i data-lucide="filter"></i>
+
+                                Filter
+
+                            </button>
+
+
+                            <button
+                                class="page-btn primary"
+                                type="button"
+                            >
+
+                                <i data-lucide="plus"></i>
+
+                                Mulai Batch
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CALENDAR TOOLBAR
+                    ================================================== -->
+
+                    <div class="calendar-toolbar">
+
+
+                        <div class="calendar-navigation">
+
+
+                            <button
+                                class="calendar-nav-btn"
+                                id="previousMonth"
+                                type="button"
+                                aria-label="Bulan sebelumnya"
+                            >
+
+                                <i data-lucide="chevron-left"></i>
+
+                            </button>
+
+
+                            <div class="calendar-current">
+
+                                <strong id="calendarMonth">
+                                    September 2026
+                                </strong>
+
+                            </div>
+
+
+                            <button
+                                class="calendar-nav-btn"
+                                id="nextMonth"
+                                type="button"
+                                aria-label="Bulan berikutnya"
+                            >
+
+                                <i data-lucide="chevron-right"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <button
+                            class="today-btn"
+                            id="todayButton"
+                            type="button"
+                        >
+
+                            Hari Ini
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CALENDAR
+                    ================================================== -->
+
+                    <div class="fermentation-calendar">
+
+
+                        <!-- WEEK HEADER -->
+
+                        <div class="calendar-weekdays">
+
+                            <div>Sen</div>
+                            <div>Sel</div>
+                            <div>Rab</div>
+                            <div>Kam</div>
+                            <div>Jum</div>
+                            <div>Sab</div>
+                            <div>Min</div>
+
+                        </div>
+
+
+                        <!-- DAYS -->
+
+                        <div
+                            id="calendarGrid"
+                            class="calendar-grid"
+                        >
+
+                            <!-- Generated by JS -->
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         LEGEND
+                    ================================================== -->
+
+                    <div class="calendar-legend">
+
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot f1"></span>
+
+                            F1 Fermentasi
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot f2"></span>
+
+                            F2 Fermentasi
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot harvest"></span>
+
+                            Ready Harvest
+
+                        </div>
+
+
+                        <div class="legend-item">
+
+                            <span class="legend-dot delayed"></span>
+
+                            Terlambat
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         UPCOMING FERMENTATION
+                    ================================================== -->
+
+                    <section class="upcoming-fermentation">
+
+
+                        <div class="section-header">
+
+                            <div>
+
+                                <h3>
+                                    Upcoming Fermentation
+                                </h3>
+
+                                <span>
+                                    Batch yang membutuhkan perhatian
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="upcomingList"
+                            class="upcoming-list"
+                        >
+
+                            <!-- Generated by JS -->
+
+                        </div>
+
+
+                    </section>
+
+
+                </div>
+                <!-- /.fermentation-page-content -->
+
+
+            </section>
+            <!-- /.page-wrapper -->
+
+
+        </main>
+
+    </div>
+
+
+
+    <!-- =========================================================
+         SCRIPTS
+    ========================================================== -->
+
+    <script src="../js/fermentation-calendar.js"></script>
+
+    <script src="../js/component-loader.js"></script>
+
+    <script src="../js/app.js"></script>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                if(window.initFermentationCalendar){
+
+                    window.initFermentationCalendar();
+
+                }
+
+                if(window.lucide){
+
+                    lucide.createIcons();
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
