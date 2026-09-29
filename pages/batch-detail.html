@@ -1416,6 +1416,127 @@
 
     </div>
 
+    <!-- =====================================================
+     CANCEL BATCH MODAL
+====================================================== -->
+
+<div
+    id="cancelBatchModal"
+    class="batch-modal"
+    aria-hidden="true"
+>
+
+    <div
+        class="batch-modal-backdrop"
+        data-close-cancel-modal
+    ></div>
+
+
+    <div
+        class="batch-modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancelBatchTitle"
+    >
+
+        <div class="batch-modal-header">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    BATCH ACTION
+                </span>
+
+                <h2 id="cancelBatchTitle">
+                    Batalkan Batch
+                </h2>
+
+                <p>
+                    Batch tidak akan dihapus.
+                    Status akan berubah menjadi
+                    <strong>Cancelled</strong>.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="batch-modal-close"
+                data-close-cancel-modal
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <form id="cancelBatchForm">
+
+            <div class="form-group">
+
+                <label>
+                    Batch
+                </label>
+
+                <div
+                    id="cancelBatchCode"
+                    class="form-static-value"
+                >
+                    —
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="cancelBatchReason">
+                    Alasan Pembatalan
+                </label>
+
+                <textarea
+                    id="cancelBatchReason"
+                    rows="4"
+                    placeholder="Contoh: Salah pilih resep, batch gagal QC, atau produksi dihentikan."
+                ></textarea>
+
+            </div>
+
+
+            <div class="batch-modal-actions">
+
+                <button
+                    type="button"
+                    class="page-btn secondary"
+                    data-close-cancel-modal
+                >
+                    Kembali
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="page-btn danger"
+                >
+
+                    <i data-lucide="ban"></i>
+
+                    Batalkan Batch
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
 
 
     <!-- =====================================================
