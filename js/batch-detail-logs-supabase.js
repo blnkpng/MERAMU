@@ -1,17 +1,23 @@
 /* =========================================================
    MERAMU — BATCH DETAIL SUPABASE LOGS
-   Read-only fermentation logs
 ========================================================= */
 
 (function () {
 
     function getBatchCode() {
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(
+            window.location.search
+        );
+
         return params.get("id") || "KB-022";
     }
 
+
     function formatDate(value) {
-        if (!value) return "—";
+
+        if (!value) {
+            return "—";
+        }
 
         return new Intl.DateTimeFormat("id-ID", {
             day: "2-digit",
@@ -20,8 +26,12 @@
         }).format(new Date(value));
     }
 
+
     function formatTime(value) {
-        if (!value) return "—";
+
+        if (!value) {
+            return "—";
+        }
 
         return new Intl.DateTimeFormat("id-ID", {
             hour: "2-digit",
@@ -30,57 +40,8 @@
         }).format(new Date(value));
     }
 
-    function formatNumber(value, decimals = 2) {
-        if (
-            value === null ||
-            value === undefined ||
-            value === ""
-        ) {
-            return "—";
-        }
 
-        return Number(value).toFixed(decimals);
-    }
-
-    function getQcClass(qc) {
-
-        if (qc === "passed") {
-            return "passed";
-        }
-
-        if (qc === "warning") {
-            return "warning";
-        }
-
-        if (qc === "failed") {
-            return "failed";
-        }
-
-        return "";
-    }
-
-    function getQcLabel(qc) {
-
-        if (qc === "passed") {
-            return "Passed";
-        }
-
-        if (qc === "warning") {
-            return "Warning";
-        }
-
-        if (qc === "failed") {
-            return "Failed";
-        }
-
-        return "—";
-    }
-
-    function renderSupabaseLogs(logs) {
-
-        /* ================================================
-           CONTAINER ASLI DARI BATCH DETAIL
-        ================================================ */
+    function renderLogs(logs) {
 
         const container =
             document.getElementById(
@@ -93,28 +54,26 @@
             );
 
 
+        console.log(
+            "MERAMU: fermentationLogList =",
+            container
+        );
+
+
         if (!container) {
 
-            console.warn(
-                "MERAMU: #fermentationLogList tidak ditemukan."
+            console.error(
+                "MERAMU ERROR: #fermentationLogList tidak ditemukan."
             );
 
             return;
         }
 
 
-        /* ================================================
-           UPDATE COUNT
-        ================================================ */
-
         if (count) {
             count.textContent = logs.length;
         }
 
-
-        /* ================================================
-           EMPTY STATE
-        ================================================ */
 
         if (!logs.length) {
 
@@ -139,67 +98,44 @@
                 lucide.createIcons();
             }
 
-            console.log(
-                "MERAMU: Tidak ada fermentation log."
-            );
-
             return;
         }
 
 
-        /* ================================================
-           RENDER LOG
-        ================================================ */
-
         container.innerHTML = logs.map(log => {
 
-            const stage =
-                log.stage
-                    ? String(log.stage).toUpperCase()
-                    : "—";
-
-            const qcClass =
-                getQcClass(log.qc_status);
+            const qc =
+                log.qc_status || "";
 
             const qcLabel =
-                getQcLabel(log.qc_status);
+                qc === "passed"
+                    ? "Passed"
+                    : qc === "warning"
+                        ? "Warning"
+                        : qc === "failed"
+                            ? "Failed"
+                            : "—";
 
 
             return `
+                <article class="fermentation-log-item">
 
-                <article
-                    class="fermentation-log-item"
-                >
+                    <div class="fermentation-log-top">
 
-                    <div
-                        class="fermentation-log-top"
-                    >
+                        <div class="fermentation-log-date">
 
-                        <div
-                            class="fermentation-log-date"
-                        >
-
-                            <div
-                                class="fermentation-log-icon"
-                            >
-                                <i
-                                    data-lucide="activity"
-                                ></i>
+                            <div class="fermentation-log-icon">
+                                <i data-lucide="activity"></i>
                             </div>
-
 
                             <div>
 
                                 <strong>
-                                    ${formatDate(
-                                        log.measured_at
-                                    )}
+                                    ${formatDate(log.measured_at)}
                                 </strong>
 
                                 <span>
-                                    ${formatTime(
-                                        log.measured_at
-                                    )}
+                                    ${formatTime(log.measured_at)}
                                 </span>
 
                             </div>
@@ -207,30 +143,28 @@
                         </div>
 
 
-                        <span
-                            class="log-stage"
-                        >
-                            ${stage}
+                        <span class="log-stage">
+                            ${String(
+                                log.stage || "—"
+                            ).toUpperCase()}
                         </span>
 
                     </div>
 
 
-                    <div
-                        class="fermentation-log-metrics"
-                    >
+                    <div class="fermentation-log-metrics">
 
                         <div class="log-metric">
 
-                            <span>
-                                pH
-                            </span>
+                            <span>pH</span>
 
                             <strong>
-                                ${formatNumber(
-                                    log.ph,
-                                    2
-                                )}
+                                ${
+                                    log.ph !== null &&
+                                    log.ph !== undefined
+                                        ? Number(log.ph).toFixed(2)
+                                        : "—"
+                                }
                             </strong>
 
                         </div>
@@ -238,15 +172,15 @@
 
                         <div class="log-metric">
 
-                            <span>
-                                Brix
-                            </span>
+                            <span>Brix</span>
 
                             <strong>
-                                ${formatNumber(
-                                    log.brix,
-                                    2
-                                )}°
+                                ${
+                                    log.brix !== null &&
+                                    log.brix !== undefined
+                                        ? Number(log.brix).toFixed(2)
+                                        : "—"
+                                }°
                             </strong>
 
                         </div>
@@ -254,15 +188,17 @@
 
                         <div class="log-metric">
 
-                            <span>
-                                Suhu
-                            </span>
+                            <span>Suhu</span>
 
                             <strong>
-                                ${formatNumber(
-                                    log.temperature_c,
-                                    1
-                                )}°C
+                                ${
+                                    log.temperature_c !== null &&
+                                    log.temperature_c !== undefined
+                                        ? Number(
+                                            log.temperature_c
+                                        ).toFixed(1)
+                                        : "—"
+                                }°C
                             </strong>
 
                         </div>
@@ -270,15 +206,17 @@
 
                         <div class="log-metric">
 
-                            <span>
-                                Volume
-                            </span>
+                            <span>Volume</span>
 
                             <strong>
-                                ${formatNumber(
-                                    log.volume,
-                                    2
-                                )} L
+                                ${
+                                    log.volume !== null &&
+                                    log.volume !== undefined
+                                        ? Number(
+                                            log.volume
+                                        ).toFixed(2)
+                                        : "—"
+                                } L
                             </strong>
 
                         </div>
@@ -286,17 +224,11 @@
                     </div>
 
 
-                    <div
-                        class="fermentation-log-bottom"
-                    >
+                    <div class="fermentation-log-bottom">
 
-                        <div
-                            class="log-operator"
-                        >
+                        <div class="log-operator">
 
-                            <i
-                                data-lucide="user-round"
-                            ></i>
+                            <i data-lucide="user-round"></i>
 
                             <span>
                                 ${log.operator_name || "—"}
@@ -305,12 +237,7 @@
                         </div>
 
 
-                        <span
-                            class="
-                                log-qc
-                                ${qcClass}
-                            "
-                        >
+                        <span class="log-qc ${qc}">
                             ${qcLabel}
                         </span>
 
@@ -320,27 +247,20 @@
                     ${
                         log.notes
                             ? `
+                                <div class="fermentation-log-note">
 
-                                <div
-                                    class="fermentation-log-note"
-                                >
-
-                                    <i
-                                        data-lucide="message-square"
-                                    ></i>
+                                    <i data-lucide="message-square"></i>
 
                                     <span>
                                         ${log.notes}
                                     </span>
 
                                 </div>
-
                               `
                             : ""
                     }
 
                 </article>
-
             `;
 
         }).join("");
@@ -357,12 +277,12 @@
     }
 
 
-    async function loadFermentationLogs() {
+    async function loadLogs() {
 
         if (!window.supabaseClient) {
 
             console.error(
-                "MERAMU: Supabase client belum tersedia."
+                "MERAMU ERROR: Supabase client belum tersedia."
             );
 
             return;
@@ -374,67 +294,56 @@
 
 
         console.log(
-            `MERAMU: Mengambil fermentation logs: ${batchCode}`
+            "MERAMU: Mengambil fermentation logs:",
+            batchCode
         );
 
 
-        try {
-
-            /* ============================================
-               1. CARI BATCH
-            ============================================ */
-
-            const {
-                data: batch,
-                error: batchError
-            } = await window.supabaseClient
-
+        const {
+            data: batch,
+            error: batchError
+        } =
+            await window.supabaseClient
                 .from("batches")
-
-                .select(
-                    "id,batch_code"
-                )
-
-                .eq(
-                    "batch_code",
-                    batchCode
-                )
-
+                .select("id,batch_code")
+                .eq("batch_code", batchCode)
                 .maybeSingle();
 
 
-            if (batchError) {
-                throw batchError;
-            }
+        if (batchError) {
 
-
-            if (!batch) {
-
-                console.warn(
-                    `MERAMU: Batch ${batchCode} tidak ditemukan.`
-                );
-
-                return;
-            }
-
-
-            console.log(
-                "MERAMU: Batch ID untuk log:",
-                batch.id
+            console.error(
+                "MERAMU ERROR batch:",
+                batchError
             );
 
+            return;
+        }
 
-            /* ============================================
-               2. AMBIL LOG
-            ============================================ */
 
-            const {
-                data: logs,
-                error: logsError
-            } = await window.supabaseClient
+        if (!batch) {
 
+            console.error(
+                "MERAMU ERROR: Batch tidak ditemukan:",
+                batchCode
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "MERAMU: Batch ditemukan:",
+            batch
+        );
+
+
+        const {
+            data: logs,
+            error: logsError
+        } =
+            await window.supabaseClient
                 .from("fermentation_logs")
-
                 .select(`
                     id,
                     batch_id,
@@ -448,12 +357,7 @@
                     qc_status,
                     notes
                 `)
-
-                .eq(
-                    "batch_id",
-                    batch.id
-                )
-
+                .eq("batch_id", batch.id)
                 .order(
                     "measured_at",
                     {
@@ -462,86 +366,50 @@
                 );
 
 
-            if (logsError) {
-                throw logsError;
-            }
-
-
-            console.log(
-                "MERAMU: Data fermentation logs dari Supabase:",
-                logs
-            );
-
-
-            renderSupabaseLogs(
-                logs || []
-            );
-
-        } catch (error) {
+        if (logsError) {
 
             console.error(
-                "MERAMU: Gagal mengambil fermentation logs.",
-                error
+                "MERAMU ERROR fermentation logs:",
+                logsError
             );
-
-        }
-    }
-
-
-    function initSupabaseLogs() {
-
-        if (window.supabaseClient) {
-
-            loadFermentationLogs();
 
             return;
         }
 
 
-        let attempts = 0;
+        console.log(
+            "MERAMU: Fermentation logs dari Supabase:",
+            logs
+        );
 
 
-        const timer =
-            setInterval(() => {
-
-                attempts++;
-
-
-                if (window.supabaseClient) {
-
-                    clearInterval(timer);
-
-                    loadFermentationLogs();
-
-                    return;
-                }
-
-
-                if (attempts >= 50) {
-
-                    clearInterval(timer);
-
-                    console.error(
-                        "MERAMU: Supabase client tidak tersedia."
-                    );
-
-                }
-
-            }, 100);
-
+        renderLogs(
+            logs || []
+        );
     }
 
 
-    window.loadFermentationLogs =
-        loadFermentationLogs;
+    function init() {
 
-    window.initSupabaseLogs =
-        initSupabaseLogs;
+        /*
+         * Tunggu sebentar supaya seluruh
+         * component + HTML sudah siap.
+         */
+
+        setTimeout(
+            loadLogs,
+            300
+        );
+    }
 
 
     document.addEventListener(
         "DOMContentLoaded",
-        initSupabaseLogs
+        init
     );
+
+
+    window.loadSupabaseFermentationLogs =
+        loadLogs;
 
 })();
