@@ -1,45 +1,102 @@
-// ================================
-// MERAMU Layout Controller
-// Sidebar + Mobile Drawer
-// Navigation
-// ================================
-
-
-const appShell =
-    document.getElementById("appShell");
-
-const overlay =
-    document.getElementById("sidebarOverlay");
+/* =========================================================
+   MERAMU APP CONTROLLER
+   Global Sidebar + Navigation
+========================================================= */
 
 
 /* =========================================================
-   SIDEBAR
+   GET ELEMENTS
 ========================================================= */
 
-function getSidebar(){
+function getAppShell(){
+    return document.getElementById("appShell");
+}
 
+function getOverlay(){
+    return document.getElementById("sidebarOverlay");
+}
+
+function getSidebar(){
     return document.querySelector(".sidebar");
+}
+
+
+/* =========================================================
+   SIDEBAR STATE
+========================================================= */
+
+function openMobileSidebar(){
+
+    const sidebar = getSidebar();
+    const overlay = getOverlay();
+
+    if(!sidebar){
+        console.warn("MERAMU: Sidebar tidak ditemukan.");
+        return;
+    }
+
+    sidebar.classList.add("show");
+
+    if(overlay){
+        overlay.classList.add("show");
+    }
+
+    document.body.classList.add("sidebar-open");
+
+}
+
+
+function closeMobileSidebar(){
+
+    const sidebar = getSidebar();
+    const overlay = getOverlay();
+
+    sidebar?.classList.remove("show");
+    overlay?.classList.remove("show");
+
+    document.body.classList.remove("sidebar-open");
 
 }
 
 
 function toggleSidebar(){
 
-    const sidebar =
-        getSidebar();
+    const sidebar = getSidebar();
+    const overlay = getOverlay();
+    const appShell = getAppShell();
 
-    if(!sidebar) return;
+    if(!sidebar){
+        console.warn("MERAMU: Sidebar tidak ditemukan.");
+        return;
+    }
 
+
+    /* -----------------------------------------
+       MOBILE
+    ----------------------------------------- */
 
     if(window.innerWidth <= 768){
 
-        sidebar.classList.toggle("show");
+        const isOpen =
+            sidebar.classList.contains("show");
 
-        overlay?.classList.toggle("show");
+        if(isOpen){
+            closeMobileSidebar();
+        }else{
+            openMobileSidebar();
+        }
 
-    }else{
+        return;
+    }
 
-        appShell?.classList.toggle(
+
+    /* -----------------------------------------
+       DESKTOP
+    ----------------------------------------- */
+
+    if(appShell){
+
+        appShell.classList.toggle(
             "sidebar-collapsed"
         );
 
@@ -54,14 +111,12 @@ function toggleSidebar(){
 
 function navigateToRoute(route){
 
-    if(!route) return;
+    if(!route){
+        return;
+    }
 
 
     switch(route){
-
-        /* -----------------------------------------------
-           OVERVIEW
-        ------------------------------------------------ */
 
         case "overview":
 
@@ -71,9 +126,13 @@ function navigateToRoute(route){
             break;
 
 
-        /* -----------------------------------------------
-           FERMENTATION CALENDAR
-        ------------------------------------------------ */
+        case "production":
+
+            window.location.href =
+                "/pages/production.html";
+
+            break;
+
 
         case "fermentation-calendar":
 
@@ -83,68 +142,58 @@ function navigateToRoute(route){
             break;
 
 
-        /* -----------------------------------------------
-           FUTURE PAGES
-        ------------------------------------------------ */
-
-        case "production":
-
-            console.log(
-                "Production page belum dibuat."
-            );
-
-            break;
-
-
         case "f1":
 
-            console.log(
-                "F1 page belum dibuat."
-            );
+            window.location.href =
+                "/pages/f1.html";
 
             break;
 
 
         case "f2":
 
-            console.log(
-                "F2 page belum dibuat."
-            );
+            window.location.href =
+                "/pages/f2.html";
 
             break;
 
 
         case "harvest":
 
-            console.log(
-                "Harvest page belum dibuat."
-            );
+            window.location.href =
+                "/pages/harvest.html";
 
             break;
 
 
         case "recipe":
 
-            console.log(
-                "Recipe page belum dibuat."
-            );
+            window.location.href =
+                "/pages/recipe.html";
 
             break;
 
 
         case "inventory":
 
-            console.log(
-                "Inventory page belum dibuat."
-            );
+            window.location.href =
+                "/pages/inventory.html";
 
             break;
 
 
         case "hpp":
 
-            console.log(
-                "HPP page belum dibuat."
+            window.location.href =
+                "/pages/hpp.html";
+
+            break;
+
+
+        default:
+
+            console.warn(
+                `MERAMU: Route "${route}" belum tersedia.`
             );
 
             break;
@@ -166,7 +215,9 @@ function setActiveMenu(){
         );
 
 
-    if(!menuItems.length) return;
+    if(!menuItems.length){
+        return;
+    }
 
 
     const currentPath =
@@ -177,68 +228,80 @@ function setActiveMenu(){
 
     menuItems.forEach(item => {
 
-        item.classList.remove(
-            "active"
-        );
+        item.classList.remove("active");
 
 
         const route =
             item.dataset.route;
 
 
-        /* -----------------------------------------------
-           FERMENTATION CALENDAR
-        ------------------------------------------------ */
-
-        if(
-            route ===
-            "fermentation-calendar"
-        ){
-
-            if(
-                currentPath.includes(
-                    "/pages/fermentation-calendar.html"
-                )
-            ){
-
-                item.classList.add(
-                    "active"
-                );
-
-            }
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
+        /* -----------------------------------------
            OVERVIEW
-        ------------------------------------------------ */
+        ----------------------------------------- */
 
-        if(
-            route ===
-            "overview"
-        ){
+        if(route === "overview"){
 
             const isDashboard =
-
-                currentPath === "/"
-
-                ||
-
+                currentPath === "/" ||
                 currentPath.endsWith(
                     "/index.html"
                 );
 
-
             if(isDashboard){
 
-                item.classList.add(
-                    "active"
-                );
+                item.classList.add("active");
 
             }
+
+            return;
+        }
+
+
+        /* -----------------------------------------
+           OTHER PAGES
+        ----------------------------------------- */
+
+        const routeFileMap = {
+
+            "fermentation-calendar":
+                "/pages/fermentation-calendar.html",
+
+            "production":
+                "/pages/production.html",
+
+            "f1":
+                "/pages/f1.html",
+
+            "f2":
+                "/pages/f2.html",
+
+            "harvest":
+                "/pages/harvest.html",
+
+            "recipe":
+                "/pages/recipe.html",
+
+            "inventory":
+                "/pages/inventory.html",
+
+            "hpp":
+                "/pages/hpp.html"
+
+        };
+
+
+        const expectedPath =
+            routeFileMap[route];
+
+
+        if(
+            expectedPath &&
+            currentPath.includes(
+                expectedPath
+            )
+        ){
+
+            item.classList.add("active");
 
         }
 
@@ -248,40 +311,120 @@ function setActiveMenu(){
 
 
 /* =========================================================
-   EVENT DELEGATION
+   FIND HAMBURGER BUTTON
+========================================================= */
+
+function findSidebarToggleButton(){
+
+    /* -----------------------------------------
+       PRIMARY IDs
+    ----------------------------------------- */
+
+    const directButton =
+        document.getElementById(
+            "sidebarToggle"
+        ) ||
+        document.getElementById(
+            "mobileSidebarToggle"
+        );
+
+
+    if(directButton){
+
+        return directButton;
+
+    }
+
+
+    /* -----------------------------------------
+       DATA ATTRIBUTES
+    ----------------------------------------- */
+
+    const dataButton =
+        document.querySelector(
+            "[data-sidebar-toggle]"
+        );
+
+
+    if(dataButton){
+
+        return dataButton;
+
+    }
+
+
+    /* -----------------------------------------
+       COMMON CLASS NAMES
+    ----------------------------------------- */
+
+    const classButton =
+        document.querySelector(
+            ".sidebar-toggle, .mobile-sidebar-toggle, .hamburger-toggle"
+        );
+
+
+    if(classButton){
+
+        return classButton;
+
+    }
+
+
+    /* -----------------------------------------
+       TOPBAR FALLBACK
+       Ambil tombol pertama di topbar.
+    ----------------------------------------- */
+
+    const topbar =
+        document.querySelector(
+            ".topbar, header"
+        );
+
+
+    if(topbar){
+
+        const buttons =
+            topbar.querySelectorAll(
+                "button"
+            );
+
+
+        if(buttons.length){
+
+            return buttons[0];
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   GLOBAL CLICK HANDLER
 ========================================================= */
 
 document.addEventListener(
     "click",
-    (e) => {
+    function(event){
+
+        /* -----------------------------------------
+           SIDEBAR TOGGLE
+        ----------------------------------------- */
+
+        const directToggle =
+            event.target.closest(
+                "#sidebarToggle, #mobileSidebarToggle, [data-sidebar-toggle], .sidebar-toggle, .mobile-sidebar-toggle, .hamburger-toggle"
+            );
 
 
-        /* -----------------------------------------------
-           DESKTOP HAMBURGER
-        ------------------------------------------------ */
+        if(directToggle){
 
-        if(
-            e.target.closest(
-                "#sidebarToggle"
-            )
-        ){
-
-            toggleSidebar();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           MOBILE HAMBURGER
-        ------------------------------------------------ */
-
-        if(
-            e.target.closest(
-                "#mobileSidebarToggle"
-            )
-        ){
+            event.preventDefault();
+            event.stopPropagation();
 
             toggleSidebar();
 
@@ -290,98 +433,166 @@ document.addEventListener(
         }
 
 
-        /* -----------------------------------------------
+        /* -----------------------------------------
            OVERLAY
-        ------------------------------------------------ */
+        ----------------------------------------- */
 
         if(
-            e.target.id ===
-            "sidebarOverlay"
+            event.target.closest(
+                "#sidebarOverlay"
+            )
         ){
 
-            getSidebar()
-                ?.classList
-                .remove("show");
-
-            overlay
-                ?.classList
-                .remove("show");
+            closeMobileSidebar();
 
             return;
 
         }
 
 
-        /* -----------------------------------------------
+        /* -----------------------------------------
            SIDEBAR MENU
-        ------------------------------------------------ */
+        ----------------------------------------- */
 
         const menuItem =
-            e.target.closest(
+            event.target.closest(
                 ".menu a[data-route]"
             );
 
 
-        if(!menuItem) return;
+        if(!menuItem){
+            return;
+        }
 
 
         const route =
             menuItem.dataset.route;
 
 
-        /*
-           Page yang belum dibuat
-           tidak melakukan navigasi.
-        */
-
-        if(
-            route !== "overview"
-            &&
-            route !==
-                "fermentation-calendar"
-        ){
-
-            e.preventDefault();
-
-            console.log(
-                `Page "${route}" belum dibuat.`
-            );
-
+        if(!route){
             return;
-
         }
 
 
-        e.preventDefault();
+        event.preventDefault();
 
 
-        navigateToRoute(
-            route
-        );
+        /* Close mobile sidebar */
+
+        closeMobileSidebar();
+
+
+        /* Navigate */
+
+        navigateToRoute(route);
+
+    },
+    true
+);
+
+
+/* =========================================================
+   MOBILE SIDEBAR FALLBACK
+   Jika topbar tidak mempunyai ID toggle,
+   tombol pertama di topbar akan menjadi hamburger.
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const directToggle =
+            event.target.closest(
+                "#sidebarToggle, #mobileSidebarToggle, [data-sidebar-toggle], .sidebar-toggle, .mobile-sidebar-toggle, .hamburger-toggle"
+            );
+
+
+        if(directToggle){
+            return;
+        }
+
+
+        if(window.innerWidth > 768){
+            return;
+        }
+
+
+        const topbar =
+            event.target.closest(
+                ".topbar, header"
+            );
+
+
+        if(!topbar){
+            return;
+        }
+
+
+        const clickedButton =
+            event.target.closest(
+                "button"
+            );
+
+
+        if(!clickedButton){
+            return;
+        }
+
+
+        const buttons =
+            topbar.querySelectorAll(
+                "button"
+            );
+
+
+        /* Tombol pertama dianggap hamburger */
+
+        if(
+            buttons.length &&
+            clickedButton === buttons[0]
+        ){
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            toggleSidebar();
+
+        }
+
+    },
+    true
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        if(window.innerWidth > 768){
+
+            closeMobileSidebar();
+
+        }
 
     }
 );
 
 
 /* =========================================================
-   RESET SAAT RESIZE
+   ESCAPE
 ========================================================= */
 
-window.addEventListener(
-    "resize",
-    () => {
+document.addEventListener(
+    "keydown",
+    function(event){
 
-        if(
-            window.innerWidth > 768
-        ){
+        if(event.key === "Escape"){
 
-            getSidebar()
-                ?.classList
-                .remove("show");
-
-            overlay
-                ?.classList
-                .remove("show");
+            closeMobileSidebar();
 
         }
 
@@ -404,8 +615,40 @@ function initApp(){
 
     }
 
+
+    console.log(
+        "✅ MERAMU App Controller Loaded"
+    );
+
 }
 
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+window.toggleSidebar =
+    toggleSidebar;
+
+window.openMobileSidebar =
+    openMobileSidebar;
+
+window.closeMobileSidebar =
+    closeMobileSidebar;
+
+window.navigateToRoute =
+    navigateToRoute;
+
+window.setActiveMenu =
+    setActiveMenu;
+
+window.initApp =
+    initApp;
+
+
+/* =========================================================
+   START
+========================================================= */
 
 window.addEventListener(
     "load",
