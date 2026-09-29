@@ -732,71 +732,15 @@
                 );
 
 
-                const {
-                    data,
-                    error
-                } =
-                    await supabase
-
-                        .from("batches")
-
-                        .select(`
-                            id,
-                            batch_code,
-                            product_id,
-                            recipe_id,
-                            recipe_version_id,
-                            production_date,
-                            target_date,
-                            expiry_date,
-                            best_before_date,
-                            planned_volume,
-                            actual_volume,
-                            volume_unit_id,
-                            current_stage,
-                            status,
-                            hpp_total,
-                            hpp_per_unit,
-                            notes,
-
-                            products (
-                                id,
-                                code,
-                                name,
-                                product_type,
-                                category
-                            ),
-
-                            recipes (
-                                id,
-                                code,
-                                name,
-                                recipe_type
-                            ),
-
-                            recipe_versions (
-                                id,
-                                version_number,
-                                yield_quantity,
-                                fermentation_required,
-                                f1_target_days,
-                                f2_target_days,
-                                shelf_life_days
-                            ),
-
-                            units (
-                                id,
-                                code,
-                                name
-                            )
-                        `)
-
-                        .eq(
-                            "batch_code",
-                            batchId
-                        )
-
-                        .maybeSingle();
+const {
+    data,
+    error
+} =
+    await supabase
+        .from("batches")
+        .select("*")
+        .eq("batch_code", batchId)
+        .maybeSingle();
 
 
                 if(error){
