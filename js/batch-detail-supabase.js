@@ -794,6 +794,8 @@ const {
                        data.products = productData;
                    }
                }
+               console.log("🔎 MERAMU Batch dari DB:", data);
+               console.log("🔎 MERAMU product_id:", data.product_id);
 
                 const supabaseBatch =
                     mapSupabaseBatch(
