@@ -794,6 +794,46 @@ const {
                        data.products = productData;
                    }
                }
+               /* -----------------------------------------
+                  AMBIL RECIPE
+               ----------------------------------------- */
+               
+               if(data.recipe_id){
+               
+                   const {
+                       data: recipeData,
+                       error: recipeError
+                   } = await supabase
+                       .from("recipes")
+                       .select(`
+                           id,
+                           code,
+                           name,
+                           recipe_type
+                       `)
+                       .eq("id", data.recipe_id)
+                       .maybeSingle();
+               
+                   if(recipeError){
+               
+                       console.error(
+                           "MERAMU: Gagal mengambil recipe.",
+                           recipeError
+                       );
+               
+                   }else{
+               
+                       data.recipes = recipeData;
+               
+                       console.log(
+                           "🔎 MERAMU Recipe:",
+                           recipeData
+                       );
+               
+                   }
+               }
+
+               
                console.log("🔎 MERAMU Batch dari DB:", data);
                console.log("🔎 MERAMU product_id:", data.product_id);
 
