@@ -764,7 +764,36 @@ const {
                     return;
 
                 }
-
+               /* -----------------------------------------
+                  AMBIL PRODUCT
+               ----------------------------------------- */
+               
+               if(data.product_id){
+               
+                   const {
+                       data: productData,
+                       error: productError
+                   } = await supabase
+                       .from("products")
+                       .select(`
+                           id,
+                           code,
+                           name,
+                           product_type,
+                           category
+                       `)
+                       .eq("id", data.product_id)
+                       .maybeSingle();
+               
+                   if(productError){
+                       console.error(
+                           "MERAMU: Gagal mengambil product.",
+                           productError
+                       );
+                   }else{
+                       data.products = productData;
+                   }
+               }
 
                 const supabaseBatch =
                     mapSupabaseBatch(
