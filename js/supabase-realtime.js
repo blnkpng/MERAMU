@@ -22,6 +22,8 @@
 
     let realtimeChannel = null;
 
+    let refreshTimer = null;
+
 
     /* =====================================================
        WAIT FOR SUPABASE
@@ -71,6 +73,109 @@
 
 
     /* =====================================================
+       REFRESH CURRENT PAGE DATA
+    ===================================================== */
+
+    function refreshCurrentPageData(){
+
+        /*
+           Delay kecil supaya beberapa perubahan database
+           yang terjadi berdekatan tidak membuat UI
+           melakukan refresh berkali-kali.
+        */
+
+        clearTimeout(
+            refreshTimer
+        );
+
+
+        refreshTimer =
+            setTimeout(
+                function(){
+
+                    /* -------------------------------------
+                       BATCH DETAIL
+                    ------------------------------------- */
+
+                    if(
+                        typeof window.initBatchSupabase ===
+                        "function"
+                    ){
+
+                        console.log(
+                            "🔄 MERAMU: Refresh Batch Detail dari Supabase..."
+                        );
+
+
+                        window.initBatchSupabase();
+
+                    }
+
+
+                    /* -------------------------------------
+                       FERMENTATION CALENDAR
+                    ------------------------------------- */
+
+                    if(
+                        typeof window.initFermentationCalendarSupabase ===
+                        "function"
+                    ){
+
+                        console.log(
+                            "🔄 MERAMU: Refresh Calendar dari Supabase..."
+                        );
+
+
+                        window.initFermentationCalendarSupabase();
+
+                    }
+
+
+                    /*
+                       Beberapa versi Calendar adapter
+                       mungkin memakai nama fungsi berbeda.
+                    */
+
+                    if(
+                        typeof window.loadCalendarFromSupabase ===
+                        "function"
+                    ){
+
+                        console.log(
+                            "🔄 MERAMU: Reload Calendar Supabase..."
+                        );
+
+
+                        window.loadCalendarFromSupabase();
+
+                    }
+
+
+                    /* -------------------------------------
+                       GLOBAL CUSTOM EVENT
+                    ------------------------------------- */
+
+                    window.dispatchEvent(
+                        new CustomEvent(
+                            "meramu:realtime-refresh",
+                            {
+                                detail: {
+                                    timestamp:
+                                        new Date().toISOString()
+                                }
+                            }
+                        )
+                    );
+
+
+                },
+                250
+            );
+
+    }
+
+
+    /* =====================================================
        DISPATCH GLOBAL EVENT
     ===================================================== */
 
@@ -85,10 +190,19 @@
                 "meramu:supabase-change",
                 {
                     detail: {
-                        table: table,
-                        eventType: eventType,
-                        payload: payload,
-                        timestamp: new Date().toISOString()
+
+                        table:
+                            table,
+
+                        eventType:
+                            eventType,
+
+                        payload:
+                            payload,
+
+                        timestamp:
+                            new Date().toISOString()
+
                     }
                 }
             );
@@ -104,11 +218,19 @@
             payload
         );
 
+
+        /*
+           Setelah menerima perubahan database,
+           refresh data halaman.
+        */
+
+        refreshCurrentPageData();
+
     }
 
 
     /* =====================================================
-       SUBSCRIBE
+       START REALTIME
     ===================================================== */
 
     function startRealtime(){
@@ -117,7 +239,7 @@
             function(supabase){
 
                 /* -----------------------------------------
-                   Jangan subscribe dua kali
+                   Hindari subscribe dua kali
                 ----------------------------------------- */
 
                 if(realtimeChannel){
@@ -188,7 +310,7 @@
 
 
                 /* =========================================
-                   CONNECT CHANNEL
+                   CONNECT
                 ========================================= */
 
                 realtimeChannel.subscribe(
@@ -283,7 +405,7 @@
 
 
     /* =====================================================
-       GET STATUS
+       GET CHANNEL
     ===================================================== */
 
     function getRealtimeChannel(){
@@ -306,7 +428,10 @@
             stopRealtime,
 
         channel:
-            getRealtimeChannel
+            getRealtimeChannel,
+
+        refresh:
+            refreshCurrentPageData
 
     };
 
