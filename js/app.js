@@ -1,11 +1,12 @@
 /* =========================================================
    MERAMU APP CONTROLLER
    Global Sidebar + Navigation
+   Desktop + Mobile
 ========================================================= */
 
 
 /* =========================================================
-   GET ELEMENTS
+   ELEMENT HELPERS
 ========================================================= */
 
 function getAppShell(){
@@ -22,7 +23,7 @@ function getSidebar(){
 
 
 /* =========================================================
-   SIDEBAR STATE
+   MOBILE SIDEBAR
 ========================================================= */
 
 function openMobileSidebar(){
@@ -31,7 +32,9 @@ function openMobileSidebar(){
     const overlay = getOverlay();
 
     if(!sidebar){
-        console.warn("MERAMU: Sidebar tidak ditemukan.");
+        console.warn(
+            "MERAMU: Sidebar tidak ditemukan."
+        );
         return;
     }
 
@@ -41,8 +44,9 @@ function openMobileSidebar(){
         overlay.classList.add("show");
     }
 
-    document.body.classList.add("sidebar-open");
-
+    document.body.classList.add(
+        "sidebar-open"
+    );
 }
 
 
@@ -51,13 +55,23 @@ function closeMobileSidebar(){
     const sidebar = getSidebar();
     const overlay = getOverlay();
 
-    sidebar?.classList.remove("show");
-    overlay?.classList.remove("show");
+    if(sidebar){
+        sidebar.classList.remove("show");
+    }
 
-    document.body.classList.remove("sidebar-open");
+    if(overlay){
+        overlay.classList.remove("show");
+    }
 
+    document.body.classList.remove(
+        "sidebar-open"
+    );
 }
 
+
+/* =========================================================
+   SIDEBAR TOGGLE
+========================================================= */
 
 function toggleSidebar(){
 
@@ -66,14 +80,18 @@ function toggleSidebar(){
     const appShell = getAppShell();
 
     if(!sidebar){
-        console.warn("MERAMU: Sidebar tidak ditemukan.");
+
+        console.warn(
+            "MERAMU: Sidebar tidak ditemukan."
+        );
+
         return;
     }
 
 
-    /* -----------------------------------------
+    /* -----------------------------------------------------
        MOBILE
-    ----------------------------------------- */
+    ----------------------------------------------------- */
 
     if(window.innerWidth <= 768){
 
@@ -81,18 +99,22 @@ function toggleSidebar(){
             sidebar.classList.contains("show");
 
         if(isOpen){
+
             closeMobileSidebar();
+
         }else{
+
             openMobileSidebar();
+
         }
 
         return;
     }
 
 
-    /* -----------------------------------------
+    /* -----------------------------------------------------
        DESKTOP
-    ----------------------------------------- */
+    ----------------------------------------------------- */
 
     if(appShell){
 
@@ -100,6 +122,12 @@ function toggleSidebar(){
             "sidebar-collapsed"
         );
 
+        console.log(
+            "MERAMU: Desktop sidebar toggle",
+            appShell.classList.contains(
+                "sidebar-collapsed"
+            )
+        );
     }
 
 }
@@ -214,7 +242,6 @@ function setActiveMenu(){
             ".menu a[data-route]"
         );
 
-
     if(!menuItems.length){
         return;
     }
@@ -228,16 +255,18 @@ function setActiveMenu(){
 
     menuItems.forEach(item => {
 
-        item.classList.remove("active");
+        item.classList.remove(
+            "active"
+        );
 
 
         const route =
             item.dataset.route;
 
 
-        /* -----------------------------------------
+        /* -------------------------------------------------
            OVERVIEW
-        ----------------------------------------- */
+        ------------------------------------------------- */
 
         if(route === "overview"){
 
@@ -249,7 +278,9 @@ function setActiveMenu(){
 
             if(isDashboard){
 
-                item.classList.add("active");
+                item.classList.add(
+                    "active"
+                );
 
             }
 
@@ -257,9 +288,9 @@ function setActiveMenu(){
         }
 
 
-        /* -----------------------------------------
-           OTHER PAGES
-        ----------------------------------------- */
+        /* -------------------------------------------------
+           OTHER ROUTES
+        ------------------------------------------------- */
 
         const routeFileMap = {
 
@@ -301,7 +332,9 @@ function setActiveMenu(){
             )
         ){
 
-            item.classList.add("active");
+            item.classList.add(
+                "active"
+            );
 
         }
 
@@ -311,148 +344,66 @@ function setActiveMenu(){
 
 
 /* =========================================================
-   FIND HAMBURGER BUTTON
-========================================================= */
-
-function findSidebarToggleButton(){
-
-    /* -----------------------------------------
-       PRIMARY IDs
-    ----------------------------------------- */
-
-    const directButton =
-        document.getElementById(
-            "sidebarToggle"
-        ) ||
-        document.getElementById(
-            "mobileSidebarToggle"
-        );
-
-
-    if(directButton){
-
-        return directButton;
-
-    }
-
-
-    /* -----------------------------------------
-       DATA ATTRIBUTES
-    ----------------------------------------- */
-
-    const dataButton =
-        document.querySelector(
-            "[data-sidebar-toggle]"
-        );
-
-
-    if(dataButton){
-
-        return dataButton;
-
-    }
-
-
-    /* -----------------------------------------
-       COMMON CLASS NAMES
-    ----------------------------------------- */
-
-    const classButton =
-        document.querySelector(
-            ".sidebar-toggle, .mobile-sidebar-toggle, .hamburger-toggle"
-        );
-
-
-    if(classButton){
-
-        return classButton;
-
-    }
-
-
-    /* -----------------------------------------
-       TOPBAR FALLBACK
-       Ambil tombol pertama di topbar.
-    ----------------------------------------- */
-
-    const topbar =
-        document.querySelector(
-            ".topbar, header"
-        );
-
-
-    if(topbar){
-
-        const buttons =
-            topbar.querySelectorAll(
-                "button"
-            );
-
-
-        if(buttons.length){
-
-            return buttons[0];
-
-        }
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =========================================================
    GLOBAL CLICK HANDLER
+   IMPORTANT:
+   Component HTML dimuat secara dinamis,
+   sehingga event delegation digunakan.
 ========================================================= */
 
 document.addEventListener(
     "click",
     function(event){
 
-        /* -----------------------------------------
-           SIDEBAR TOGGLE
-        ----------------------------------------- */
+        /* -------------------------------------------------
+           HAMBURGER / SIDEBAR TOGGLE
+        ------------------------------------------------- */
 
-        const directToggle =
+        const toggleButton =
             event.target.closest(
                 "#sidebarToggle, #mobileSidebarToggle, [data-sidebar-toggle], .sidebar-toggle, .mobile-sidebar-toggle, .hamburger-toggle"
             );
 
 
-        if(directToggle){
+        if(toggleButton){
 
             event.preventDefault();
+
             event.stopPropagation();
+
+            console.log(
+                "MERAMU: Hamburger clicked",
+                toggleButton.id ||
+                toggleButton.className
+            );
+
 
             toggleSidebar();
 
             return;
-
         }
 
 
-        /* -----------------------------------------
-           OVERLAY
-        ----------------------------------------- */
+        /* -------------------------------------------------
+           SIDEBAR OVERLAY
+        ------------------------------------------------- */
 
-        if(
+        const overlay =
             event.target.closest(
                 "#sidebarOverlay"
-            )
-        ){
+            );
+
+
+        if(overlay){
 
             closeMobileSidebar();
 
             return;
-
         }
 
 
-        /* -----------------------------------------
+        /* -------------------------------------------------
            SIDEBAR MENU
-        ----------------------------------------- */
+        ------------------------------------------------- */
 
         const menuItem =
             event.target.closest(
@@ -477,14 +428,12 @@ document.addEventListener(
         event.preventDefault();
 
 
-        /* Close mobile sidebar */
-
         closeMobileSidebar();
 
 
-        /* Navigate */
-
-        navigateToRoute(route);
+        navigateToRoute(
+            route
+        );
 
     },
     true
@@ -492,14 +441,17 @@ document.addEventListener(
 
 
 /* =========================================================
-   MOBILE SIDEBAR FALLBACK
-   Jika topbar tidak mempunyai ID toggle,
-   tombol pertama di topbar akan menjadi hamburger.
+   MOBILE TOPBAR FALLBACK
+   Jika tombol pertama pada mobile topbar
+   belum mempunyai ID, tetap bisa membuka sidebar.
 ========================================================= */
 
 document.addEventListener(
     "click",
     function(event){
+
+        /* Jangan jalankan fallback jika sudah
+           ditangani oleh handler utama */
 
         const directToggle =
             event.target.closest(
@@ -512,18 +464,20 @@ document.addEventListener(
         }
 
 
+        /* Hanya mobile */
+
         if(window.innerWidth > 768){
             return;
         }
 
 
-        const topbar =
+        const mobileTopbar =
             event.target.closest(
-                ".topbar, header"
+                ".topbar-mobile"
             );
 
 
-        if(!topbar){
+        if(!mobileTopbar){
             return;
         }
 
@@ -540,12 +494,12 @@ document.addEventListener(
 
 
         const buttons =
-            topbar.querySelectorAll(
+            mobileTopbar.querySelectorAll(
                 "button"
             );
 
 
-        /* Tombol pertama dianggap hamburger */
+        /* Tombol pertama = hamburger */
 
         if(
             buttons.length &&
@@ -553,6 +507,7 @@ document.addEventListener(
         ){
 
             event.preventDefault();
+
             event.stopPropagation();
 
             toggleSidebar();
@@ -572,6 +527,11 @@ window.addEventListener(
     "resize",
     function(){
 
+        /* -------------------------------------------------
+           Saat kembali ke desktop,
+           tutup state mobile.
+        ------------------------------------------------- */
+
         if(window.innerWidth > 768){
 
             closeMobileSidebar();
@@ -583,7 +543,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   ESCAPE
+   ESC KEY
 ========================================================= */
 
 document.addEventListener(
@@ -601,7 +561,7 @@ document.addEventListener(
 
 
 /* =========================================================
-   INIT
+   INITIALIZE APP
 ========================================================= */
 
 function initApp(){
@@ -624,7 +584,7 @@ function initApp(){
 
 
 /* =========================================================
-   EXPORT
+   GLOBAL EXPORT
 ========================================================= */
 
 window.toggleSidebar =
@@ -647,7 +607,7 @@ window.initApp =
 
 
 /* =========================================================
-   START
+   LOAD
 ========================================================= */
 
 window.addEventListener(
