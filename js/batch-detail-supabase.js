@@ -836,6 +836,7 @@ const {
                
                console.log("🔎 MERAMU Batch dari DB:", data);
                console.log("🔎 MERAMU product_id:", data.product_id);
+               console.log("🔎 MERAMU recipe_id:", data.recipe_id);
 
                 const supabaseBatch =
                     mapSupabaseBatch(
