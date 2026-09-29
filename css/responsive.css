@@ -499,3 +499,632 @@
     }
 
 }
+/* =========================================================
+   MERAMU BATCH DETAIL — FINAL RESPONSIVE LAYOUT
+   Fix desktop + tablet + mobile
+========================================================= */
+
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+}
+
+
+/* =========================================================
+   PAGE WRAPPER
+========================================================= */
+
+.batch-detail-page{
+    width:100%;
+    min-width:0;
+    overflow-x:hidden;
+}
+
+.batch-detail-content{
+    width:100%;
+    max-width:1400px;
+    margin:0 auto;
+    min-width:0;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.batch-detail-header{
+    width:100%;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+
+    gap:24px;
+
+    min-width:0;
+}
+
+.batch-detail-title{
+    min-width:0;
+    flex:1 1 auto;
+}
+
+.batch-title-row{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    min-width:0;
+}
+
+.batch-title-row h1{
+    min-width:0;
+    max-width:100%;
+
+    overflow-wrap:anywhere;
+}
+
+.batch-header-actions{
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.batch-progress-card{
+    width:100%;
+    min-width:0;
+
+    margin-top:24px;
+}
+
+.batch-progress-top{
+    width:100%;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:20px;
+}
+
+.batch-progress-top > div:first-child{
+    min-width:0;
+}
+
+.batch-progress-value{
+    flex:0 0 auto;
+    text-align:right;
+}
+
+.batch-progress-track{
+    width:100%;
+    min-width:0;
+}
+
+.batch-progress-meta{
+    width:100%;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:16px;
+
+    flex-wrap:wrap;
+}
+
+
+/* =========================================================
+   KPI — ALWAYS IN NORMAL FLOW
+========================================================= */
+
+.batch-kpi-grid{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+
+    gap:16px;
+
+    margin-top:24px;
+
+    min-width:0;
+}
+
+.batch-kpi-card{
+    min-width:0;
+    width:100%;
+
+    overflow:hidden;
+}
+
+.batch-kpi-card strong,
+.batch-kpi-card span{
+    overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   MAIN DETAIL GRID
+========================================================= */
+
+.batch-detail-grid{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        minmax(0,1.35fr)
+        minmax(0,1fr);
+
+    gap:20px;
+
+    margin-top:24px;
+
+    min-width:0;
+
+    align-items:start;
+}
+
+.batch-detail-grid > *{
+    min-width:0;
+    width:100%;
+}
+
+
+/* =========================================================
+   DETAIL CARD
+========================================================= */
+
+.batch-detail-grid .detail-card{
+    min-width:0;
+    width:100%;
+
+    overflow:hidden;
+}
+
+.detail-card-header{
+    min-width:0;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+
+    gap:16px;
+}
+
+.detail-card-header > div{
+    min-width:0;
+}
+
+.detail-card-header h3,
+.detail-card-header p{
+    overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   FERMENTATION METRICS
+========================================================= */
+
+.fermentation-metrics{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+
+    gap:10px;
+
+    min-width:0;
+}
+
+.fermentation-metric{
+    min-width:0;
+    width:100%;
+}
+
+.fermentation-metric strong{
+    overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   RECIPE
+========================================================= */
+
+.recipe-list{
+    width:100%;
+    min-width:0;
+}
+
+.recipe-row{
+    width:100%;
+    min-width:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:12px;
+}
+
+.recipe-row span,
+.recipe-row strong{
+    min-width:0;
+    overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   TIMELINE / LOG / NOTES
+========================================================= */
+
+.batch-history-card,
+.fermentation-log-card,
+.production-note{
+    width:100%;
+    min-width:0;
+}
+
+.batch-history-card{
+    margin-top:20px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:1000px){
+
+    .batch-kpi-grid{
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+    }
+
+    .batch-detail-grid{
+        grid-template-columns:
+            minmax(0,1fr);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+    .batch-detail-page{
+        padding-left:0;
+        padding-right:0;
+    }
+
+    .batch-detail-content{
+        width:100%;
+        max-width:none;
+
+        margin:0;
+
+        padding-left:0;
+        padding-right:0;
+    }
+
+
+    /* -----------------------------------------
+       HEADER
+    ----------------------------------------- */
+
+    .batch-detail-header{
+        width:100%;
+
+        display:flex;
+
+        flex-direction:column;
+
+        align-items:stretch;
+        justify-content:flex-start;
+
+        gap:16px;
+    }
+
+    .batch-detail-title{
+        width:100%;
+    }
+
+    .batch-title-row{
+        width:100%;
+
+        align-items:center;
+
+        gap:8px;
+    }
+
+    .batch-title-row h1{
+        font-size:24px;
+        line-height:1.15;
+    }
+
+    .batch-header-actions{
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+            minmax(0,1fr)
+            minmax(0,1fr)
+            48px
+            48px;
+
+        gap:8px;
+
+        align-items:center;
+
+        justify-content:stretch;
+    }
+
+    .batch-header-actions .page-btn{
+        width:100%;
+        min-width:0;
+
+        height:48px;
+
+        padding:0 10px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        white-space:nowrap;
+    }
+
+
+    /* -----------------------------------------
+       EDIT = ICON ONLY
+    ----------------------------------------- */
+
+    .batch-header-actions #editBatch{
+        width:48px;
+        min-width:48px;
+
+        padding:0;
+    }
+
+    .batch-header-actions #editBatch span{
+        display:none;
+    }
+
+    .batch-header-actions #editBatch i{
+        width:18px;
+        height:18px;
+    }
+
+
+    /* -----------------------------------------
+       CANCEL = ICON ONLY
+    ----------------------------------------- */
+
+    .batch-header-actions #cancelBatch{
+        width:48px;
+        min-width:48px;
+
+        padding:0;
+    }
+
+    .batch-header-actions #cancelBatch span{
+        display:none;
+    }
+
+    .batch-header-actions #cancelBatch i{
+        width:18px;
+        height:18px;
+    }
+
+
+    /* -----------------------------------------
+       PROGRESS
+    ----------------------------------------- */
+
+    .batch-progress-card{
+        margin-top:20px;
+
+        width:100%;
+    }
+
+    .batch-progress-top{
+        gap:12px;
+    }
+
+    .batch-progress-top h3{
+        font-size:20px;
+        line-height:1.25;
+    }
+
+    .batch-progress-value strong{
+        font-size:32px;
+    }
+
+    .batch-progress-meta{
+        display:flex;
+        flex-direction:column;
+        align-items:flex-start;
+
+        gap:4px;
+    }
+
+
+    /* -----------------------------------------
+       KPI 2 x 2
+    ----------------------------------------- */
+
+    .batch-kpi-grid{
+        width:100%;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:12px;
+
+        margin-top:16px;
+    }
+
+    .batch-kpi-card{
+        min-height:100px;
+
+        padding:16px;
+    }
+
+    .batch-kpi-card strong{
+        font-size:16px;
+    }
+
+
+    /* -----------------------------------------
+       MAIN GRID — ONE COLUMN
+    ----------------------------------------- */
+
+    .batch-detail-grid{
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+            minmax(0,1fr);
+
+        gap:16px;
+
+        margin-top:16px;
+    }
+
+    .batch-detail-grid > *{
+        width:100%;
+        min-width:0;
+    }
+
+
+    /* -----------------------------------------
+       FERMENTATION METRICS 2 x 2
+    ----------------------------------------- */
+
+    .fermentation-metrics{
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:8px;
+    }
+
+    .fermentation-metric{
+        min-height:64px;
+    }
+
+
+    /* -----------------------------------------
+       RECIPE
+    ----------------------------------------- */
+
+    .recipe-row{
+        min-height:42px;
+    }
+
+
+    /* -----------------------------------------
+       TIMELINE
+    ----------------------------------------- */
+
+    .batch-history-card{
+        margin-top:16px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media(max-width:430px){
+
+    .batch-detail-content{
+        width:100%;
+    }
+
+    .batch-title-row h1{
+        font-size:22px;
+    }
+
+    .batch-header-actions{
+        grid-template-columns:
+            minmax(0,1fr)
+            minmax(0,1fr)
+            46px
+            46px;
+
+        gap:6px;
+    }
+
+    .batch-header-actions #editBatch,
+    .batch-header-actions #cancelBatch{
+        width:46px;
+        min-width:46px;
+    }
+
+    .batch-header-actions .page-btn{
+        height:46px;
+    }
+
+    .batch-kpi-grid{
+        gap:10px;
+    }
+
+    .batch-kpi-card{
+        padding:14px;
+    }
+
+    .batch-progress-value strong{
+        font-size:28px;
+    }
+
+}
+
+
+/* =========================================================
+   PREVENT HORIZONTAL OVERFLOW
+========================================================= */
+
+@media(max-width:768px){
+
+    html,
+    body{
+        max-width:100%;
+        overflow-x:hidden;
+    }
+
+    .app-shell,
+    .content,
+    .page-wrapper,
+    .batch-detail-page,
+    .batch-detail-content{
+        max-width:100%;
+        overflow-x:hidden;
+    }
+
+}
