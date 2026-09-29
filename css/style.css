@@ -5665,3 +5665,37 @@ input:focus-visible{
     }
 
 }
+
+/* =========================================================
+   MERAMU DESKTOP SIDEBAR COLLAPSE
+========================================================= */
+
+@media (min-width: 769px){
+
+    #appShell.sidebar-collapsed .sidebar{
+        width: 82px;
+        min-width: 82px;
+    }
+
+    #appShell.sidebar-collapsed .brand-text{
+        display: none;
+    }
+
+    #appShell.sidebar-collapsed .menu a{
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    #appShell.sidebar-collapsed .menu a span{
+        display: none;
+    }
+
+    #appShell.sidebar-collapsed .content{
+        margin-left: 82px;
+    }
+
+    #appShell.sidebar-collapsed .sidebar{
+        overflow-x: hidden;
+    }
+}
