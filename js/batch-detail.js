@@ -950,17 +950,16 @@ function renderBatchTimeline(batch){
         },
 
 
-        bottling: {
-
-            title: "Bottling",
-
-            description:
-                "Produk masuk proses pembotolan.",
-
-            icon: "bottle"
-
-        },
-
+         bottling: {
+         
+             title: "Bottling",
+         
+             description:
+                 "Produk masuk proses pembotolan.",
+         
+             icon: "cylinder"
+         
+         },
 
         label: {
 
