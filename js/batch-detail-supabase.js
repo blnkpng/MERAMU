@@ -678,14 +678,14 @@
                     row.hpp_per_unit
                 ),
 
-            ph:
-                "—",
-
-            brix:
-                "—",
-
-            temperature:
-                "—",
+               ph:
+                   null,
+               
+               brix:
+                   null,
+               
+               temperature:
+                   null,
 
             duration:
                 calculateDuration(
@@ -895,16 +895,30 @@ if(data.recipe_version_id){
                             batchId
                         ] || {};
 
-
-                    batchDetailData[
-                        batchId
-                    ] = {
-
-                        ...oldBatch,
-
-                        ...supabaseBatch
-
-                    };
+               batchDetailData[
+                   batchId
+               ] = {
+               
+                   ...oldBatch,
+               
+                   ...supabaseBatch,
+               
+                   ph:
+                       supabaseBatch.ph ||
+                       oldBatch.ph ||
+                       "—",
+               
+                   brix:
+                       supabaseBatch.brix ||
+                       oldBatch.brix ||
+                       "—",
+               
+                   temperature:
+                       supabaseBatch.temperature ||
+                       oldBatch.temperature ||
+                       "—"
+               
+               };
 
                 }
 
