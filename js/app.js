@@ -10,7 +10,10 @@
 ========================================================= */
 
 function getAppShell(){
-    return document.getElementById("appShell");
+    return (
+        document.getElementById("appShell") ||
+        document.querySelector(".app-shell")
+    );
 }
 
 function getOverlay(){
