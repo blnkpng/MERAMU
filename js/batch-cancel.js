@@ -1,16 +1,9 @@
 /* =========================================================
    MERAMU BATCH CANCEL
-   Cancel Batch → Supabase
+   Cancel Batch via Supabase RPC
 ========================================================= */
 
 (function(){
-
-    "use strict";
-
-
-    /* =====================================================
-       HELPERS
-    ===================================================== */
 
     function getBatchCode(){
 
@@ -20,7 +13,8 @@
             );
 
         return (
-            params.get("id") ||
+            params.get("batch") ||
+            params.get("code") ||
             "KB-022"
         );
 
@@ -36,13 +30,19 @@
     }
 
 
-    function openCancelModal(){
+    function openCancelBatchModal(){
 
         const modal =
             getModal();
 
         if(!modal){
+
+            console.error(
+                "MERAMU: #cancelBatchModal tidak ditemukan."
+            );
+
             return;
+
         }
 
 
@@ -54,7 +54,6 @@
             document.getElementById(
                 "cancelBatchCode"
             );
-
 
         if(codeElement){
 
@@ -69,7 +68,6 @@
                 "cancelBatchReason"
             );
 
-
         if(reason){
 
             reason.value = "";
@@ -77,14 +75,23 @@
         }
 
 
-        modal.classList.add(
-            "show"
-        );
+        modal.classList.add("show");
 
         modal.setAttribute(
             "aria-hidden",
             "false"
         );
+
+
+        setTimeout(() => {
+
+            if(reason){
+
+                reason.focus();
+
+            }
+
+        },100);
 
 
         if(window.lucide){
@@ -96,19 +103,19 @@
     }
 
 
-    function closeCancelModal(){
+    function closeCancelBatchModal(){
 
         const modal =
             getModal();
 
         if(!modal){
+
             return;
+
         }
 
 
-        modal.classList.remove(
-            "show"
-        );
+        modal.classList.remove("show");
 
         modal.setAttribute(
             "aria-hidden",
@@ -118,63 +125,34 @@
     }
 
 
-    /* =====================================================
-       WAIT SUPABASE
-    ===================================================== */
+    async function waitForSupabase(){
 
-    function waitForSupabase(
-        callback,
-        attempts = 50
-    ){
+        for(let i = 0; i < 50; i++){
 
-        if(
-            window.supabaseClient &&
-            typeof window.supabaseClient.rpc ===
-                "function"
-        ){
+            if(window.supabaseClient){
 
-            callback(
-                window.supabaseClient
+                return window.supabaseClient;
+
+            }
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        100
+                    )
             );
-
-            return;
 
         }
 
-
-        if(attempts <= 0){
-
-            alert(
-                "Koneksi Supabase belum tersedia."
-            );
-
-            return;
-
-        }
-
-
-        setTimeout(
-            function(){
-
-                waitForSupabase(
-                    callback,
-                    attempts - 1
-                );
-
-            },
-            100
+        throw new Error(
+            "Supabase client belum tersedia."
         );
 
     }
 
 
-    /* =====================================================
-       CANCEL BATCH
-    ===================================================== */
-
-    async function cancelBatch(
-        event
-    ){
+    async function cancelBatch(event){
 
         event.preventDefault();
 
@@ -198,10 +176,14 @@
         if(!reason){
 
             alert(
-                "Masukkan alasan pembatalan terlebih dahulu."
+                "Alasan pembatalan wajib diisi."
             );
 
-            reasonElement?.focus();
+            if(reasonElement){
+
+                reasonElement.focus();
+
+            }
 
             return;
 
@@ -210,7 +192,7 @@
 
         const confirmed =
             window.confirm(
-                `Batalkan batch ${batchCode}?\n\nBatch tidak akan dihapus. Status akan menjadi CANCELLED.`
+                `Batalkan batch ${batchCode}?\n\nBatch tidak akan dihapus. Status akan menjadi Cancelled.`
             );
 
 
@@ -221,119 +203,199 @@
         }
 
 
-        waitForSupabase(
-            async function(
-                supabase
-            ){
+        try{
 
-                try{
-
-                    /* -------------------------------------
-                       Cari UUID batch
-                    ------------------------------------- */
-
-                    const {
-                        data: batch,
-                        error: batchError
-                    } =
-                        await supabase
-                            .from("batches")
-                            .select(
-                                "id,batch_code,status"
-                            )
-                            .eq(
-                                "batch_code",
-                                batchCode
-                            )
-                            .maybeSingle();
+            const supabase =
+                await waitForSupabase();
 
 
-                    if(batchError){
-
-                        throw batchError;
-
-                    }
-
-
-                    if(!batch){
-
-                        throw new Error(
-                            `Batch ${batchCode} tidak ditemukan.`
-                        );
-
-                    }
+            console.log(
+                "MERAMU: Mencari batch",
+                batchCode
+            );
 
 
-                    /* -------------------------------------
-                       Panggil RPC cancel
-                    ------------------------------------- */
+            const {
+                data: batch,
+                error: findError
+            } = await supabase
 
-                    const {
-                        data,
-                        error
-                    } =
-                        await supabase.rpc(
-                            "cancel_meramu_batch",
-                            {
-                                p_batch_id:
-                                    batch.id,
+                .from("batches")
 
-                                p_reason:
-                                    reason
-                            }
-                        );
+                .select("id,batch_code,status")
+
+                .eq(
+                    "batch_code",
+                    batchCode
+                )
+
+                .maybeSingle();
 
 
-                    if(error){
+            if(findError){
 
-                        throw error;
+                throw findError;
 
-                    }
+            }
 
+
+            if(!batch){
+
+                throw new Error(
+                    `Batch ${batchCode} tidak ditemukan.`
+                );
+
+            }
+
+
+            console.log(
+                "MERAMU: Batch ditemukan",
+                batch
+            );
+
+
+            const {
+                data,
+                error: rpcError
+            } = await supabase.rpc(
+                "cancel_meramu_batch",
+                {
+                    p_batch_id:
+                        batch.id,
+
+                    p_reason:
+                        reason
+                }
+            );
+
+
+            if(rpcError){
+
+                throw rpcError;
+
+            }
+
+
+            console.log(
+                "MERAMU: Batch berhasil dibatalkan.",
+                data
+            );
+
+
+            closeCancelBatchModal();
+
+
+            alert(
+                `Batch ${batchCode} berhasil dibatalkan.`
+            );
+
+
+            window.location.href =
+                "fermentation-calendar.html";
+
+
+        }catch(error){
+
+            console.error(
+                "MERAMU: Gagal membatalkan batch.",
+                error
+            );
+
+
+            alert(
+                "Gagal membatalkan batch:\n" +
+                (
+                    error.message ||
+                    "Terjadi kesalahan."
+                )
+            );
+
+        }
+
+    }
+
+
+    function bindEvents(){
+
+        const cancelButton =
+            document.getElementById(
+                "cancelBatch"
+            );
+
+
+        if(cancelButton){
+
+            cancelButton.addEventListener(
+                "click",
+                function(event){
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
 
                     console.log(
-                        "✅ MERAMU: Batch berhasil dibatalkan.",
-                        data
+                        "MERAMU: Tombol Batalkan Batch diklik."
                     );
 
+                    openCancelBatchModal();
 
-                    closeCancelModal();
+                }
+            );
+
+        }else{
+
+            console.warn(
+                "MERAMU: #cancelBatch belum ditemukan."
+            );
+
+        }
 
 
-                    /*
-                       Realtime akan menangkap UPDATE
-                       dari Supabase.
+        const form =
+            document.getElementById(
+                "cancelBatchForm"
+            );
 
-                       Kita juga redirect kembali ke
-                       calendar setelah sedikit delay.
-                    */
 
-                    setTimeout(
-                        function(){
+        if(form){
 
-                            window.location.href =
-                                "/pages/fermentation-calendar.html";
+            form.addEventListener(
+                "submit",
+                cancelBatch
+            );
 
-                        },
-                        500
+        }
+
+
+        document.addEventListener(
+            "click",
+            function(event){
+
+                const closeButton =
+                    event.target.closest(
+                        "[data-close-cancel-modal]"
                     );
 
+                if(closeButton){
 
-                }catch(error){
+                    closeCancelBatchModal();
 
-                    console.error(
-                        "❌ MERAMU: Gagal membatalkan batch.",
-                        error
-                    );
+                }
+
+            }
+        );
 
 
-                    alert(
-                        "Batch gagal dibatalkan.\n\n" +
-                        (
-                            error.message ||
-                            "Terjadi kesalahan."
-                        )
-                    );
+        document.addEventListener(
+            "keydown",
+            function(event){
+
+                if(
+                    event.key ===
+                    "Escape"
+                ){
+
+                    closeCancelBatchModal();
 
                 }
 
@@ -343,96 +405,28 @@
     }
 
 
-    /* =====================================================
-       EVENTS
-    ===================================================== */
-
-    document.addEventListener(
-        "click",
-        function(event){
-
-            const cancelButton =
-                event.target.closest(
-                    "#cancelBatch"
-                );
-
-
-            if(cancelButton){
-
-                event.preventDefault();
-
-                openCancelModal();
-
-                return;
-
-            }
-
-
-            const closeButton =
-                event.target.closest(
-                    "[data-close-cancel-modal]"
-                );
-
-
-            if(closeButton){
-
-                event.preventDefault();
-
-                closeCancelModal();
-
-            }
-
-        }
-    );
-
-
-    document.addEventListener(
-        "submit",
-        function(event){
-
-            if(
-                event.target.id !==
-                "cancelBatchForm"
-            ){
-
-                return;
-
-            }
-
-
-            cancelBatch(
-                event
-            );
-
-        }
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        function(event){
-
-            if(
-                event.key === "Escape"
-            ){
-
-                closeCancelModal();
-
-            }
-
-        }
-    );
-
-
-    /* =====================================================
-       EXPORT
-    ===================================================== */
-
     window.openCancelBatchModal =
-        openCancelModal;
+        openCancelBatchModal;
+
 
     window.closeCancelBatchModal =
-        closeCancelModal;
+        closeCancelBatchModal;
 
+
+    if(
+        document.readyState ===
+        "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bindEvents
+        );
+
+    }else{
+
+        bindEvents();
+
+    }
 
 })();
