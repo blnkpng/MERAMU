@@ -16,13 +16,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Icon -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -51,13 +57,25 @@
 
       <!-- Hero Dashboard -->
       <div id="hero-container"></div>
+
+      <!-- KPI Cards -->
       <div id="kpi-container"></div>
+
+      <!-- Live Production -->
       <div id="live-production-container"></div>
+
+      <!-- Quick Actions -->
       <div id="quick-container"></div>
+
+      <!-- Inventory Snapshot -->
       <div id="inventory-snapshot-container"></div>
+
+      <!-- Production Timeline -->
       <div id="timeline-container"></div>
+
+      <!-- Batch Sheet -->
       <div id="batch-sheet-container"></div>
-      
+
       <!-- Content selanjutnya -->
       <section id="dashboard-content"></section>
 
@@ -65,18 +83,37 @@
 
   </div>
 
-  <!-- Component Loader -->
-   <script src="js/live-production.js"></script>
+  <!-- ==========================================
+       SUPABASE CONFIG
+       config.js dibuat otomatis oleh Netlify
+  =========================================== -->
+  <script src="js/config.js"></script>
+
+  <!-- ==========================================
+       SUPABASE CLIENT
+  =========================================== -->
+  <script src="js/supabase.js"></script>
+
+  <!-- ==========================================
+       COMPONENT / FEATURE SCRIPTS
+  =========================================== -->
+  <script src="js/live-production.js"></script>
+  <script src="js/timeline.js"></script>
   <script src="js/component-loader.js"></script>
 
-  <!-- Main App -->
-  <script src="js/timeline.js"></script>
-    <script src="js/app.js"></script>
+  <!-- ==========================================
+       MAIN APP
+  =========================================== -->
+  <script src="js/app.js"></script>
 
+  <!-- ==========================================
+       LUCIDE ICON REFRESH
+  =========================================== -->
   <script>
-    // Render semua icon Lucide setelah component selesai dimuat
     window.addEventListener("load", () => {
-      if (window.lucide) lucide.createIcons();
+      if (window.lucide) {
+        lucide.createIcons();
+      }
     });
   </script>
 
