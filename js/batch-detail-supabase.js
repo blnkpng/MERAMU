@@ -870,6 +870,7 @@ if(data.recipe_version_id){
                console.log("🔎 MERAMU Batch dari DB:", data);
                console.log("🔎 MERAMU product_id:", data.product_id);
                console.log("🔎 MERAMU recipe_id:", data.recipe_id);
+               console.log("🔎 MERAMU recipe_version_id:", data.recipe_version_id);
 
                 const supabaseBatch =
                     mapSupabaseBatch(
