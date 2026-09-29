@@ -832,6 +832,39 @@ const {
                
                    }
                }
+               /* -----------------------------------------
+   AMBIL RECIPE VERSION
+----------------------------------------- */
+
+if(data.recipe_version_id){
+
+    const {
+        data: recipeVersionData,
+        error: recipeVersionError
+    } = await supabase
+        .from("recipe_versions")
+        .select("*")
+        .eq("id", data.recipe_version_id)
+        .maybeSingle();
+
+    if(recipeVersionError){
+
+        console.error(
+            "MERAMU: Gagal mengambil recipe version.",
+            recipeVersionError
+        );
+
+    }else{
+
+        data.recipe_versions = recipeVersionData;
+
+        console.log(
+            "🔎 MERAMU Recipe Version:",
+            recipeVersionData
+        );
+
+    }
+}
 
                
                console.log("🔎 MERAMU Batch dari DB:", data);
