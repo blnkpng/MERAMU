@@ -1,13 +1,15 @@
 /* =========================================================
    MERAMU BATCH DETAIL → SUPABASE
-   Step 3.6
-   Read-only connection test
+   Step 3.7
+   Batch + Timeline Sync
 
    Fungsi:
    - Ambil batch berdasarkan ?id=KB-022
-   - Ambil product melalui relationship
+   - Ambil product
    - Ambil recipe + recipe version
-   - Mapping data Supabase ke format Batch Detail lama
+   - Mapping data Supabase ke Batch Detail
+   - Sinkronisasi tanggal Production + Harvest
+   - Mempertahankan timeline lama sebagai fallback
    - Tidak mengubah Add Log / Edit / Print / Thermal Label
 ========================================================= */
 
@@ -168,8 +170,7 @@
 
 
         if(
-            value === "f1"
-            ||
+            value === "f1" ||
             value.includes("f1")
         ){
 
@@ -179,8 +180,7 @@
 
 
         if(
-            value === "f2"
-            ||
+            value === "f2" ||
             value.includes("f2")
         ){
 
@@ -190,8 +190,7 @@
 
 
         if(
-            value === "harvest"
-            ||
+            value === "harvest" ||
             value === "panen"
         ){
 
@@ -201,10 +200,8 @@
 
 
         if(
-            value === "bottling"
-            ||
-            value === "bottle"
-            ||
+            value === "bottling" ||
+            value === "bottle" ||
             value === "pembotolan"
         ){
 
@@ -214,8 +211,7 @@
 
 
         if(
-            value === "label"
-            ||
+            value === "label" ||
             value.includes("qr")
         ){
 
@@ -225,8 +221,7 @@
 
 
         if(
-            value === "finished"
-            ||
+            value === "finished" ||
             value === "selesai"
         ){
 
@@ -264,10 +259,8 @@
 
 
         if(
-            normalizedStage === "harvest"
-            ||
-            normalizedStatus === "ready"
-            ||
+            normalizedStage === "harvest" ||
+            normalizedStatus === "ready" ||
             normalizedStatus === "harvest"
         ){
 
@@ -277,8 +270,7 @@
 
 
         if(
-            normalizedStage === "finished"
-            ||
+            normalizedStage === "finished" ||
             normalizedStatus === "finished"
         ){
 
@@ -354,12 +346,12 @@
         const normalizedStage =
             String(
                 stage || ""
-            ).toLowerCase();
+            )
+            .toLowerCase();
 
 
         if(
-            normalizedStage === "harvest"
-            ||
+            normalizedStage === "harvest" ||
             normalizedStage === "finished"
         ){
 
@@ -552,11 +544,214 @@
 
 
     /* =====================================================
+       TIMELINE SYNC
+    ===================================================== */
+
+    function syncTimeline(
+        row,
+        oldBatch
+    ){
+
+        const oldTimeline =
+            Array.isArray(
+                oldBatch?.timeline
+            )
+                ? oldBatch.timeline
+                : [];
+
+
+        const timelineMap = {};
+
+
+        oldTimeline.forEach(
+            event => {
+
+                if(
+                    event &&
+                    event.stage
+                ){
+
+                    timelineMap[
+                        event.stage
+                    ] = {
+                        ...event
+                    };
+
+                }
+
+            }
+        );
+
+
+        /* ---------------------------------------------
+           PRODUCTION
+        --------------------------------------------- */
+
+        timelineMap.production = {
+
+            ...(timelineMap.production || {}),
+
+            stage:
+                "production",
+
+            date:
+                row.production_date
+                    ? formatDate(
+                        row.production_date
+                    )
+                    : (
+                        timelineMap.production?.date ||
+                        null
+                    ),
+
+            status:
+                timelineMap.production?.status ||
+                "completed",
+
+            note:
+                timelineMap.production?.note ||
+                "Batch dibuat dan proses produksi dimulai."
+
+        };
+
+
+        /* ---------------------------------------------
+           HARVEST
+           target_date menjadi tanggal target harvest
+        --------------------------------------------- */
+
+        if(row.target_date){
+
+            timelineMap.harvest = {
+
+                ...(timelineMap.harvest || {}),
+
+                stage:
+                    "harvest",
+
+                date:
+                    formatDate(
+                        row.target_date
+                    ),
+
+                status:
+                    (
+                        String(
+                            row.current_stage || ""
+                        )
+                        .toLowerCase() === "harvest"
+                    )
+                        ? "active"
+                        : (
+                            timelineMap.harvest?.status ||
+                            "upcoming"
+                        ),
+
+                note:
+                    timelineMap.harvest?.note ||
+                    "Target panen batch."
+
+            };
+
+        }
+
+
+        /* ---------------------------------------------
+           CURRENT STAGE
+           Jika stage sudah memiliki tanggal dari
+           timeline lama, pertahankan.
+        --------------------------------------------- */
+
+        const currentStage =
+            String(
+                row.current_stage || ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        if(
+            [
+                "production",
+                "f1",
+                "f2",
+                "harvest",
+                "bottling",
+                "label",
+                "finished"
+            ].includes(
+                currentStage
+            )
+        ){
+
+            if(
+                timelineMap[currentStage]
+            ){
+
+                timelineMap[
+                    currentStage
+                ].status =
+                    "active";
+
+            }
+
+        }
+
+
+        /* ---------------------------------------------
+           URUTAN TIMELINE
+        --------------------------------------------- */
+
+        const stageOrder = [
+
+            "production",
+            "f1",
+            "f2",
+            "harvest",
+            "bottling",
+            "label",
+            "finished"
+
+        ];
+
+
+        return stageOrder.map(
+            stage => {
+
+                return (
+                    timelineMap[stage] || {
+
+                        stage:
+                            stage,
+
+                        date:
+                            null,
+
+                        time:
+                            null,
+
+                        status:
+                            "upcoming",
+
+                        note:
+                            ""
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
        MAP SUPABASE BATCH
     ===================================================== */
 
     function mapSupabaseBatch(
-        row
+        row,
+        oldBatch
     ){
 
         const stage =
@@ -586,15 +781,19 @@
 
         const targetDays =
             normalizedStage === "f1"
+
                 ? (
                     recipeVersion?.f1_target_days ||
                     7
                 )
+
                 : normalizedStage === "f2"
+
                     ? (
                         recipeVersion?.f2_target_days ||
                         5
                     )
+
                     : (
                         recipeVersion?.f1_target_days ||
                         7
@@ -612,6 +811,13 @@
         const day =
             calculateDay(
                 row.production_date
+            );
+
+
+        const timeline =
+            syncTimeline(
+                row,
+                oldBatch
             );
 
 
@@ -670,7 +876,8 @@
                 formatVolume(
                     row.actual_volume ||
                     row.planned_volume,
-                    row.units?.code || "L"
+                    row.units?.code ||
+                    "L"
                 ),
 
             hpp:
@@ -678,14 +885,23 @@
                     row.hpp_per_unit
                 ),
 
-               ph:
-                   null,
-               
-               brix:
-                   null,
-               
-               temperature:
-                   null,
+            /*
+               Jangan timpa data metric lama
+               jika Supabase batch belum mempunyai
+               metric fermentasi.
+            */
+
+            ph:
+                oldBatch?.ph ||
+                "—",
+
+            brix:
+                oldBatch?.brix ||
+                "—",
+
+            temperature:
+                oldBatch?.temperature ||
+                "—",
 
             duration:
                 calculateDuration(
@@ -693,15 +909,22 @@
                 ),
 
             note:
-                row.notes || "",
+                row.notes ||
+                oldBatch?.note ||
+                "",
 
             recipe:
                 recipe.name ||
+                oldBatch?.recipe ||
                 "—",
 
             recipeVersion:
                 recipeVersion?.version_number ||
-                null
+                oldBatch?.recipeVersion ||
+                null,
+
+            timeline:
+                timeline
 
         };
 
@@ -732,15 +955,71 @@
                 );
 
 
-const {
-    data,
-    error
-} =
-    await supabase
-        .from("batches")
-        .select("*")
-        .eq("batch_code", batchId)
-        .maybeSingle();
+                const {
+                    data,
+                    error
+                } =
+                    await supabase
+
+                        .from("batches")
+
+                        .select(`
+                            id,
+                            batch_code,
+                            product_id,
+                            recipe_id,
+                            recipe_version_id,
+                            production_date,
+                            target_date,
+                            expiry_date,
+                            best_before_date,
+                            planned_volume,
+                            actual_volume,
+                            volume_unit_id,
+                            current_stage,
+                            status,
+                            hpp_total,
+                            hpp_per_unit,
+                            notes,
+
+                            products (
+                                id,
+                                code,
+                                name,
+                                product_type,
+                                category
+                            ),
+
+                            recipes (
+                                id,
+                                code,
+                                name,
+                                recipe_type
+                            ),
+
+                            recipe_versions (
+                                id,
+                                version_number,
+                                yield_quantity,
+                                fermentation_required,
+                                f1_target_days,
+                                f2_target_days,
+                                shelf_life_days
+                            ),
+
+                            units (
+                                id,
+                                code,
+                                name
+                            )
+                        `)
+
+                        .eq(
+                            "batch_code",
+                            batchId
+                        )
+
+                        .maybeSingle();
 
 
                 if(error){
@@ -764,125 +1043,30 @@ const {
                     return;
 
                 }
-               /* -----------------------------------------
-                  AMBIL PRODUCT
-               ----------------------------------------- */
-               
-               if(data.product_id){
-               
-                   const {
-                       data: productData,
-                       error: productError
-                   } = await supabase
-                       .from("products")
-                       .select(`
-                           id,
-                           code,
-                           name,
-                           product_type,
-                           category
-                       `)
-                       .eq("id", data.product_id)
-                       .maybeSingle();
-               
-                   if(productError){
-                       console.error(
-                           "MERAMU: Gagal mengambil product.",
-                           productError
-                       );
-                   }else{
-                       data.products = productData;
-                   }
-               }
-               /* -----------------------------------------
-                  AMBIL RECIPE
-               ----------------------------------------- */
-               
-               if(data.recipe_id){
-               
-                   const {
-                       data: recipeData,
-                       error: recipeError
-                   } = await supabase
-                       .from("recipes")
-                       .select(`
-                           id,
-                           code,
-                           name,
-                           recipe_type
-                       `)
-                       .eq("id", data.recipe_id)
-                       .maybeSingle();
-               
-                   if(recipeError){
-               
-                       console.error(
-                           "MERAMU: Gagal mengambil recipe.",
-                           recipeError
-                       );
-               
-                   }else{
-               
-                       data.recipes = recipeData;
-               
-                       console.log(
-                           "🔎 MERAMU Recipe:",
-                           recipeData
-                       );
-               
-                   }
-               }
-               /* -----------------------------------------
-   AMBIL RECIPE VERSION
------------------------------------------ */
 
-if(data.recipe_version_id){
 
-    const {
-        data: recipeVersionData,
-        error: recipeVersionError
-    } = await supabase
-        .from("recipe_versions")
-        .select("*")
-        .eq("id", data.recipe_version_id)
-        .maybeSingle();
+                const oldBatch =
+                    typeof batchDetailData !==
+                    "undefined"
 
-    if(recipeVersionError){
+                        ? (
+                            batchDetailData[
+                                batchId
+                            ] || {}
+                        )
 
-        console.error(
-            "MERAMU: Gagal mengambil recipe version.",
-            recipeVersionError
-        );
+                        : {};
 
-    }else{
-
-        data.recipe_versions = recipeVersionData;
-
-        console.log(
-            "🔎 MERAMU Recipe Version:",
-            recipeVersionData
-        );
-
-    }
-}
-
-               
-               console.log("🔎 MERAMU Batch dari DB:", data);
-               console.log("🔎 MERAMU product_id:", data.product_id);
-               console.log("🔎 MERAMU recipe_id:", data.recipe_id);
-               console.log("🔎 MERAMU recipe_version_id:", data.recipe_version_id);
 
                 const supabaseBatch =
                     mapSupabaseBatch(
-                        data
+                        data,
+                        oldBatch
                     );
 
 
                 /* -----------------------------------------
-                   MERGE KE DATA LAMA
-                   
-                   Kita pertahankan timeline dan
-                   fermentation log dummy untuk sementara.
+                   MERGE DATA
                 ----------------------------------------- */
 
                 if(
@@ -890,35 +1074,15 @@ if(data.recipe_version_id){
                     "undefined"
                 ){
 
-                    const oldBatch =
-                        batchDetailData[
-                            batchId
-                        ] || {};
+                    batchDetailData[
+                        batchId
+                    ] = {
 
-               batchDetailData[
-                   batchId
-               ] = {
-               
-                   ...oldBatch,
-               
-                   ...supabaseBatch,
-               
-                   ph:
-                       supabaseBatch.ph ||
-                       oldBatch.ph ||
-                       "—",
-               
-                   brix:
-                       supabaseBatch.brix ||
-                       oldBatch.brix ||
-                       "—",
-               
-                   temperature:
-                       supabaseBatch.temperature ||
-                       oldBatch.temperature ||
-                       "—"
-               
-               };
+                        ...oldBatch,
+
+                        ...supabaseBatch
+
+                    };
 
                 }
 
