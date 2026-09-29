@@ -9,7 +9,7 @@
    BATCH DATA
 ========================================================= */
 
-const fermentationBatches = [
+let fermentationBatches = [
 
     {
         id: 1,
@@ -101,6 +101,62 @@ const fermentationBatches = [
 
 ];
 
+/* =========================================================
+   SET DATA DARI SUPABASE
+========================================================= */
+
+function setFermentationCalendarData(data){
+
+    if(!Array.isArray(data)){
+
+        console.warn(
+            "MERAMU: Data fermentation calendar bukan array."
+        );
+
+        return;
+
+    }
+
+
+    fermentationBatches = data;
+
+
+    console.log(
+        "MERAMU: Fermentation calendar data diperbarui:",
+        fermentationBatches
+    );
+
+
+    /* -----------------------------------------
+       RENDER ULANG CALENDAR
+    ----------------------------------------- */
+
+    if(typeof renderFermentationCalendar === "function"){
+
+        renderFermentationCalendar();
+
+    }
+
+
+    /* -----------------------------------------
+       RENDER ULANG UPCOMING
+    ----------------------------------------- */
+
+    if(typeof renderUpcomingFermentation === "function"){
+
+        renderUpcomingFermentation();
+
+    }
+
+}
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+window.setFermentationCalendarData =
+    setFermentationCalendarData;
 
 /* =========================================================
    CALENDAR STATE
