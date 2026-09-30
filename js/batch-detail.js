@@ -1821,10 +1821,14 @@ if(operatorInput){
 
 /* =========================================================
    SAVE FERMENTATION LOG
-   Supabase Safe Version
+   Supabase
 ========================================================= */
 
 function saveFermentationLog(event){
+
+    /* =====================================================
+       PREVENT DEFAULT
+    ===================================================== */
 
     if(event){
         event.preventDefault();
@@ -1832,7 +1836,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       FORM
+       GET FORM
     ===================================================== */
 
     const form =
@@ -1853,7 +1857,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       VALIDATION
+       VALIDATE FORM
     ===================================================== */
 
     if(!form.checkValidity()){
@@ -1866,7 +1870,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       CURRENT BATCH
+       GET CURRENT BATCH
     ===================================================== */
 
     const batch =
@@ -1885,7 +1889,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       SUPABASE
+       SUPABASE CLIENT
     ===================================================== */
 
     const supabase =
@@ -1894,12 +1898,12 @@ function saveFermentationLog(event){
 
     if(!supabase){
 
-        alert(
-            "Koneksi Supabase belum siap."
+        console.error(
+            "MERAMU: Supabase client tidak tersedia."
         );
 
-        console.error(
-            "MERAMU: supabaseClient tidak tersedia."
+        alert(
+            "Koneksi database belum siap. Silakan coba lagi."
         );
 
         return;
@@ -1908,7 +1912,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       FORM VALUES
+       GET FORM VALUES
     ===================================================== */
 
     const stage =
@@ -1980,7 +1984,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       VALIDATE NUMBERS
+       VALIDATE NUMERIC DATA
     ===================================================== */
 
     if(
@@ -2000,10 +2004,13 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       DATE / TIME
+       VALIDATE DATE / TIME
     ===================================================== */
 
-    if(!date || !time){
+    if(
+        !date ||
+        !time
+    ){
 
         alert(
             "Tanggal dan waktu wajib diisi."
@@ -2014,12 +2021,16 @@ function saveFermentationLog(event){
     }
 
 
+    /* =====================================================
+       MEASURED AT
+    ===================================================== */
+
     const measuredAt =
         `${date}T${time}:00`;
 
 
     /* =====================================================
-       BUTTON
+       SUBMIT BUTTON
     ===================================================== */
 
     const submitButton =
@@ -2056,17 +2067,25 @@ function saveFermentationLog(event){
 
 
     supabase
+
         .from("batches")
+
         .select(
             "id,batch_code"
         )
+
         .eq(
             "batch_code",
             batch.code
         )
+
         .maybeSingle()
 
         .then(function(batchResult){
+
+            /* =============================================
+               BATCH QUERY ERROR
+            ============================================= */
 
             if(batchResult.error){
 
@@ -2074,6 +2093,10 @@ function saveFermentationLog(event){
 
             }
 
+
+            /* =============================================
+               BATCH NOT FOUND
+            ============================================= */
 
             if(!batchResult.data){
 
@@ -2094,9 +2117,16 @@ function saveFermentationLog(event){
             );
 
 
-            /* =================================================
+            /* =============================================
                PAYLOAD
-            ================================================= */
+               
+               SESUAI STRUKTUR DATABASE:
+               
+               temperature_c
+               operator_name
+               qc_status
+               notes
+            ============================================= */
 
             const payload = {
 
@@ -2115,19 +2145,19 @@ function saveFermentationLog(event){
                 brix:
                     brix,
 
-                temperature:
+                temperature_c:
                     temperature,
 
                 volume:
                     volume,
 
-                operator:
+                operator_name:
                     operator,
 
-                qc:
+                qc_status:
                     qc,
 
-                note:
+                notes:
                     note || null
 
             };
@@ -2139,21 +2169,30 @@ function saveFermentationLog(event){
             );
 
 
-            /* =================================================
+            /* =============================================
                INSERT
-            ================================================= */
+            ============================================= */
 
             return supabase
+
                 .from(
                     "fermentation_logs"
                 )
+
                 .insert(
                     payload
                 )
+
                 .select("*")
+
                 .single();
 
         })
+
+
+        /* =================================================
+           INSERT RESULT
+        ================================================= */
 
         .then(function(logResult){
 
@@ -2170,23 +2209,23 @@ function saveFermentationLog(event){
             );
 
 
-            /* =================================================
+            /* =============================================
                CLOSE MODAL
-            ================================================= */
+            ============================================= */
 
             closeFermentationLogModal();
 
 
-            /* =================================================
+            /* =============================================
                RESET FORM
-            ================================================= */
+            ============================================= */
 
             resetFermentationLogForm();
 
 
-            /* =================================================
+            /* =============================================
                RELOAD LOG DARI SUPABASE
-            ================================================= */
+            ============================================= */
 
             if(
                 typeof window.initBatchFermentationLogs ===
@@ -2203,13 +2242,23 @@ function saveFermentationLog(event){
 
         })
 
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
         .then(function(){
 
             console.log(
-                "MERAMU: Fermentation Log selesai."
+                "MERAMU: Fermentation Log selesai diproses."
             );
 
         })
+
+
+        /* =================================================
+           ERROR
+        ================================================= */
 
         .catch(function(error){
 
@@ -2229,11 +2278,12 @@ function saveFermentationLog(event){
 
         })
 
-        .finally(function(){
 
-            /* =================================================
-               RESTORE BUTTON
-            ================================================= */
+        /* =================================================
+           RESTORE BUTTON
+        ================================================= */
+
+        .finally(function(){
 
             if(submitButton){
 
