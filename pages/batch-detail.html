@@ -1421,86 +1421,178 @@
                                 </div>
 
 
-                                <div class="form-grid-2">
+                                <!-- =========================================================
+                                     DECISION
+                                ========================================================== -->
 
-                            <!-- =========================================================
-                                 DECISION
-                            ========================================================= -->
-                            
-                            <div class="form-field">
-                            
-                                <label for="qcDecision">
-                                    Keputusan QC
-                                </label>
-                            
-                                <select
-                                    id="qcDecision"
-                                    required
+                                <div class="form-field">
+
+                                    <label for="qcDecision">
+                                        Keputusan QC
+                                    </label>
+
+                                    <select
+                                        id="qcDecision"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Pilih keputusan
+                                        </option>
+
+                                        <option value="passed">
+                                            PASS — Siap Lanjut
+                                        </option>
+
+                                        <option value="not_ready">
+                                            NOT READY — Perpanjang
+                                        </option>
+
+                                        <option value="hold">
+                                            HOLD — Tahan
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- =========================================================
+                                     EXTENSION
+                                ========================================================== -->
+
+                                <div
+                                    id="qcExtensionSection"
+                                    class="form-grid-2"
+                                    hidden
                                 >
-                            
-                                    <option value="">
-                                        Pilih keputusan
-                                    </option>
-                            
-                                    <option value="passed">
-                                        PASS — Siap Lanjut
-                                    </option>
-                            
-                                    <option value="not_ready">
-                                        NOT READY — Perpanjang
-                                    </option>
-                            
-                                    <option value="hold">
-                                        HOLD — Tahan
-                                    </option>
-                            
-                                </select>
-                            
-                            </div>
-                            
-                            
-                            <!-- =========================================================
-                                 EXTENSION
-                            ========================================================= -->
-                            
-                            <div
-                                id="qcExtensionSection"
-                                class="form-grid-2"
-                                hidden
-                            >
-                            
-                                <div class="form-field">
-                            
-                                    <label for="qcExtensionDays">
-                                        Tambahan Hari
-                                    </label>
-                            
-                                    <input
-                                        id="qcExtensionDays"
-                                        type="number"
-                                        min="1"
-                                        step="1"
-                                        placeholder="Contoh: 4"
-                                    >
-                            
+
+                                    <div class="form-field">
+
+                                        <label for="qcExtensionDays">
+                                            Tambahan Hari
+                                        </label>
+
+                                        <input
+                                            id="qcExtensionDays"
+                                            type="number"
+                                            min="1"
+                                            step="1"
+                                            placeholder="Contoh: 4"
+                                        >
+
+                                    </div>
+
+
+                                    <div class="form-field">
+
+                                        <label for="qcNextTargetDate">
+                                            Target Berikutnya
+                                        </label>
+
+                                        <input
+                                            id="qcNextTargetDate"
+                                            type="date"
+                                            readonly
+                                        >
+
+                                    </div>
+
                                 </div>
-                            
-                            
+
+
+                                <!-- =========================================================
+                                     OPERATOR
+                                ========================================================== -->
+
                                 <div class="form-field">
-                            
-                                    <label for="qcNextTargetDate">
-                                        Target Berikutnya
+
+                                    <label for="qcOperator">
+                                        Operator
                                     </label>
-                            
+
                                     <input
-                                        id="qcNextTargetDate"
-                                        type="date"
-                                        readonly
+                                        id="qcOperator"
+                                        type="text"
+                                        value="Arif"
+                                        placeholder="Nama operator"
                                     >
-                            
+
                                 </div>
-                            
-                            </div>
+
+
+                                <!-- =========================================================
+                                     ALASAN / TEMUAN
+                                ========================================================== -->
+
+                                <div class="form-field">
+
+                                    <label for="qcReason">
+                                        Alasan / Temuan QC
+                                    </label>
+
+                                    <textarea
+                                        id="qcReason"
+                                        rows="3"
+                                        placeholder="Contoh: pH masih tinggi, aroma belum matang..."
+                                    ></textarea>
+
+                                </div>
+
+
+                                <!-- =========================================================
+                                     CATATAN
+                                ========================================================== -->
+
+                                <div class="form-field">
+
+                                    <label for="qcNotes">
+                                        Catatan
+                                    </label>
+
+                                    <textarea
+                                        id="qcNotes"
+                                        rows="3"
+                                        placeholder="Catatan tambahan..."
+                                    ></textarea>
+
+                                </div>
+
+
+                                <!-- =========================================================
+                                     ACTIONS
+                                ========================================================== -->
+
+                                <div class="fermentation-log-form-actions">
+
+                                    <button
+                                        id="cancelQualityCheck"
+                                        class="page-btn secondary"
+                                        type="button"
+                                    >
+                                        Batal
+                                    </button>
+
+
+                                    <button
+                                        id="saveQualityCheck"
+                                        class="page-btn primary"
+                                        type="submit"
+                                    >
+
+                                        <i data-lucide="save"></i>
+
+                                        Simpan QC
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
 
 
                     <!-- =========================================================
