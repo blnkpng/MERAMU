@@ -1820,219 +1820,670 @@ if(operatorInput){
 }
 
 /* =========================================================
-SAVE FERMENTATION LOG
+   SAVE FERMENTATION LOG
+   Supabase Version
 ========================================================= */
 
 function saveFermentationLog(event){
 
-event.preventDefault();
+    /* =====================================================
+       PREVENT DEFAULT FORM SUBMIT
+    ===================================================== */
 
+    if(event){
+        event.preventDefault();
+    }
 
-const form =
-    document.getElementById(
-        "fermentationLogForm"
-    );
 
+    /* =====================================================
+       GET FORM
+    ===================================================== */
 
-if(!form){
+    const form =
+        document.getElementById(
+            "fermentationLogForm"
+        );
 
-    return;
 
-}
+    if(!form){
 
+        console.warn(
+            "MERAMU: Form fermentation log tidak ditemukan."
+        );
 
-if(!form.checkValidity()){
+        return;
 
-    form.reportValidity();
+    }
 
-    return;
 
-}
+    /* =====================================================
+       VALIDATE FORM
+    ===================================================== */
 
+    if(!form.checkValidity()){
 
-const batch =
-    getCurrentBatch();
+        form.reportValidity();
 
+        return;
 
-if(!batch){
+    }
 
-    return;
 
-}
+    /* =====================================================
+       GET CURRENT BATCH
+    ===================================================== */
 
+    const batch =
+        getCurrentBatch();
 
-if(!Array.isArray(
-    batch.fermentationLogs
-)){
 
-    batch.fermentationLogs = [];
+    if(!batch){
 
-}
+        alert(
+            "Batch tidak ditemukan."
+        );
 
+        return;
 
-/* -----------------------------------------------------
-   GET FORM VALUES
------------------------------------------------------ */
+    }
 
-const stage =
-    document.getElementById(
-        "logStage"
-    )?.value || "f2";
 
+    /* =====================================================
+       GET SUPABASE CLIENT
+    ===================================================== */
 
-const date =
-    document.getElementById(
-        "logDate"
-    )?.value || "";
+    const supabase =
+        window.supabaseClient;
 
 
-const time =
-    document.getElementById(
-        "logTime"
-    )?.value || "";
+    if(!supabase){
 
+        console.error(
+            "MERAMU: Supabase client belum tersedia."
+        );
 
-const ph =
-    document.getElementById(
-        "logPh"
-    )?.value || "";
+        alert(
+            "Koneksi database belum siap. Silakan tunggu sebentar lalu coba lagi."
+        );
 
+        return;
 
-const brix =
-    document.getElementById(
-        "logBrix"
-    )?.value || "";
+    }
 
 
-const temperature =
-    document.getElementById(
-        "logTemperature"
-    )?.value || "";
+    /* =====================================================
+       GET FORM VALUES
+    ===================================================== */
 
+    const stage =
+        document.getElementById(
+            "logStage"
+        )?.value || "f2";
 
-const volume =
-    document.getElementById(
-        "logVolume"
-    )?.value || "";
 
+    const date =
+        document.getElementById(
+            "logDate"
+        )?.value || "";
 
-const qc =
-    document.getElementById(
-        "logQc"
-    )?.value || "passed";
 
+    const time =
+        document.getElementById(
+            "logTime"
+        )?.value || "";
 
-const operator =
-    document.getElementById(
-        "logOperator"
-    )?.value.trim() || "Arif";
 
+    const phInput =
+        document.getElementById(
+            "logPh"
+        )?.value;
 
-const note =
-    document.getElementById(
-        "logNote"
-    )?.value.trim() || "";
 
+    const brixInput =
+        document.getElementById(
+            "logBrix"
+        )?.value;
 
-/* -----------------------------------------------------
-   CREATE LOG
------------------------------------------------------ */
 
-const newLog = {
+    const temperatureInput =
+        document.getElementById(
+            "logTemperature"
+        )?.value;
 
-    id:
-        Date.now(),
 
-    stage:
-        stage,
+    const volumeInput =
+        document.getElementById(
+            "logVolume"
+        )?.value;
 
-    date:
-        formatFermentationDate(
-            date
-        ),
 
-    time:
-        time,
+    const qc =
+        document.getElementById(
+            "logQc"
+        )?.value || "passed";
 
-    ph:
-        Number(ph)
-            .toFixed(2),
 
-    brix:
-        `${Number(brix).toFixed(1)}°`,
+    const operator =
+        document.getElementById(
+            "logOperator"
+        )?.value.trim() || "Arif";
 
-    temperature:
-        `${Number(temperature).toFixed(1)}°C`,
 
-    volume:
-        `${Number(volume).toFixed(1)} L`,
+    const note =
+        document.getElementById(
+            "logNote"
+        )?.value.trim() || "";
 
-    operator:
-        operator,
 
-    qc:
-        qc,
+    /* =====================================================
+       CONVERT NUMERIC VALUES
+    ===================================================== */
 
-    note:
-        note
+    const ph =
+        Number(phInput);
 
-};
 
+    const brix =
+        Number(brixInput);
 
-/* -----------------------------------------------------
-   ADD TO TOP
------------------------------------------------------ */
 
-batch.fermentationLogs.unshift(
-    newLog
-);
+    const temperature =
+        Number(temperatureInput);
 
 
-/* -----------------------------------------------------
-   UPDATE CURRENT METRICS
------------------------------------------------------ */
+    const volume =
+        Number(volumeInput);
 
-batch.ph =
-    newLog.ph;
 
+    /* =====================================================
+       VALIDATE NUMERIC VALUES
+    ===================================================== */
 
-batch.brix =
-    newLog.brix;
+    if(
+        !Number.isFinite(ph) ||
+        !Number.isFinite(brix) ||
+        !Number.isFinite(temperature) ||
+        !Number.isFinite(volume)
+    ){
 
+        alert(
+            "Nilai pH, Brix, suhu, dan volume harus berupa angka yang valid."
+        );
 
-batch.temperature =
-    newLog.temperature;
+        return;
 
+    }
 
-batch.volume =
-    newLog.volume;
 
+    if(volume <= 0){
 
-/* -----------------------------------------------------
-   RENDER AGAIN
------------------------------------------------------ */
+        alert(
+            "Volume harus lebih besar dari 0."
+        );
 
-renderBatchDetail();
+        return;
 
+    }
 
-/* -----------------------------------------------------
-   CLOSE MODAL
------------------------------------------------------ */
 
-closeFermentationLogModal();
+    /* =====================================================
+       VALIDATE DATE & TIME
+    ===================================================== */
 
+    if(
+        !date ||
+        !time
+    ){
 
-/* -----------------------------------------------------
-   RESET FORM
------------------------------------------------------ */
+        alert(
+            "Tanggal dan waktu pengukuran wajib diisi."
+        );
 
-resetFermentationLogForm();
+        return;
 
+    }
 
-console.log(
-    "MERAMU: Fermentation Log berhasil ditambahkan.",
-    newLog
-);
+
+    /* =====================================================
+       BUILD MEASURED AT
+    ===================================================== */
+
+    const measuredDate =
+        new Date(
+            `${date}T${time}:00`
+        );
+
+
+    if(
+        Number.isNaN(
+            measuredDate.getTime()
+        )
+    ){
+
+        alert(
+            "Tanggal atau waktu pengukuran tidak valid."
+        );
+
+        return;
+
+    }
+
+
+    const measuredAt =
+        measuredDate.toISOString();
+
+
+    /* =====================================================
+       GET REAL BATCH UUID
+       
+       batch.code = KB-022
+       batches.id = UUID
+
+       fermentation_logs.batch_id
+       membutuhkan UUID.
+    ===================================================== */
+
+    let batchUuid =
+        batch?.id ||
+        batch?.batch_id ||
+        null;
+
+
+    /* =====================================================
+       UUID VALIDATION
+    ===================================================== */
+
+    const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+
+    if(
+        !uuidPattern.test(
+            String(
+                batchUuid || ""
+            )
+        )
+    ){
+
+        batchUuid =
+            null;
+
+    }
+
+
+    /* =====================================================
+       LOOKUP BATCH UUID FROM SUPABASE
+    ===================================================== */
+
+    if(!batchUuid){
+
+        console.log(
+            "MERAMU: Mencari UUID batch:",
+            batch.code
+        );
+
+
+        const {
+            data: batchRow,
+            error: batchError
+        } =
+            await supabase
+                .from("batches")
+                .select(
+                    "id,batch_code"
+                )
+                .eq(
+                    "batch_code",
+                    batch.code
+                )
+                .maybeSingle();
+
+
+        if(batchError){
+
+            console.error(
+                "MERAMU: Gagal mencari UUID batch.",
+                batchError
+            );
+
+
+            alert(
+                `Gagal mencari batch ${batch.code} di database.\n\n${batchError.message || "Unknown error"}`
+            );
+
+
+            return;
+
+        }
+
+
+        if(!batchRow?.id){
+
+            alert(
+                `Batch ${batch.code} tidak ditemukan di database.`
+            );
+
+
+            return;
+
+        }
+
+
+        batchUuid =
+            batchRow.id;
+
+
+        console.log(
+            "MERAMU: UUID batch ditemukan:",
+            batchUuid
+        );
+
+    }
+
+
+    /* =====================================================
+       GET SUBMIT BUTTON
+    ===================================================== */
+
+    const submitButton =
+        form.querySelector(
+            'button[type="submit"]'
+        );
+
+
+    const originalSubmitText =
+        submitButton?.innerHTML ||
+        "Simpan Log";
+
+
+    /* =====================================================
+       PREVENT DOUBLE SUBMIT
+    ===================================================== */
+
+    if(submitButton){
+
+        submitButton.disabled =
+            true;
+
+
+        submitButton.innerHTML =
+            `
+                <span
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        gap:8px;
+                    "
+                >
+                    <span
+                        style="
+                            width:14px;
+                            height:14px;
+                            border:2px solid currentColor;
+                            border-right-color:transparent;
+                            border-radius:50%;
+                            display:inline-block;
+                            animation:meramuSpin .7s linear infinite;
+                        "
+                    ></span>
+
+                    Menyimpan...
+                </span>
+            `;
+
+    }
+
+
+    /* =====================================================
+       INSERT TO SUPABASE
+    ===================================================== */
+
+    try{
+
+        const payload = {
+
+            batch_id:
+                batchUuid,
+
+            stage:
+                stage,
+
+            measured_at:
+                measuredAt,
+
+            ph:
+                ph,
+
+            brix:
+                brix,
+
+            temperature:
+                temperature,
+
+            volume:
+                volume,
+
+            operator:
+                operator,
+
+            qc:
+                qc,
+
+            note:
+                note || null
+
+        };
+
+
+        console.log(
+            "MERAMU: INSERT fermentation_logs...",
+            payload
+        );
+
+
+        const {
+            data: insertedLog,
+            error: insertError
+        } =
+            await supabase
+                .from(
+                    "fermentation_logs"
+                )
+                .insert(
+                    payload
+                )
+                .select("*")
+                .single();
+
+
+        /* =================================================
+           HANDLE INSERT ERROR
+        ================================================= */
+
+        if(insertError){
+
+            console.error(
+                "MERAMU: Gagal INSERT fermentation log.",
+                insertError
+            );
+
+
+            alert(
+                `Fermentation Log gagal disimpan.\n\n${insertError.message || "Unknown error"}`
+            );
+
+
+            return;
+
+        }
+
+
+        /* =================================================
+           INSERT SUCCESS
+        ================================================= */
+
+        console.log(
+            "MERAMU: Fermentation Log berhasil disimpan.",
+            insertedLog
+        );
+
+
+        /* =================================================
+           CLOSE MODAL
+        ================================================= */
+
+        closeFermentationLogModal();
+
+
+        /* =================================================
+           RESET FORM
+        ================================================= */
+
+        resetFermentationLogForm();
+
+
+        /* =================================================
+           RELOAD FROM SUPABASE
+           
+           Jangan hanya menggunakan data lokal.
+           Database menjadi sumber data utama.
+        ================================================= */
+
+        if(
+            typeof window.initBatchFermentationLogs ===
+            "function"
+        ){
+
+            await
+                window.initBatchFermentationLogs();
+
+        }
+        else{
+
+            /* =================================================
+               FALLBACK
+            ================================================= */
+
+            const newLog = {
+
+                id:
+                    insertedLog?.id ||
+                    Date.now(),
+
+                stage:
+                    insertedLog?.stage ||
+                    stage,
+
+                date:
+                    formatFermentationDate(
+                        date
+                    ),
+
+                time:
+                    time,
+
+                ph:
+                    Number(ph)
+                        .toFixed(2),
+
+                brix:
+                    `${Number(brix).toFixed(1)}°`,
+
+                temperature:
+                    `${Number(temperature).toFixed(1)}°C`,
+
+                volume:
+                    `${Number(volume).toFixed(1)} L`,
+
+                operator:
+                    operator,
+
+                qc:
+                    qc,
+
+                note:
+                    note
+
+            };
+
+
+            if(
+                !Array.isArray(
+                    batch.fermentationLogs
+                )
+            ){
+
+                batch.fermentationLogs = [];
+
+            }
+
+
+            batch.fermentationLogs.unshift(
+                newLog
+            );
+
+
+            batch.ph =
+                newLog.ph;
+
+
+            batch.brix =
+                newLog.brix;
+
+
+            batch.temperature =
+                newLog.temperature;
+
+
+            batch.volume =
+                newLog.volume;
+
+
+            renderBatchDetail();
+
+        }
+
+
+        /* =================================================
+           SUCCESS MESSAGE
+        ================================================= */
+
+        console.log(
+            "MERAMU: Fermentation Log selesai diproses."
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU: Exception saat menyimpan fermentation log.",
+            error
+        );
+
+
+        alert(
+            `Terjadi error saat menyimpan Fermentation Log.\n\n${error?.message || error}`
+        );
+
+    }
+    finally{
+
+        /* =================================================
+           RESTORE SUBMIT BUTTON
+        ================================================= */
+
+        if(submitButton){
+
+            submitButton.disabled =
+                false;
+
+
+            submitButton.innerHTML =
+                originalSubmitText;
+
+        }
+
+    }
 
 }
 
