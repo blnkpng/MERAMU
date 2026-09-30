@@ -640,103 +640,129 @@
 
 
     /* =====================================================
-       APPLY LOGS TO BATCH
-    ===================================================== */
+   APPLY LOGS TO BATCH
+   Fermentation Log hanya memperbarui:
+   - fermentationLogs
+   - pH
+   - Brix
+   - Temperature
 
-    function applyLogsToBatch(
-        batchCode,
-        logs
+   TIDAK mengubah batch.volume.
+   Volume utama batch berasal dari:
+   public.batches.actual_volume / planned_volume
+===================================================== */
+
+function applyLogsToBatch(
+    batchCode,
+    logs
+){
+
+    if(
+        typeof batchDetailData ===
+        "undefined"
     ){
 
-        if(
-            typeof batchDetailData ===
-            "undefined"
-        ){
-
-            console.warn(
-                "MERAMU Logs: batchDetailData belum tersedia."
-            );
-
-            return;
-
-        }
-
-
-        const batch =
-            batchDetailData[
-                batchCode
-            ];
-
-
-        if(!batch){
-
-            console.warn(
-                `MERAMU Logs: Data lokal ${batchCode} tidak ditemukan.`
-            );
-
-            return;
-
-        }
-
-
-        batch.fermentationLogs =
-            logs;
-
-
-        /* -------------------------------------------------
-           LOG TERBARU
-        ------------------------------------------------- */
-
-        const latest =
-            logs[0];
-
-
-        if(latest){
-
-            batch.ph =
-                latest.ph;
-
-            batch.brix =
-                latest.brix;
-
-            batch.temperature =
-                latest.temperature;
-
-            if(
-                latest.volume &&
-                latest.volume !== "—"
-            ){
-
-                batch.volume =
-                    latest.volume;
-
-            }
-
-        }
-
-
-        console.log(
-            `✅ MERAMU: ${logs.length} fermentation log ${batchCode} berhasil diambil.`,
-            logs
+        console.warn(
+            "MERAMU Logs: batchDetailData belum tersedia."
         );
 
-
-        /* -------------------------------------------------
-           RENDER BATCH DETAIL
-        ------------------------------------------------- */
-
-        if(
-            typeof window.renderBatchDetail ===
-            "function"
-        ){
-
-            window.renderBatchDetail();
-
-        }
+        return;
 
     }
 
 
+    const batch =
+        batchDetailData[
+            batchCode
+        ];
+
+
+    if(!batch){
+
+        console.warn(
+            `MERAMU Logs: Data lokal ${batchCode} tidak ditemukan.`
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       SIMPAN SELURUH LOG
+    ===================================================== */
+
+    batch.fermentationLogs =
+        logs;
+
+
+    /* =====================================================
+       LOG TERBARU
+       
+       Hanya parameter fermentasi:
+       - pH
+       - Brix
+       - Temperature
+
+       Volume TIDAK disentuh.
+    ===================================================== */
+
+    const latest =
+        logs[0];
+
+
+    if(latest){
+
+        batch.ph =
+            latest.ph;
+
+        batch.brix =
+            latest.brix;
+
+        batch.temperature =
+            latest.temperature;
+
+    }
+
+
+    /* =====================================================
+       PENTING
+       
+       JANGAN melakukan:
+       
+       batch.volume = latest.volume;
+       
+       Karena volume log adalah hasil pengukuran
+       pada waktu tertentu, bukan volume utama batch.
+       
+       Volume utama berasal dari:
+       
+       batches.actual_volume
+       atau
+       batches.planned_volume
+    ===================================================== */
+
+
+    console.log(
+        `✅ MERAMU: ${logs.length} fermentation log ${batchCode} berhasil diambil.`,
+        logs
+    );
+
+
+    /* =====================================================
+       RENDER BATCH DETAIL
+    ===================================================== */
+
+    if(
+        typeof window.renderBatchDetail ===
+        "function"
+    ){
+
+        window.renderBatchDetail();
+
+    }
+
+}
     /* =====================================================
        LOAD FERMENTATION LOGS
     ===================================================== */
