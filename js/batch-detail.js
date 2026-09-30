@@ -3027,7 +3027,7 @@ function saveEditBatch(event){
     if(!stage){
 
         alert(
-            "Stage wajib dipilih."
+            "Current Stage wajib dipilih."
         );
 
         return;
@@ -3042,10 +3042,10 @@ function saveEditBatch(event){
 
 
     /* =====================================================
-       CALCULATE STATUS
+       STATUS
     ===================================================== */
 
-    let status = "";
+    let status;
 
 
     if(
@@ -3083,66 +3083,53 @@ function saveEditBatch(event){
         status =
             `${getStageLabel(
                 normalizedStage
-            )
-            .replace(
+            ).replace(
                 " Fermentasi",
                 ""
-            )
-            .toUpperCase()} ACTIVE`;
+            ).toUpperCase()} ACTIVE`;
 
     }
 
 
     /* =====================================================
-       CALCULATE PROGRESS
+       PROGRESS
     ===================================================== */
 
     let progress =
-        batch.progress || 0;
+        Number(
+            batch.progress
+        ) || 0;
+
+
+    const stageProgress = {
+
+        production: 10,
+
+        f1: 50,
+
+        f2: 80,
+
+        harvest: 100,
+
+        bottling: 90,
+
+        label: 95,
+
+        finished: 100
+
+    };
 
 
     if(
-        normalizedStage ===
-        "harvest"
-        ||
-        normalizedStage ===
-        "finished"
+        stageProgress[
+            normalizedStage
+        ] !== undefined
     ){
 
         progress =
-            100;
-
-    }
-
-    else{
-
-        const stageProgress = {
-
-            production: 10,
-
-            f1: 50,
-
-            f2: 80,
-
-            bottling: 90,
-
-            label: 95
-
-        };
-
-
-        if(
             stageProgress[
                 normalizedStage
-            ] !== undefined
-        ){
-
-            progress =
-                stageProgress[
-                    normalizedStage
-                ];
-
-        }
+            ];
 
     }
 
@@ -3202,7 +3189,7 @@ function saveEditBatch(event){
         .then(function(productResult){
 
             /* =============================================
-               PRODUCT QUERY ERROR
+               PRODUCT ERROR
             ============================================= */
 
             if(productResult.error){
@@ -3236,62 +3223,116 @@ function saveEditBatch(event){
 
 
             /* =============================================
-               UPDATE PAYLOAD
+               FIND BATCH UUID
+               
+               JANGAN PAKAI batch.id
+               KARENA DATA FRONTEND TIDAK MEMILIKINYA.
             ============================================= */
 
-            const payload = {
-
-                product_id:
-                    productId,
-
-                target_date:
-                    targetDate,
-
-                planned_volume:
-                    Number(volume),
-
-                current_stage:
-                    normalizedStage,
-
-                status:
-                    status,
-
-                notes:
-                    note || null
-
-            };
-
-
             console.log(
-                "MERAMU: UPDATE batch:",
-                payload
+                "MERAMU: Mencari batch UUID:",
+                batch.code
             );
 
 
-            /* =============================================
-               UPDATE BATCH
-            ============================================= */
-
             return supabase
 
-                .from(
-                    "batches"
-                )
+                .from("batches")
 
-                .update(
-                    payload
+                .select(
+                    "id,batch_code"
                 )
 
                 .eq(
-                    "id",
-                    batch.id
+                    "batch_code",
+                    batch.code
                 )
 
-                .select(
-                    "*"
-                )
+                .maybeSingle()
 
-                .single();
+                .then(function(batchResult){
+
+                    if(batchResult.error){
+
+                        throw batchResult.error;
+
+                    }
+
+
+                    if(!batchResult.data){
+
+                        throw new Error(
+                            `Batch ${batch.code} tidak ditemukan di Supabase.`
+                        );
+
+                    }
+
+
+                    const batchUuid =
+                        batchResult.data.id;
+
+
+                    console.log(
+                        "MERAMU: Batch UUID:",
+                        batchUuid
+                    );
+
+
+                    /* =====================================
+                       UPDATE PAYLOAD
+                    ===================================== */
+
+                    const payload = {
+
+                        product_id:
+                            productId,
+
+                        target_date:
+                            targetDate,
+
+                        planned_volume:
+                            Number(volume),
+
+                        current_stage:
+                            normalizedStage,
+
+                        status:
+                            status,
+
+                        notes:
+                            note || null
+
+                    };
+
+
+                    console.log(
+                        "MERAMU: UPDATE batch:",
+                        payload
+                    );
+
+
+                    /* =====================================
+                       UPDATE SUPABASE
+                    ===================================== */
+
+                    return supabase
+
+                        .from("batches")
+
+                        .update(
+                            payload
+                        )
+
+                        .eq(
+                            "id",
+                            batchUuid
+                        )
+
+                        .select("*")
+
+                        .single();
+
+                });
 
         })
 
@@ -3317,7 +3358,6 @@ function saveEditBatch(event){
 
             /* =================================================
                UPDATE LOCAL DATA
-               Supaya UI langsung berubah
             ================================================= */
 
             batch.product =
@@ -3355,6 +3395,10 @@ function saveEditBatch(event){
             batch.progress =
                 progress;
 
+
+            /* =================================================
+               UPDATE DAY
+            ================================================= */
 
             if(
                 normalizedStage ===
@@ -3402,7 +3446,7 @@ function saveEditBatch(event){
 
 
             console.log(
-                "MERAMU: Edit Batch selesai.",
+                "MERAMU: Edit Batch berhasil.",
                 batch
             );
 
