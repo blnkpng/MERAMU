@@ -1,6 +1,6 @@
 /* =========================================================
    MERAMU BATCH QUALITY CHECK
-   Supabase -> public.quality_checks
+   QC + EXTENSION
 ========================================================= */
 
 (function(){
@@ -9,20 +9,28 @@
 
 
     /* =====================================================
+       CONFIG
+    ===================================================== */
+
+    const DEFAULT_BATCH_CODE = "KB-022";
+
+
+    /* =====================================================
        GET BATCH CODE
     ===================================================== */
 
     function getBatchCode(){
 
-        const params = new URLSearchParams(
-            window.location.search
-        );
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
         return (
             params.get("id") ||
             params.get("batch") ||
-            "KB-022"
-        ).trim();
+            DEFAULT_BATCH_CODE
+        );
 
     }
 
@@ -31,32 +39,50 @@
        WAIT FOR SUPABASE
     ===================================================== */
 
-    function waitForSupabase(callback, attempt = 0){
+    function waitForSupabase(
+        maxAttempts = 100
+    ){
 
-        if(window.supabaseClient){
+        return new Promise(
+            resolve => {
 
-            callback(window.supabaseClient);
-            return;
+                let attempts = 0;
 
-        }
+                const timer =
+                    setInterval(
+                        () => {
 
-        if(attempt >= 50){
+                            attempts++;
 
-            console.error(
-                "MERAMU QC: Supabase client tidak ditemukan."
-            );
+                            if(
+                                window.supabaseClient
+                            ){
 
-            alert(
-                "Supabase belum siap. Silakan refresh halaman."
-            );
+                                clearInterval(timer);
 
-            return;
+                                resolve(
+                                    window.supabaseClient
+                                );
 
-        }
+                                return;
 
-        setTimeout(
-            () => waitForSupabase(callback, attempt + 1),
-            100
+                            }
+
+                            if(
+                                attempts >= maxAttempts
+                            ){
+
+                                clearInterval(timer);
+
+                                resolve(null);
+
+                            }
+
+                        },
+                        100
+                    );
+
+            }
         );
 
     }
@@ -74,7 +100,7 @@
 
 
     /* =====================================================
-       DEFAULT DATE TIME
+       DATE TIME DEFAULT
     ===================================================== */
 
     function setDefaultDateTime(){
@@ -82,93 +108,101 @@
         const input =
             getElement("qcCheckedAt");
 
-        if(!input) return;
+        if(!input){
 
-        const now = new Date();
+            return;
 
-        const local = new Date(
-            now.getTime() -
-            now.getTimezoneOffset() * 60000
-        );
+        }
+
+        const now =
+            new Date();
+
+        const offset =
+            now.getTimezoneOffset();
+
+        const local =
+            new Date(
+                now.getTime() -
+                offset * 60000
+            );
 
         input.value =
-            local.toISOString().slice(0,16);
+            local
+                .toISOString()
+                .slice(0,16);
 
     }
 
 
     /* =====================================================
-       DEFAULT DATA FROM BATCH
+       DEFAULT FORM
     ===================================================== */
 
-    function setDefaultFromBatch(){
-
-        const batchCode =
-            getBatchCode();
-
-        const batch =
-            window.batchDetailData &&
-            window.batchDetailData[batchCode];
-
-        if(!batch) return;
-
-
-        /* ================================================
-           STAGE
-        ================================================= */
+    function setDefaultFormValues(){
 
         const stage =
             getElement("qcStage");
 
-        if(stage && batch.stage){
-
-            let normalized =
-                String(batch.stage)
-                    .toLowerCase()
-                    .trim();
-
-            normalized =
-                normalized
-                    .replace(" fermentasi","")
-                    .replace("fermentasi","")
-                    .trim();
-
-            const validStages = [
-                "production",
-                "f1",
-                "f2",
-                "harvest",
-                "bottling",
-                "finished"
-            ];
-
-            if(
-                validStages.includes(normalized)
-            ){
-
-                stage.value =
-                    normalized;
-
-            }
-
-        }
-
-
-        /* ================================================
-           OPERATOR
-        ================================================= */
+        const decision =
+            getElement("qcDecision");
 
         const operator =
             getElement("qcOperator");
 
-        if(
-            operator &&
-            batch.operator &&
-            !operator.value.trim()
-        ){
+        const extensionSection =
+            getElement(
+                "qcExtensionSection"
+            );
+
+        const extensionDays =
+            getElement(
+                "qcExtensionDays"
+            );
+
+        const nextTarget =
+            getElement(
+                "qcNextTargetDate"
+            );
+
+
+        if(stage){
+
+            stage.value = "f2";
+
+        }
+
+        if(decision){
+
+            decision.value =
+                "passed";
+
+        }
+
+        if(operator){
 
             operator.value =
-                batch.operator;
+                "Arif";
+
+        }
+
+        if(extensionSection){
+
+            extensionSection.hidden =
+                true;
+
+        }
+
+        if(extensionDays){
+
+            extensionDays.value =
+                "";
+
+        }
+
+        if(nextTarget){
+
+            nextTarget.value =
+                "";
 
         }
 
@@ -182,15 +216,19 @@
     function openQualityCheck(){
 
         const modal =
-            getElement("qualityCheckModal");
+            getElement(
+                "qualityCheckModal"
+            );
 
-        if(!modal) return;
+        if(!modal){
 
+            console.warn(
+                "MERAMU: qualityCheckModal tidak ditemukan."
+            );
 
-        setDefaultDateTime();
+            return;
 
-        setDefaultFromBatch();
-
+        }
 
         modal.hidden = false;
 
@@ -199,11 +237,9 @@
             "false"
         );
 
+        setDefaultDateTime();
 
-        document.body.classList.add(
-            "modal-open"
-        );
-
+        setDefaultFormValues();
 
         if(window.lucide){
 
@@ -221,10 +257,15 @@
     function closeQualityCheck(){
 
         const modal =
-            getElement("qualityCheckModal");
+            getElement(
+                "qualityCheckModal"
+            );
 
-        if(!modal) return;
+        if(!modal){
 
+            return;
+
+        }
 
         modal.hidden = true;
 
@@ -233,10 +274,191 @@
             "true"
         );
 
+    }
 
-        document.body.classList.remove(
-            "modal-open"
+
+    /* =====================================================
+       SHOW / HIDE EXTENSION
+    ===================================================== */
+
+    function updateExtensionVisibility(){
+
+        const decision =
+            getElement(
+                "qcDecision"
+            );
+
+        const section =
+            getElement(
+                "qcExtensionSection"
+            );
+
+        const extensionDays =
+            getElement(
+                "qcExtensionDays"
+            );
+
+        const nextTarget =
+            getElement(
+                "qcNextTargetDate"
+            );
+
+
+        if(
+            !decision ||
+            !section
+        ){
+
+            return;
+
+        }
+
+
+        const isNotReady =
+            decision.value ===
+            "not_ready";
+
+
+        section.hidden =
+            !isNotReady;
+
+
+        if(
+            extensionDays
+        ){
+
+            extensionDays.required =
+                isNotReady;
+
+            if(!isNotReady){
+
+                extensionDays.value =
+                    "";
+
+            }
+
+        }
+
+
+        if(
+            nextTarget
+        ){
+
+            nextTarget.required =
+                false;
+
+            if(!isNotReady){
+
+                nextTarget.value =
+                    "";
+
+            }
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DATE ADD DAYS
+    ===================================================== */
+
+    function addDaysToDate(
+        dateString,
+        days
+    ){
+
+        if(
+            !dateString ||
+            !Number.isFinite(days)
+        ){
+
+            return "";
+
+        }
+
+        const date =
+            new Date(
+                `${dateString}T00:00:00`
+            );
+
+        if(
+            Number.isNaN(
+                date.getTime()
+            )
+        ){
+
+            return "";
+
+        }
+
+        date.setDate(
+            date.getDate() + days
         );
+
+        return [
+            date.getFullYear(),
+            String(
+                date.getMonth() + 1
+            ).padStart(2,"0"),
+            String(
+                date.getDate()
+            ).padStart(2,"0")
+        ].join("-");
+
+    }
+
+
+    /* =====================================================
+       GET CURRENT BATCH
+    ===================================================== */
+
+    async function getCurrentBatch(
+        supabase,
+        batchCode
+    ){
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from("batches")
+            .select(`
+                id,
+                batch_code,
+                original_target_date,
+                target_date,
+                status
+            `)
+            .eq(
+                "batch_code",
+                batchCode
+            )
+            .maybeSingle();
+
+
+        if(error){
+
+            console.error(
+                "MERAMU: Gagal mengambil batch.",
+                error
+            );
+
+            throw error;
+
+        }
+
+
+        if(!data){
+
+            throw new Error(
+                `Batch ${batchCode} tidak ditemukan.`
+            );
+
+        }
+
+
+        return data;
 
     }
 
@@ -250,12 +472,14 @@
         const element =
             getElement(id);
 
-        if(!element) return null;
+        if(!element){
 
+            return null;
+
+        }
 
         const value =
             element.value.trim();
-
 
         if(value === ""){
 
@@ -263,19 +487,12 @@
 
         }
 
-
         const number =
             Number(value);
 
-
-        if(!Number.isFinite(number)){
-
-            return null;
-
-        }
-
-
-        return number;
+        return Number.isFinite(number)
+            ? number
+            : null;
 
     }
 
@@ -284,38 +501,142 @@
        SAVE QUALITY CHECK
     ===================================================== */
 
-    async function saveQualityCheck(event){
+    async function saveQualityCheck(
+        event
+    ){
 
-        event.preventDefault();
+        if(event){
+
+            event.preventDefault();
+
+        }
 
 
         const form =
-            getElement("qualityCheckForm");
+            getElement(
+                "qualityCheckForm"
+            );
 
-        if(!form) return;
+        const saveButton =
+            getElement(
+                "saveQualityCheck"
+            );
+
+        const batchCode =
+            getBatchCode();
 
 
-        if(!form.checkValidity()){
+        const supabase =
+            await waitForSupabase();
 
-            form.reportValidity();
+
+        if(!supabase){
+
+            alert(
+                "Supabase belum siap."
+            );
 
             return;
 
         }
 
 
-        const saveButton =
-            getElement("saveQualityCheck");
+        /* -----------------------------------------
+           FORM VALUES
+        ----------------------------------------- */
 
+        const decision =
+            getElement(
+                "qcDecision"
+            )?.value || "";
+
+
+        const stage =
+            getElement(
+                "qcStage"
+            )?.value || "";
+
+
+        const checkedAt =
+            getElement(
+                "qcCheckedAt"
+            )?.value || "";
+
+
+        const extensionDays =
+            getOptionalNumber(
+                "qcExtensionDays"
+            );
+
+
+        /* -----------------------------------------
+           VALIDATION
+        ----------------------------------------- */
+
+        if(!decision){
+
+            alert(
+                "Pilih keputusan QC terlebih dahulu."
+            );
+
+            return;
+
+        }
+
+
+        if(!checkedAt){
+
+            alert(
+                "Tanggal dan waktu QC wajib diisi."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            decision === "not_ready" &&
+            (
+                extensionDays === null ||
+                extensionDays <= 0
+            )
+        ){
+
+            alert(
+                "Untuk NOT READY, isi tambahan hari lebih dari 0."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            decision !== "not_ready" &&
+            extensionDays !== null
+        ){
+
+            console.warn(
+                "MERAMU: Extension diabaikan karena keputusan bukan NOT READY."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           BUTTON STATE
+        ----------------------------------------- */
 
         if(saveButton){
 
-            saveButton.disabled = true;
+            saveButton.disabled =
+                true;
 
             saveButton.dataset.originalText =
-                saveButton.textContent.trim();
+                saveButton.innerHTML;
 
-            saveButton.textContent =
+            saveButton.innerHTML =
                 "Menyimpan...";
 
         }
@@ -323,121 +644,74 @@
 
         try{
 
-            /* =============================================
-               WAIT SUPABASE
-            ============================================== */
+            /* -------------------------------------
+               GET BATCH
+            ------------------------------------- */
 
-            const supabase =
-                await new Promise(
-                    resolve => {
-
-                        waitForSupabase(
-                            resolve
-                        );
-
-                    }
-                );
-
-
-            if(!supabase){
-
-                throw new Error(
-                    "Supabase client belum tersedia."
-                );
-
-            }
-
-
-            /* =============================================
-               BATCH CODE
-            ============================================== */
-
-            const batchCode =
-                getBatchCode();
-
-
-            console.log(
-                "MERAMU QC: Mencari batch",
-                batchCode
-            );
-
-
-            /* =============================================
-               FIND BATCH UUID
-            ============================================== */
-
-            const {
-                data: batch,
-                error: batchError
-            } = await supabase
-
-                .from("batches")
-
-                .select(
-                    "id,batch_code"
-                )
-
-                .eq(
-                    "batch_code",
+            const batch =
+                await getCurrentBatch(
+                    supabase,
                     batchCode
-                )
-
-                .maybeSingle();
-
-
-            if(batchError){
-
-                throw batchError;
-
-            }
-
-
-            if(!batch){
-
-                throw new Error(
-                    `Batch ${batchCode} tidak ditemukan di Supabase.`
                 );
 
+
+            /* -------------------------------------
+               CALCULATE NEXT TARGET
+            ------------------------------------- */
+
+            let nextTargetDate =
+                null;
+
+
+            if(
+                decision === "not_ready"
+            ){
+
+                nextTargetDate =
+                    addDaysToDate(
+                        batch.target_date,
+                        extensionDays
+                    );
+
+
+                if(!nextTargetDate){
+
+                    throw new Error(
+                        "Target date batch tidak valid."
+                    );
+
+                }
+
+
+                const nextTargetInput =
+                    getElement(
+                        "qcNextTargetDate"
+                    );
+
+
+                if(nextTargetInput){
+
+                    nextTargetInput.value =
+                        nextTargetDate;
+
+                }
+
             }
 
 
-            console.log(
-                "MERAMU QC: Batch ditemukan",
-                batch
-            );
-
-
-            /* =============================================
+            /* -------------------------------------
                CHECKED AT
-            ============================================== */
+            ------------------------------------- */
 
-            const checkedAt =
-                getElement(
-                    "qcCheckedAt"
-                ).value;
-
-
-            let checkedAtIso;
+            const checkedAtIso =
+                new Date(
+                    checkedAt
+                ).toISOString();
 
 
-            if(checkedAt){
-
-                checkedAtIso =
-                    new Date(
-                        checkedAt
-                    ).toISOString();
-
-            }else{
-
-                checkedAtIso =
-                    new Date().toISOString();
-
-            }
-
-
-            /* =============================================
-               BUILD PAYLOAD
-            ============================================== */
+            /* -------------------------------------
+               QC PAYLOAD
+            ------------------------------------- */
 
             const payload = {
 
@@ -448,9 +722,7 @@
                     checkedAtIso,
 
                 stage:
-                    getElement(
-                        "qcStage"
-                    ).value,
+                    stage,
 
                 ph:
                     getOptionalNumber(
@@ -475,171 +747,168 @@
                 aroma:
                     getElement(
                         "qcAroma"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
 
                 taste:
                     getElement(
                         "qcTaste"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
 
                 color:
                     getElement(
                         "qcColor"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
 
                 carbonation:
                     getElement(
                         "qcCarbonation"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
 
                 scoby_condition:
                     getElement(
-                        "qcScobyCondition"
-                    )?.value?.trim() || null,
+                        "qcScoby"
+                    )?.value.trim() || null,
 
                 decision:
-                    getElement(
-                        "qcDecision"
-                    ).value,
+                    decision,
 
                 reason:
                     getElement(
                         "qcReason"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
+
+                extension_days:
+                    decision === "not_ready"
+                        ? extensionDays
+                        : null,
+
+                next_target_date:
+                    decision === "not_ready"
+                        ? nextTargetDate
+                        : null,
 
                 operator_name:
                     getElement(
                         "qcOperator"
-                    )?.value?.trim() || null,
+                    )?.value.trim() || null,
 
                 notes:
                     getElement(
                         "qcNotes"
-                    )?.value?.trim() || null
+                    )?.value.trim() || null
 
             };
 
 
-            console.log(
-                "MERAMU QC: Payload",
-                payload
-            );
-
-
-            /* =============================================
-               INSERT TO SUPABASE
-            ============================================== */
+            /* -------------------------------------
+               INSERT QC
+            ------------------------------------- */
 
             const {
-                data,
-                error
+                data: qualityCheck,
+                error: qualityError
             } = await supabase
-
                 .from(
                     "quality_checks"
                 )
-
                 .insert(
                     payload
                 )
-
                 .select()
-
                 .single();
 
 
-            if(error){
+            if(qualityError){
 
-                throw error;
+                throw qualityError;
 
             }
 
 
-            console.log(
-                "MERAMU QC: Quality Check berhasil disimpan.",
-                data
-            );
+            /* -------------------------------------
+               EXTEND BATCH
+            ------------------------------------- */
+
+            if(
+                decision === "not_ready"
+            ){
+
+                const {
+                    data: extendedBatch,
+                    error: extensionError
+                } = await supabase
+                    .rpc(
+                        "extend_meramu_batch",
+                        {
+                            p_batch_id:
+                                batch.id,
+
+                            p_extension_days:
+                                extensionDays
+                        }
+                    );
 
 
-            /* =============================================
-               CLOSE MODAL
-            ============================================== */
+                if(extensionError){
 
-            closeQualityCheck();
+                    console.error(
+                        "MERAMU: QC tersimpan tetapi extension gagal.",
+                        extensionError
+                    );
 
+                    throw new Error(
+                        `QC berhasil disimpan, tetapi target batch gagal diperpanjang: ${extensionError.message}`
+                    );
 
-            /* =============================================
-               RESET FORM
-            ============================================== */
-
-            form.reset();
-
-
-            setDefaultDateTime();
+                }
 
 
-            const stage =
-                getElement(
-                    "qcStage"
+                console.log(
+                    "MERAMU: Batch berhasil diperpanjang.",
+                    extendedBatch
                 );
 
-            if(stage){
-
-                stage.value = "f2";
-
             }
 
 
-            const decision =
-                getElement(
-                    "qcDecision"
-                );
-
-            if(decision){
-
-                decision.value = "passed";
-
-            }
-
-
-            const operator =
-                getElement(
-                    "qcOperator"
-                );
-
-            if(operator){
-
-                operator.value =
-                    "Arif";
-
-            }
-
-
-            /* =============================================
-               CUSTOM EVENT
-            ============================================== */
+            /* -------------------------------------
+               EVENT
+            ------------------------------------- */
 
             document.dispatchEvent(
                 new CustomEvent(
                     "meramu:quality-check-saved",
                     {
                         detail: {
-                            batchCode,
-                            data
+                            batchCode:
+                                batchCode,
+
+                            qualityCheck:
+                                qualityCheck,
+
+                            decision:
+                                decision,
+
+                            extensionDays:
+                                extensionDays,
+
+                            nextTargetDate:
+                                nextTargetDate
                         }
                     }
                 )
             );
 
 
-            /* =============================================
+            /* -------------------------------------
                REALTIME REFRESH
-            ============================================== */
+            ------------------------------------- */
 
             if(
                 window.MERAMURealtime &&
-                typeof window.MERAMURealtime.refresh ===
-                    "function"
+                typeof
+                window.MERAMURealtime.refresh ===
+                "function"
             ){
 
                 window.MERAMURealtime.refresh();
@@ -647,37 +916,92 @@
             }
 
 
-            alert(
-                `QC Check ${batchCode} berhasil disimpan.`
+            /* -------------------------------------
+               RESET
+            ------------------------------------- */
+
+            if(form){
+
+                form.reset();
+
+            }
+
+
+            setDefaultDateTime();
+
+            setDefaultFormValues();
+
+
+            /* -------------------------------------
+               CLOSE
+            ------------------------------------- */
+
+            closeQualityCheck();
+
+
+            /* -------------------------------------
+               SUCCESS
+            ------------------------------------- */
+
+            if(
+                decision === "not_ready"
+            ){
+
+                alert(
+                    `QC ${batchCode} berhasil disimpan.\n\n` +
+                    `Extension: +${extensionDays} hari\n` +
+                    `Target berikutnya: ${nextTargetDate}`
+                );
+
+            }else{
+
+                alert(
+                    `QC ${batchCode} berhasil disimpan.`
+                );
+
+            }
+
+
+            console.log(
+                "MERAMU: QC berhasil disimpan.",
+                qualityCheck
             );
 
-
-        }catch(error){
+        }
+        catch(error){
 
             console.error(
-                "MERAMU QC: Gagal menyimpan Quality Check.",
+                "MERAMU: QC gagal disimpan.",
                 error
             );
 
 
             alert(
-                "QC Check gagal disimpan.\n\n" +
-                (
-                    error?.message ||
-                    "Unknown error"
-                )
+                `QC gagal disimpan.\n\n${error.message || error}`
             );
 
-
-        }finally{
+        }
+        finally{
 
             if(saveButton){
 
-                saveButton.disabled = false;
+                saveButton.disabled =
+                    false;
 
-                saveButton.textContent =
-                    saveButton.dataset.originalText ||
-                    "Simpan QC";
+                if(
+                    saveButton.dataset.originalText
+                ){
+
+                    saveButton.innerHTML =
+                        saveButton.dataset.originalText;
+
+                }
+
+            }
+
+            if(window.lucide){
+
+                lucide.createIcons();
 
             }
 
@@ -687,288 +1011,313 @@
 
 
     /* =====================================================
-       RESET FORM
+       EVENTS
     ===================================================== */
 
-    function resetQualityCheckForm(){
+    document.addEventListener(
+        "click",
+        event => {
 
-        const form =
-            getElement(
-                "qualityCheckForm"
-            );
+            const addButton =
+                event.target.closest(
+                    "#addQualityCheck"
+                );
 
-        if(!form) return;
+            if(addButton){
+
+                event.preventDefault();
+
+                openQualityCheck();
+
+                return;
+
+            }
 
 
-        form.reset();
+            const closeButton =
+                event.target.closest(
+                    "#closeQualityCheck"
+                );
+
+            if(closeButton){
+
+                event.preventDefault();
+
+                closeQualityCheck();
+
+                return;
+
+            }
 
 
-        setDefaultDateTime();
+            const cancelButton =
+                event.target.closest(
+                    "#cancelQualityCheck"
+                );
+
+            if(cancelButton){
+
+                event.preventDefault();
+
+                closeQualityCheck();
+
+                return;
+
+            }
 
 
-        const stage =
-            getElement(
-                "qcStage"
-            );
+            const backdrop =
+                event.target.closest(
+                    "[data-close-quality-check]"
+                );
 
-        if(stage){
+            if(backdrop){
 
-            stage.value =
-                "f2";
+                closeQualityCheck();
+
+            }
 
         }
-
-
-        const decision =
-            getElement(
-                "qcDecision"
-            );
-
-        if(decision){
-
-            decision.value =
-                "pass";
-
-        }
-
-
-        const operator =
-            getElement(
-                "qcOperator"
-            );
-
-        if(operator){
-
-            operator.value =
-                "Arif";
-
-        }
-
-    }
+    );
 
 
     /* =====================================================
-       BIND EVENTS
+       DECISION CHANGE
     ===================================================== */
 
-    function bindEvents(){
+    document.addEventListener(
+        "change",
+        event => {
 
+            if(
+                event.target.id !==
+                "qcDecision"
+            ){
 
-        /* ================================================
-           OPEN
-        ================================================= */
+                return;
 
-        const addButton =
-            getElement(
-                "addQualityCheck"
-            );
+            }
 
-
-        if(addButton){
-
-            addButton.addEventListener(
-                "click",
-                function(){
-
-                    resetQualityCheckForm();
-
-                    setDefaultFromBatch();
-
-                    openQualityCheck();
-
-                }
-            );
+            updateExtensionVisibility();
 
         }
+    );
 
 
-        /* ================================================
-           CLOSE BUTTON
-        ================================================= */
+    /* =====================================================
+       EXTENSION CHANGE
+    ===================================================== */
 
-        const closeButton =
-            getElement(
-                "closeQualityCheck"
-            );
+    document.addEventListener(
+        "input",
+        event => {
 
+            if(
+                event.target.id !==
+                "qcExtensionDays"
+            ){
 
-        if(closeButton){
+                return;
 
-            closeButton.addEventListener(
-                "click",
-                closeQualityCheck
-            );
-
-        }
+            }
 
 
-        /* ================================================
-           CANCEL
-        ================================================= */
-
-        const cancelButton =
-            getElement(
-                "cancelQualityCheck"
-            );
+            const decision =
+                getElement(
+                    "qcDecision"
+                )?.value;
 
 
-        if(cancelButton){
+            if(
+                decision !==
+                "not_ready"
+            ){
 
-            cancelButton.addEventListener(
-                "click",
-                closeQualityCheck
-            );
+                return;
 
-        }
-
-
-        /* ================================================
-           BACKDROP
-        ================================================= */
-
-        const modal =
-            getElement(
-                "qualityCheckModal"
-            );
+            }
 
 
-        if(modal){
-
-            modal.addEventListener(
-                "click",
-                function(event){
-
-                    if(
-                        event.target.closest(
-                            "[data-close-quality-check]"
-                        )
-                    ){
-
-                        closeQualityCheck();
-
-                    }
-
-                }
-            );
-
-        }
+            const days =
+                Number(
+                    event.target.value
+                );
 
 
-        /* ================================================
-           FORM SUBMIT
-        ================================================= */
+            if(
+                !Number.isFinite(days) ||
+                days <= 0
+            ){
 
-        const form =
-            getElement(
-                "qualityCheckForm"
-            );
-
-
-        if(form){
-
-            form.addEventListener(
-                "submit",
-                saveQualityCheck
-            );
-
-        }
-
-
-        /* ================================================
-           ESCAPE
-        ================================================= */
-
-        document.addEventListener(
-            "keydown",
-            function(event){
-
-                if(
-                    event.key !== "Escape"
-                ){
-
-                    return;
-
-                }
-
-
-                const modal =
+                const nextTarget =
                     getElement(
-                        "qualityCheckModal"
+                        "qcNextTargetDate"
                     );
 
+                if(nextTarget){
 
-                if(
-                    modal &&
-                    !modal.hidden
-                ){
-
-                    closeQualityCheck();
+                    nextTarget.value =
+                        "";
 
                 }
 
-            }
-        );
+                return;
 
-    }
+            }
+
+
+            /*
+               Ambil target aktif batch
+               untuk preview tanggal.
+            */
+
+            waitForSupabase()
+                .then(
+                    async supabase => {
+
+                        if(!supabase){
+
+                            return;
+
+                        }
+
+                        try{
+
+                            const batch =
+                                await getCurrentBatch(
+                                    supabase,
+                                    getBatchCode()
+                                );
+
+
+                            const nextDate =
+                                addDaysToDate(
+                                    batch.target_date,
+                                    days
+                                );
+
+
+                            const nextTarget =
+                                getElement(
+                                    "qcNextTargetDate"
+                                );
+
+
+                            if(nextTarget){
+
+                                nextTarget.value =
+                                    nextDate;
+
+                            }
+
+                        }
+                        catch(error){
+
+                            console.error(
+                                "MERAMU: Gagal menghitung target extension.",
+                                error
+                            );
+
+                        }
+
+                    }
+                );
+
+        }
+    );
+
+
+    /* =====================================================
+       FORM SUBMIT
+    ===================================================== */
+
+    document.addEventListener(
+        "submit",
+        event => {
+
+            if(
+                event.target.id !==
+                "qualityCheckForm"
+            ){
+
+                return;
+
+            }
+
+            saveQualityCheck(
+                event
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       ESCAPE
+    ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if(
+                event.key !==
+                "Escape"
+            ){
+
+                return;
+
+            }
+
+
+            const modal =
+                getElement(
+                    "qualityCheckModal"
+                );
+
+
+            if(
+                modal &&
+                !modal.hidden
+            ){
+
+                closeQualityCheck();
+
+            }
+
+        }
+    );
 
 
     /* =====================================================
        INIT
     ===================================================== */
 
-    function init(){
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
 
-        bindEvents();
-
-
-        if(window.lucide){
-
-            lucide.createIcons();
+            updateExtensionVisibility();
 
         }
-
-
-        console.log(
-            "MERAMU: Batch Quality Check Loaded"
-        );
-
-    }
+    );
 
 
     /* =====================================================
-       GLOBAL
+       EXPORT
     ===================================================== */
 
     window.openQualityCheck =
         openQualityCheck;
 
-
     window.closeQualityCheck =
         closeQualityCheck;
-
 
     window.saveQualityCheck =
         saveQualityCheck;
 
+    window.updateExtensionVisibility =
+        updateExtensionVisibility;
 
-    /* =====================================================
-       START
-    ===================================================== */
-
-    if(
-        document.readyState ===
-        "loading"
-    ){
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            init
-        );
-
-    }else{
-
-        init();
-
-    }
 
 })();
