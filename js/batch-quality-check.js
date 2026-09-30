@@ -1,6 +1,6 @@
 /* =========================================================
-   MERAMU QUALITY CHECK
-   Supabase Insert
+   MERAMU BATCH QUALITY CHECK
+   Supabase -> public.quality_checks
 ========================================================= */
 
 (function(){
@@ -14,123 +14,163 @@
 
     function getBatchCode(){
 
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
+        const params = new URLSearchParams(
+            window.location.search
+        );
 
         return (
             params.get("id") ||
+            params.get("batch") ||
             "KB-022"
+        ).trim();
+
+    }
+
+
+    /* =====================================================
+       WAIT FOR SUPABASE
+    ===================================================== */
+
+    function waitForSupabase(callback, attempt = 0){
+
+        if(window.supabaseClient){
+
+            callback(window.supabaseClient);
+            return;
+
+        }
+
+        if(attempt >= 50){
+
+            console.error(
+                "MERAMU QC: Supabase client tidak ditemukan."
+            );
+
+            alert(
+                "Supabase belum siap. Silakan refresh halaman."
+            );
+
+            return;
+
+        }
+
+        setTimeout(
+            () => waitForSupabase(callback, attempt + 1),
+            100
         );
 
     }
 
 
     /* =====================================================
-       GET MODAL
+       ELEMENT HELPER
     ===================================================== */
 
-    function getModal(){
+    function getElement(id){
 
-        return document.getElementById(
-            "qualityCheckModal"
-        );
+        return document.getElementById(id);
 
     }
 
 
     /* =====================================================
-       WAIT SUPABASE
+       DEFAULT DATE TIME
     ===================================================== */
 
-    async function waitForSupabase(){
+    function setDefaultDateTime(){
 
-        for(let i = 0; i < 50; i++){
+        const input =
+            getElement("qcCheckedAt");
 
-            if(window.supabaseClient){
+        if(!input) return;
 
-                return window.supabaseClient;
+        const now = new Date();
+
+        const local = new Date(
+            now.getTime() -
+            now.getTimezoneOffset() * 60000
+        );
+
+        input.value =
+            local.toISOString().slice(0,16);
+
+    }
+
+
+    /* =====================================================
+       DEFAULT DATA FROM BATCH
+    ===================================================== */
+
+    function setDefaultFromBatch(){
+
+        const batchCode =
+            getBatchCode();
+
+        const batch =
+            window.batchDetailData &&
+            window.batchDetailData[batchCode];
+
+        if(!batch) return;
+
+
+        /* ================================================
+           STAGE
+        ================================================= */
+
+        const stage =
+            getElement("qcStage");
+
+        if(stage && batch.stage){
+
+            let normalized =
+                String(batch.stage)
+                    .toLowerCase()
+                    .trim();
+
+            normalized =
+                normalized
+                    .replace(" fermentasi","")
+                    .replace("fermentasi","")
+                    .trim();
+
+            const validStages = [
+                "production",
+                "f1",
+                "f2",
+                "harvest",
+                "bottling",
+                "finished"
+            ];
+
+            if(
+                validStages.includes(normalized)
+            ){
+
+                stage.value =
+                    normalized;
 
             }
 
-            await new Promise(
-                resolve =>
-                    setTimeout(
-                        resolve,
-                        100
-                    )
-            );
-
         }
 
-        throw new Error(
-            "Supabase client belum siap."
-        );
 
-    }
+        /* ================================================
+           OPERATOR
+        ================================================= */
 
-
-    /* =====================================================
-       NORMALIZE STAGE
-    ===================================================== */
-
-    function normalizeStage(stage){
-
-        const value =
-            String(stage || "")
-                .trim()
-                .toLowerCase();
-
+        const operator =
+            getElement("qcOperator");
 
         if(
-            value.includes("f2")
+            operator &&
+            batch.operator &&
+            !operator.value.trim()
         ){
 
-            return "f2";
+            operator.value =
+                batch.operator;
 
         }
-
-
-        if(
-            value.includes("f1")
-        ){
-
-            return "f1";
-
-        }
-
-
-        if(
-            value.includes("harvest") ||
-            value.includes("panen")
-        ){
-
-            return "harvest";
-
-        }
-
-
-        if(
-            value.includes("bottling")
-        ){
-
-            return "bottling";
-
-        }
-
-
-        if(
-            value.includes("production") ||
-            value.includes("produksi")
-        ){
-
-            return "production";
-
-        }
-
-
-        return "f2";
 
     }
 
@@ -142,145 +182,14 @@
     function openQualityCheck(){
 
         const modal =
-            getModal();
+            getElement("qualityCheckModal");
+
+        if(!modal) return;
 
 
-        if(!modal){
+        setDefaultDateTime();
 
-            console.warn(
-                "MERAMU: Quality Check modal tidak ditemukan."
-            );
-
-            return;
-
-        }
-
-
-        /* ---------------------------------------------
-           DEFAULT DATE / TIME
-        --------------------------------------------- */
-
-        const now =
-            new Date();
-
-
-        const localDateTime =
-            new Date(
-                now.getTime()
-                -
-                now.getTimezoneOffset() * 60000
-            )
-            .toISOString()
-            .slice(0,16);
-
-
-        const checkedAt =
-            document.getElementById(
-                "qcCheckedAt"
-            );
-
-
-        if(checkedAt){
-
-            checkedAt.value =
-                localDateTime;
-
-        }
-
-
-        /* ---------------------------------------------
-           GET CURRENT BATCH
-        --------------------------------------------- */
-
-        let batch = null;
-
-
-        if(
-            typeof window.getCurrentBatch ===
-            "function"
-        ){
-
-            batch =
-                window.getCurrentBatch();
-
-        }
-
-
-        /* ---------------------------------------------
-           STAGE
-        --------------------------------------------- */
-
-        const stageInput =
-            document.getElementById(
-                "qcStage"
-            );
-
-
-        if(
-            stageInput &&
-            batch?.stage
-        ){
-
-            stageInput.value =
-                normalizeStage(
-                    batch.stage
-                );
-
-        }
-
-
-        /* ---------------------------------------------
-           VOLUME
-        --------------------------------------------- */
-
-        const volumeInput =
-            document.getElementById(
-                "qcVolume"
-            );
-
-
-        if(
-            volumeInput &&
-            batch?.volume
-        ){
-
-            const match =
-                String(batch.volume)
-                    .replace(",",".")
-                    .match(
-                        /[\d.]+/
-                    );
-
-
-            if(match){
-
-                volumeInput.value =
-                    match[0];
-
-            }
-
-        }
-
-
-        /* ---------------------------------------------
-           OPERATOR DEFAULT
-        --------------------------------------------- */
-
-        const operatorInput =
-            document.getElementById(
-                "qcOperator"
-            );
-
-
-        if(
-            operatorInput &&
-            !operatorInput.value
-        ){
-
-            operatorInput.value =
-                "Arif";
-
-        }
+        setDefaultFromBatch();
 
 
         modal.hidden = false;
@@ -288,6 +197,11 @@
         modal.setAttribute(
             "aria-hidden",
             "false"
+        );
+
+
+        document.body.classList.add(
+            "modal-open"
         );
 
 
@@ -307,14 +221,9 @@
     function closeQualityCheck(){
 
         const modal =
-            getModal();
+            getElement("qualityCheckModal");
 
-
-        if(!modal){
-
-            return;
-
-        }
+        if(!modal) return;
 
 
         modal.hidden = true;
@@ -324,26 +233,49 @@
             "true"
         );
 
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
     }
 
 
     /* =====================================================
-       RESET FORM
+       OPTIONAL NUMBER
     ===================================================== */
 
-    function resetQualityCheckForm(){
+    function getOptionalNumber(id){
 
-        const form =
-            document.getElementById(
-                "qualityCheckForm"
-            );
+        const element =
+            getElement(id);
+
+        if(!element) return null;
 
 
-        if(form){
+        const value =
+            element.value.trim();
 
-            form.reset();
+
+        if(value === ""){
+
+            return null;
 
         }
+
+
+        const number =
+            Number(value);
+
+
+        if(!Number.isFinite(number)){
+
+            return null;
+
+        }
+
+
+        return number;
 
     }
 
@@ -358,17 +290,14 @@
 
 
         const form =
-            document.getElementById(
-                "qualityCheckForm"
-            );
+            getElement("qualityCheckForm");
+
+        if(!form) return;
 
 
-        if(
-            !form ||
-            !form.checkValidity()
-        ){
+        if(!form.checkValidity()){
 
-            form?.reportValidity();
+            form.reportValidity();
 
             return;
 
@@ -376,74 +305,84 @@
 
 
         const saveButton =
-            document.getElementById(
-                "saveQualityCheck"
-            );
+            getElement("saveQualityCheck");
 
 
         if(saveButton){
 
             saveButton.disabled = true;
 
+            saveButton.dataset.originalText =
+                saveButton.textContent.trim();
 
-            saveButton.innerHTML =
-                `
-                    <i data-lucide="loader-circle"></i>
-                    Menyimpan...
-                `;
-
-
-            if(window.lucide){
-
-                lucide.createIcons();
-
-            }
+            saveButton.textContent =
+                "Menyimpan...";
 
         }
 
 
         try{
 
-            /* -----------------------------------------
-               SUPABASE
-            ----------------------------------------- */
+            /* =============================================
+               WAIT SUPABASE
+            ============================================== */
 
             const supabase =
-                await waitForSupabase();
+                await new Promise(
+                    resolve => {
+
+                        waitForSupabase(
+                            resolve
+                        );
+
+                    }
+                );
 
 
-            /* -----------------------------------------
+            if(!supabase){
+
+                throw new Error(
+                    "Supabase client belum tersedia."
+                );
+
+            }
+
+
+            /* =============================================
                BATCH CODE
-            ----------------------------------------- */
+            ============================================== */
 
             const batchCode =
                 getBatchCode();
 
 
             console.log(
-                "MERAMU: Mencari batch untuk QC:",
+                "MERAMU QC: Mencari batch",
                 batchCode
             );
 
 
-            /* -----------------------------------------
+            /* =============================================
                FIND BATCH UUID
-            ----------------------------------------- */
+            ============================================== */
 
             const {
                 data: batch,
                 error: batchError
-            } =
-                await supabase
-                    .from("batches")
-                    .select(
-                        "id,batch_code"
-                    )
-                    .eq(
-                        "batch_code",
-                        batchCode
-                    )
-                    .maybeSingle();
+            } = await supabase
+
+                .from("batches")
+
+                .select(
+                    "id,batch_code"
+                )
+
+                .eq(
+                    "batch_code",
+                    batchCode
+                )
+
+                .maybeSingle();
 
 
             if(batchError){
@@ -456,238 +395,157 @@
             if(!batch){
 
                 throw new Error(
-                    `Batch ${batchCode} tidak ditemukan.`
+                    `Batch ${batchCode} tidak ditemukan di Supabase.`
                 );
 
             }
 
 
             console.log(
-                "MERAMU: Batch UUID untuk QC:",
-                batch.id
+                "MERAMU QC: Batch ditemukan",
+                batch
             );
 
 
-            /* -----------------------------------------
-               FORM VALUES
-            ----------------------------------------- */
+            /* =============================================
+               CHECKED AT
+            ============================================== */
 
             const checkedAt =
-                document.getElementById(
+                getElement(
                     "qcCheckedAt"
-                )?.value || "";
+                ).value;
 
 
-            const stage =
-                document.getElementById(
-                    "qcStage"
-                )?.value || "f2";
+            let checkedAtIso;
 
 
-            const ph =
-                document.getElementById(
-                    "qcPh"
-                )?.value;
+            if(checkedAt){
+
+                checkedAtIso =
+                    new Date(
+                        checkedAt
+                    ).toISOString();
+
+            }else{
+
+                checkedAtIso =
+                    new Date().toISOString();
+
+            }
 
 
-            const brix =
-                document.getElementById(
-                    "qcBrix"
-                )?.value;
-
-
-            const temperature =
-                document.getElementById(
-                    "qcTemperature"
-                )?.value;
-
-
-            const volume =
-                document.getElementById(
-                    "qcVolume"
-                )?.value;
-
-
-            const aroma =
-                document.getElementById(
-                    "qcAroma"
-                )?.value
-                    .trim() || null;
-
-
-            const taste =
-                document.getElementById(
-                    "qcTaste"
-                )?.value
-                    .trim() || null;
-
-
-            const color =
-                document.getElementById(
-                    "qcColor"
-                )?.value
-                    .trim() || null;
-
-
-            const carbonation =
-                document.getElementById(
-                    "qcCarbonation"
-                )?.value
-                    .trim() || null;
-
-
-            const scobyCondition =
-                document.getElementById(
-                    "qcScoby"
-                )?.value
-                    .trim() || null;
-
-
-            const decision =
-                document.getElementById(
-                    "qcDecision"
-                )?.value || "";
-
-
-            const reason =
-                document.getElementById(
-                    "qcReason"
-                )?.value
-                    .trim() || null;
-
-
-            const extensionDaysValue =
-                document.getElementById(
-                    "qcExtensionDays"
-                )?.value;
-
-
-            const nextTargetDate =
-                document.getElementById(
-                    "qcNextTargetDate"
-                )?.value || null;
-
-
-            const operator =
-                document.getElementById(
-                    "qcOperator"
-                )?.value
-                    .trim() || null;
-
-
-            const notes =
-                document.getElementById(
-                    "qcNotes"
-                )?.value
-                    .trim() || null;
-
-
-            /* -----------------------------------------
-               PAYLOAD
-            ----------------------------------------- */
+            /* =============================================
+               BUILD PAYLOAD
+            ============================================== */
 
             const payload = {
-
-                id:
-                    crypto.randomUUID(),
 
                 batch_id:
                     batch.id,
 
                 checked_at:
-                    new Date(
-                        checkedAt
-                    ).toISOString(),
+                    checkedAtIso,
 
                 stage:
-                    stage,
+                    getElement(
+                        "qcStage"
+                    ).value,
 
                 ph:
-                    ph === ""
-                        ? null
-                        : Number(ph),
+                    getOptionalNumber(
+                        "qcPh"
+                    ),
 
                 brix:
-                    brix === ""
-                        ? null
-                        : Number(brix),
+                    getOptionalNumber(
+                        "qcBrix"
+                    ),
 
                 temperature_c:
-                    temperature === ""
-                        ? null
-                        : Number(temperature),
+                    getOptionalNumber(
+                        "qcTemperature"
+                    ),
 
                 volume:
-                    volume === ""
-                        ? null
-                        : Number(volume),
+                    getOptionalNumber(
+                        "qcVolume"
+                    ),
 
                 aroma:
-                    aroma,
+                    getElement(
+                        "qcAroma"
+                    )?.value?.trim() || null,
 
                 taste:
-                    taste,
+                    getElement(
+                        "qcTaste"
+                    )?.value?.trim() || null,
 
                 color:
-                    color,
+                    getElement(
+                        "qcColor"
+                    )?.value?.trim() || null,
 
                 carbonation:
-                    carbonation,
+                    getElement(
+                        "qcCarbonation"
+                    )?.value?.trim() || null,
 
                 scoby_condition:
-                    scobyCondition,
+                    getElement(
+                        "qcScobyCondition"
+                    )?.value?.trim() || null,
 
                 decision:
-                    decision,
+                    getElement(
+                        "qcDecision"
+                    ).value,
 
                 reason:
-                    reason,
-
-                extension_days:
-                    extensionDaysValue === ""
-                        ? null
-                        : Number(
-                            extensionDaysValue
-                        ),
-
-                next_target_date:
-                    nextTargetDate,
+                    getElement(
+                        "qcReason"
+                    )?.value?.trim() || null,
 
                 operator_name:
-                    operator,
+                    getElement(
+                        "qcOperator"
+                    )?.value?.trim() || null,
 
                 notes:
-                    notes,
-
-                created_at:
-                    new Date().toISOString()
+                    getElement(
+                        "qcNotes"
+                    )?.value?.trim() || null
 
             };
 
 
             console.log(
-                "MERAMU: QUALITY CHECK PAYLOAD:",
+                "MERAMU QC: Payload",
                 payload
             );
 
 
-            /* -----------------------------------------
-               INSERT
-            ----------------------------------------- */
+            /* =============================================
+               INSERT TO SUPABASE
+            ============================================== */
 
             const {
                 data,
                 error
-            } =
-                await supabase
-                    .from(
-                        "quality_checks"
-                    )
-                    .insert(
-                        payload
-                    )
-                    .select()
-                    .single();
+            } = await supabase
+
+                .from(
+                    "quality_checks"
+                )
+
+                .insert(
+                    payload
+                )
+
+                .select()
+
+                .single();
 
 
             if(error){
@@ -698,38 +556,115 @@
 
 
             console.log(
-                "✅ MERAMU: Quality Check berhasil disimpan.",
+                "MERAMU QC: Quality Check berhasil disimpan.",
                 data
             );
 
 
-            /* -----------------------------------------
-               CLOSE + RESET
-            ----------------------------------------- */
+            /* =============================================
+               CLOSE MODAL
+            ============================================== */
 
             closeQualityCheck();
 
-            resetQualityCheckForm();
+
+            /* =============================================
+               RESET FORM
+            ============================================== */
+
+            form.reset();
+
+
+            setDefaultDateTime();
+
+
+            const stage =
+                getElement(
+                    "qcStage"
+                );
+
+            if(stage){
+
+                stage.value = "f2";
+
+            }
+
+
+            const decision =
+                getElement(
+                    "qcDecision"
+                );
+
+            if(decision){
+
+                decision.value = "pass";
+
+            }
+
+
+            const operator =
+                getElement(
+                    "qcOperator"
+                );
+
+            if(operator){
+
+                operator.value =
+                    "Arif";
+
+            }
+
+
+            /* =============================================
+               CUSTOM EVENT
+            ============================================== */
+
+            document.dispatchEvent(
+                new CustomEvent(
+                    "meramu:quality-check-saved",
+                    {
+                        detail: {
+                            batchCode,
+                            data
+                        }
+                    }
+                )
+            );
+
+
+            /* =============================================
+               REALTIME REFRESH
+            ============================================== */
+
+            if(
+                window.MERAMURealtime &&
+                typeof window.MERAMURealtime.refresh ===
+                    "function"
+            ){
+
+                window.MERAMURealtime.refresh();
+
+            }
 
 
             alert(
-                `QC ${batchCode} berhasil disimpan.`
+                `QC Check ${batchCode} berhasil disimpan.`
             );
 
 
         }catch(error){
 
             console.error(
-                "MERAMU: Gagal menyimpan Quality Check.",
+                "MERAMU QC: Gagal menyimpan Quality Check.",
                 error
             );
 
 
             alert(
-                "QC gagal disimpan.\n\n" +
+                "QC Check gagal disimpan.\n\n" +
                 (
                     error?.message ||
-                    "Terjadi kesalahan."
+                    "Unknown error"
                 )
             );
 
@@ -740,19 +675,9 @@
 
                 saveButton.disabled = false;
 
-
-                saveButton.innerHTML =
-                    `
-                        <i data-lucide="save"></i>
-                        Simpan QC
-                    `;
-
-
-                if(window.lucide){
-
-                    lucide.createIcons();
-
-                }
+                saveButton.textContent =
+                    saveButton.dataset.originalText ||
+                    "Simpan QC";
 
             }
 
@@ -762,147 +687,252 @@
 
 
     /* =====================================================
-       CLICK EVENTS
+       RESET FORM
     ===================================================== */
 
-    document.addEventListener(
-        "click",
-        function(event){
+    function resetQualityCheckForm(){
 
-            /* -----------------------------------------
-               OPEN
-            ----------------------------------------- */
+        const form =
+            getElement(
+                "qualityCheckForm"
+            );
 
-            if(
-                event.target.closest(
-                    "#addQualityCheck"
-                )
-            ){
-
-                event.preventDefault();
-
-                openQualityCheck();
-
-                return;
-
-            }
+        if(!form) return;
 
 
-            /* -----------------------------------------
-               CLOSE BUTTON
-            ----------------------------------------- */
-
-            if(
-                event.target.closest(
-                    "#closeQualityCheck"
-                )
-            ){
-
-                event.preventDefault();
-
-                closeQualityCheck();
-
-                return;
-
-            }
+        form.reset();
 
 
-            /* -----------------------------------------
-               CANCEL
-            ----------------------------------------- */
-
-            if(
-                event.target.closest(
-                    "#cancelQualityCheck"
-                )
-            ){
-
-                event.preventDefault();
-
-                closeQualityCheck();
-
-                return;
-
-            }
+        setDefaultDateTime();
 
 
-            /* -----------------------------------------
-               BACKDROP
-            ----------------------------------------- */
+        const stage =
+            getElement(
+                "qcStage"
+            );
 
-            if(
-                event.target.closest(
-                    "[data-close-quality-check]"
-                )
-            ){
+        if(stage){
 
-                closeQualityCheck();
-
-            }
+            stage.value =
+                "f2";
 
         }
-    );
+
+
+        const decision =
+            getElement(
+                "qcDecision"
+            );
+
+        if(decision){
+
+            decision.value =
+                "pass";
+
+        }
+
+
+        const operator =
+            getElement(
+                "qcOperator"
+            );
+
+        if(operator){
+
+            operator.value =
+                "Arif";
+
+        }
+
+    }
 
 
     /* =====================================================
-       FORM SUBMIT
+       BIND EVENTS
     ===================================================== */
 
-    document.addEventListener(
-        "submit",
-        function(event){
-
-            if(
-                event.target.id !==
-                "qualityCheckForm"
-            ){
-
-                return;
-
-            }
+    function bindEvents(){
 
 
-            saveQualityCheck(
-                event
+        /* ================================================
+           OPEN
+        ================================================= */
+
+        const addButton =
+            getElement(
+                "addQualityCheck"
+            );
+
+
+        if(addButton){
+
+            addButton.addEventListener(
+                "click",
+                function(){
+
+                    resetQualityCheckForm();
+
+                    setDefaultFromBatch();
+
+                    openQualityCheck();
+
+                }
             );
 
         }
-    );
+
+
+        /* ================================================
+           CLOSE BUTTON
+        ================================================= */
+
+        const closeButton =
+            getElement(
+                "closeQualityCheck"
+            );
+
+
+        if(closeButton){
+
+            closeButton.addEventListener(
+                "click",
+                closeQualityCheck
+            );
+
+        }
+
+
+        /* ================================================
+           CANCEL
+        ================================================= */
+
+        const cancelButton =
+            getElement(
+                "cancelQualityCheck"
+            );
+
+
+        if(cancelButton){
+
+            cancelButton.addEventListener(
+                "click",
+                closeQualityCheck
+            );
+
+        }
+
+
+        /* ================================================
+           BACKDROP
+        ================================================= */
+
+        const modal =
+            getElement(
+                "qualityCheckModal"
+            );
+
+
+        if(modal){
+
+            modal.addEventListener(
+                "click",
+                function(event){
+
+                    if(
+                        event.target.closest(
+                            "[data-close-quality-check]"
+                        )
+                    ){
+
+                        closeQualityCheck();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* ================================================
+           FORM SUBMIT
+        ================================================= */
+
+        const form =
+            getElement(
+                "qualityCheckForm"
+            );
+
+
+        if(form){
+
+            form.addEventListener(
+                "submit",
+                saveQualityCheck
+            );
+
+        }
+
+
+        /* ================================================
+           ESCAPE
+        ================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function(event){
+
+                if(
+                    event.key !== "Escape"
+                ){
+
+                    return;
+
+                }
+
+
+                const modal =
+                    getElement(
+                        "qualityCheckModal"
+                    );
+
+
+                if(
+                    modal &&
+                    !modal.hidden
+                ){
+
+                    closeQualityCheck();
+
+                }
+
+            }
+        );
+
+    }
 
 
     /* =====================================================
-       ESC
+       INIT
     ===================================================== */
 
-    document.addEventListener(
-        "keydown",
-        function(event){
+    function init(){
 
-            if(
-                event.key !==
-                "Escape"
-            ){
-
-                return;
-
-            }
+        bindEvents();
 
 
-            const modal =
-                getModal();
+        if(window.lucide){
 
-
-            if(
-                modal &&
-                !modal.hidden
-            ){
-
-                closeQualityCheck();
-
-            }
+            lucide.createIcons();
 
         }
-    );
+
+
+        console.log(
+            "MERAMU: Batch Quality Check Loaded"
+        );
+
+    }
 
 
     /* =====================================================
@@ -921,8 +951,24 @@
         saveQualityCheck;
 
 
-    console.log(
-        "✅ MERAMU Quality Check Loaded"
-    );
+    /* =====================================================
+       START
+    ===================================================== */
+
+    if(
+        document.readyState ===
+        "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            init
+        );
+
+    }else{
+
+        init();
+
+    }
 
 })();
