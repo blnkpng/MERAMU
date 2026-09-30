@@ -1,6 +1,12 @@
-(function(){
+(function () {
 
     "use strict";
+
+
+    /* =====================================================
+       MERAMU FINISHED PRODUCTS
+       Finished Batch + Individual Units + QR + Thermal Label
+       ===================================================== */
 
 
     /* =====================================================
@@ -20,10 +26,10 @@
 
 
     /* =====================================================
-       ELEMENTS
+       DOM HELPER
     ===================================================== */
 
-    function $(id){
+    function $(id) {
 
         return document.getElementById(id);
 
@@ -31,95 +37,138 @@
 
 
     /* =====================================================
-       FORMAT
+       FORMAT NUMBER
     ===================================================== */
 
-    function formatNumber(value){
+    function formatNumber(value, decimals = 2) {
 
-        if(
+        if (
             value === null ||
             value === undefined ||
             value === ""
-        ){
+        ) {
 
             return "—";
 
         }
+
+
+        const number =
+            Number(value);
+
+
+        if (
+            Number.isNaN(number)
+        ) {
+
+            return "—";
+
+        }
+
 
         return new Intl.NumberFormat(
             "id-ID",
             {
-                maximumFractionDigits:2
+                minimumFractionDigits: 0,
+                maximumFractionDigits: decimals
             }
-        ).format(Number(value));
+        ).format(number);
 
     }
 
 
-    function formatDate(value){
+    /* =====================================================
+       FORMAT DATE
+    ===================================================== */
 
-        if(!value){
+    function formatDate(value) {
+
+        if (!value) {
 
             return "—";
 
         }
 
+
         const date =
             new Date(value);
 
-        if(
+
+        if (
             Number.isNaN(
                 date.getTime()
             )
-        ){
+        ) {
 
-            return value;
+            return String(value);
 
         }
+
 
         return date.toLocaleDateString(
             "id-ID",
             {
-                day:"2-digit",
-                month:"short",
-                year:"numeric"
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
             }
         );
 
     }
 
 
-    function escapeHtml(value){
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
 
-        if(
+    function escapeHtml(value) {
+
+        if (
             value === null ||
             value === undefined
-        ){
+        ) {
 
             return "";
 
         }
 
+
         return String(value)
-            .replaceAll("&","&amp;")
-            .replaceAll("<","&lt;")
-            .replaceAll(">","&gt;")
-            .replaceAll('"',"&quot;")
-            .replaceAll("'","&#039;");
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
 
     }
 
 
     /* =====================================================
-       LOAD FINISHED BATCHES
+       CREATE ICONS
     ===================================================== */
 
-    async function loadFinishedBatches(){
+    function createIcons() {
+
+        if (window.lucide) {
+
+            lucide.createIcons();
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SUPABASE CLIENT
+    ===================================================== */
+
+    function getSupabaseClient() {
 
         const supabase =
             window.supabaseClient;
 
-        if(!supabase){
+
+        if (!supabase) {
 
             throw new Error(
                 "Supabase client belum tersedia."
@@ -128,135 +177,176 @@
         }
 
 
-        const {
-            data,
-            error
-        } = await supabase
-
-            .from("finished_batches")
-
-            .select(`
-                id,
-                finished_code,
-                allocation_id,
-                product_id,
-                production_date,
-                quantity_bottles,
-                bottle_size_ml,
-                output_volume,
-                waste_volume,
-                expiry_date,
-                best_before_date,
-                hpp_total,
-                hpp_per_bottle,
-                status,
-                operator_name,
-                notes,
-                products (
-                    id,
-                    code,
-                    name,
-                    category
-                )
-            `)
-
-            .neq(
-                "status",
-                "cancelled"
-            )
-
-            .order(
-                "created_at",
-                {
-                    ascending:false
-                }
-            );
-
-
-        if(error){
-
-            console.error(
-                "Finished batch error:",
-                error
-            );
-
-            throw error;
-
-        }
-
-
-        finishedBatches =
-            data || [];
-
-
-        renderBatchOptions();
-
-
-        if(
-            finishedBatches.length > 0
-        ){
-
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
-
-            const requestedBatch =
-                params.get(
-                    "batch"
-                );
-
-
-            const found =
-                finishedBatches.find(
-                    item =>
-                        item.id === requestedBatch ||
-                        item.finished_code === requestedBatch
-                );
-
-
-            const batch =
-                found ||
-                finishedBatches[0];
-
-
-            $("finishedBatchSelect")
-                .value =
-                batch.id;
-
-
-            await selectFinishedBatch(
-                batch.id
-            );
-
-        }else{
-
-            renderEmpty();
-
-        }
+        return supabase;
 
     }
 
 
     /* =====================================================
-       BATCH OPTIONS
+       LOAD FINISHED BATCHES
+       VIA RPC
     ===================================================== */
 
-    function renderBatchOptions(){
+    async function loadFinishedBatches() {
 
-        const select =
-            $("finishedBatchSelect");
+        const supabase =
+            getSupabaseClient();
 
-        if(!select){
+
+        console.log(
+            "MERAMU: mengambil finished batches..."
+        );
+
+
+        const {
+            data,
+            error
+        } = await supabase.rpc(
+            "get_meramu_finished_batches"
+        );
+
+
+        if (error) {
+
+            console.error(
+                "MERAMU Finished Batch RPC Error:",
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                "Gagal mengambil finished batch."
+            );
+
+        }
+
+
+        finishedBatches =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        /*
+         * Normalisasi agar bagian UI tetap
+         * bisa menggunakan:
+         *
+         * batch.products.name
+         * batch.products.code
+         * batch.products.category
+         */
+
+        finishedBatches =
+            finishedBatches.map(
+                batch => ({
+
+                    ...batch,
+
+                    products: {
+
+                        id:
+                            batch.product_id,
+
+                        code:
+                            batch.product_code,
+
+                        name:
+                            batch.product_name,
+
+                        category:
+                            batch.product_category
+
+                    }
+
+                })
+            );
+
+
+        console.log(
+            `MERAMU: ${finishedBatches.length} finished batch ditemukan.`
+        );
+
+
+        renderBatchOptions();
+
+
+        if (
+            finishedBatches.length === 0
+        ) {
+
+            selectedBatch = null;
+
+            finishedUnits = [];
+
+            renderEmpty();
 
             return;
 
         }
 
 
-        if(
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const requestedBatch =
+            params.get("batch");
+
+
+        const requested =
+            finishedBatches.find(
+                batch =>
+                    batch.id === requestedBatch ||
+                    batch.finished_code === requestedBatch
+            );
+
+
+        const batch =
+            requested ||
+            finishedBatches[0];
+
+
+        const select =
+            $("finishedBatchSelect");
+
+
+        if (select) {
+
+            select.value =
+                batch.id;
+
+        }
+
+
+        await selectFinishedBatch(
+            batch.id
+        );
+
+    }
+
+
+    /* =====================================================
+       RENDER BATCH OPTIONS
+    ===================================================== */
+
+    function renderBatchOptions() {
+
+        const select =
+            $("finishedBatchSelect");
+
+
+        if (!select) {
+
+            return;
+
+        }
+
+
+        if (
             finishedBatches.length === 0
-        ){
+        ) {
 
             select.innerHTML = `
                 <option value="">
@@ -270,52 +360,77 @@
 
 
         select.innerHTML =
-            finishedBatches.map(
-                batch => {
+            finishedBatches
+                .map(
+                    batch => {
 
-                    const product =
-                        batch.products?.name ||
-                        "Product";
+                        const productName =
+                            batch.product_name ||
+                            batch.products?.name ||
+                            "Product";
 
 
-                    return `
-                        <option
-                            value="${escapeHtml(batch.id)}"
-                        >
-                            ${escapeHtml(
-                                batch.finished_code
-                            )}
-                            —
-                            ${escapeHtml(product)}
-                        </option>
-                    `;
+                        return `
+                            <option
+                                value="${escapeHtml(
+                                    batch.id
+                                )}"
+                            >
+                                ${escapeHtml(
+                                    batch.finished_code
+                                )}
+                                —
+                                ${escapeHtml(
+                                    productName
+                                )}
+                            </option>
+                        `;
 
-                }
-            ).join("");
+                    }
+                )
+                .join("");
 
     }
 
 
     /* =====================================================
-       SELECT BATCH
+       SELECT FINISHED BATCH
     ===================================================== */
 
     async function selectFinishedBatch(
         batchId
-    ){
+    ) {
 
-        selectedBatch =
-            finishedBatches.find(
-                item =>
-                    item.id === batchId
-            );
-
-
-        if(!selectedBatch){
+        if (!batchId) {
 
             return;
 
         }
+
+
+        selectedBatch =
+            finishedBatches.find(
+                batch =>
+                    batch.id === batchId
+            );
+
+
+        if (!selectedBatch) {
+
+            console.warn(
+                "MERAMU: finished batch tidak ditemukan:",
+                batchId
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "MERAMU: selected finished batch:",
+            selectedBatch.finished_code
+        );
 
 
         renderBatchInfo();
@@ -329,59 +444,49 @@
 
 
     /* =====================================================
-       LOAD UNITS
+       LOAD FINISHED UNITS
+       VIA RPC
     ===================================================== */
 
     async function loadFinishedUnits(
         finishedBatchId
-    ){
+    ) {
 
         const supabase =
-            window.supabaseClient;
+            getSupabaseClient();
+
+
+        console.log(
+            "MERAMU: mengambil finished units:",
+            finishedBatchId
+        );
 
 
         const {
             data,
             error
-        } = await supabase
-
-            .from("finished_units")
-
-            .select(`
-                id,
-                finished_batch_id,
-                unit_number,
-                qr_token,
-                trace_code,
-                bottle_size_ml,
-                status,
-                sold_at,
-                notes
-            `)
-
-            .eq(
-                "finished_batch_id",
-                finishedBatchId
-            )
-
-            .order(
-                "unit_number",
-                {
-                    ascending:true
-                }
-            );
+        } = await supabase.rpc(
+            "get_meramu_finished_units",
+            {
+                p_finished_batch_id:
+                    finishedBatchId
+            }
+        );
 
 
-        if(error){
+        if (error) {
 
             console.error(
-                "Finished units error:",
+                "MERAMU Finished Units RPC Error:",
                 error
             );
 
+
             renderUnitsError(
-                error.message
+                error.message ||
+                "Gagal mengambil finished unit."
             );
+
 
             return;
 
@@ -389,7 +494,14 @@
 
 
         finishedUnits =
-            data || [];
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        console.log(
+            `MERAMU: ${finishedUnits.length} finished units ditemukan.`
+        );
 
 
         renderUnits();
@@ -398,16 +510,19 @@
 
 
     /* =====================================================
-       BATCH INFO
+       RENDER BATCH INFO
     ===================================================== */
 
-    function renderBatchInfo(){
+    function renderBatchInfo() {
 
         const el =
             $("finishedBatchInfo");
 
 
-        if(!el || !selectedBatch){
+        if (
+            !el ||
+            !selectedBatch
+        ) {
 
             return;
 
@@ -417,6 +532,12 @@
         const product =
             selectedBatch.products ||
             {};
+
+
+        const productName =
+            selectedBatch.product_name ||
+            product.name ||
+            "Finished Product";
 
 
         el.style.display =
@@ -432,11 +553,11 @@
                     <h2 class="finished-batch-name">
 
                         ${escapeHtml(
-                            product.name ||
-                            "Finished Product"
+                            productName
                         )}
 
                     </h2>
+
 
                     <div class="finished-batch-code">
 
@@ -454,7 +575,8 @@
                     <span class="finished-status-dot"></span>
 
                     ${escapeHtml(
-                        selectedBatch.status
+                        selectedBatch.status ||
+                        "finished"
                     )}
 
                 </div>
@@ -472,7 +594,8 @@
 
                     <strong>
                         ${formatNumber(
-                            selectedBatch.quantity_bottles
+                            selectedBatch.quantity_bottles,
+                            0
                         )}
                     </strong>
 
@@ -487,7 +610,8 @@
 
                     <strong>
                         ${formatNumber(
-                            selectedBatch.bottle_size_ml
+                            selectedBatch.bottle_size_ml,
+                            0
                         )}
                         ML
                     </strong>
@@ -535,33 +659,38 @@
        RENDER UNITS
     ===================================================== */
 
-    function renderUnits(){
+    function renderUnits() {
 
         const container =
             $("finishedUnits");
+
 
         const count =
             $("finishedUnitCount");
 
 
-        if(!container){
+        if (!container) {
 
             return;
 
         }
 
 
-        if(count){
+        if (count) {
 
             count.textContent =
-                `${finishedUnits.length} bottle`;
+                `${finishedUnits.length} bottle${
+                    finishedUnits.length === 1
+                        ? ""
+                        : "s"
+                }`;
 
         }
 
 
-        if(
+        if (
             finishedUnits.length === 0
-        ){
+        ) {
 
             container.innerHTML = `
 
@@ -591,121 +720,146 @@
 
 
         container.innerHTML =
-            finishedUnits.map(
-                unit => {
+            finishedUnits
+                .map(
+                    unit => {
 
-                    return `
+                        return `
 
-                        <article
-                            class="finished-unit"
-                        >
-
-                            <div
-                                class="finished-unit-top"
+                            <article
+                                class="finished-unit"
                             >
 
-                                <span
-                                    class="finished-unit-number"
+                                <div
+                                    class="finished-unit-top"
                                 >
 
-                                    Bottle #${formatNumber(
-                                        unit.unit_number
-                                    )}
+                                    <span
+                                        class="finished-unit-number"
+                                    >
 
-                                </span>
+                                        Bottle #${formatNumber(
+                                            unit.unit_number,
+                                            0
+                                        )}
 
-
-                                <span
-                                    class="finished-unit-status"
-                                >
-
-                                    ${escapeHtml(
-                                        unit.status
-                                    )}
-
-                                </span>
-
-                            </div>
+                                    </span>
 
 
-                            <div
-                                class="finished-qr"
-                                id="qr-${unit.id}"
-                            >
-                            </div>
+                                    <span
+                                        class="finished-unit-status"
+                                    >
+
+                                        ${escapeHtml(
+                                            unit.status ||
+                                            "available"
+                                        )}
+
+                                    </span>
+
+                                </div>
 
 
-                            <div
-                                class="finished-trace-code"
-                            >
-
-                                ${escapeHtml(
-                                    unit.trace_code
-                                )}
-
-                            </div>
-
-
-                            <div
-                                class="finished-unit-actions"
-                            >
-
-                                <button
-                                    class="finished-unit-btn"
-                                    type="button"
-                                    data-copy-trace="${escapeHtml(
-                                        unit.trace_code
-                                    )}"
-                                >
-
-                                    <i
-                                        data-lucide="copy"
-                                    ></i>
-
-                                    Copy
-
-                                </button>
-
-
-                                <button
-                                    class="finished-unit-btn primary"
-                                    type="button"
-                                    data-print-unit="${escapeHtml(
+                                <div
+                                    class="finished-qr"
+                                    id="qr-${escapeHtml(
                                         unit.id
                                     )}"
                                 >
-
-                                    <i
-                                        data-lucide="printer"
-                                    ></i>
-
-                                    Print
-
-                                </button>
-
-                            </div>
-
-                        </article>
-
-                    `;
-
-                }
-            ).join("");
+                                </div>
 
 
-        generateAllQr();
+                                <div
+                                    class="finished-trace-code"
+                                >
+
+                                    ${escapeHtml(
+                                        unit.trace_code
+                                    )}
+
+                                </div>
+
+
+                                <div
+                                    class="finished-unit-actions"
+                                >
+
+                                    <button
+                                        class="finished-unit-btn"
+                                        type="button"
+                                        data-copy-trace="${escapeHtml(
+                                            unit.trace_code
+                                        )}"
+                                    >
+
+                                        <i
+                                            data-lucide="copy"
+                                        ></i>
+
+                                        Copy
+
+                                    </button>
+
+
+                                    <button
+                                        class="finished-unit-btn primary"
+                                        type="button"
+                                        data-print-unit="${escapeHtml(
+                                            unit.id
+                                        )}"
+                                    >
+
+                                        <i
+                                            data-lucide="printer"
+                                        ></i>
+
+                                        Print
+
+                                    </button>
+
+                                </div>
+
+                            </article>
+
+                        `;
+
+                    }
+                )
+                .join("");
 
 
         createIcons();
+
+
+        generateAllQr();
 
     }
 
 
     /* =====================================================
-       QR
+       GENERATE ALL QR
     ===================================================== */
 
-    function generateAllQr(){
+    function generateAllQr() {
+
+        if (
+            typeof QRCode === "undefined"
+        ) {
+
+            console.error(
+                "MERAMU: QRCode library belum tersedia."
+            );
+
+
+            showToast(
+                "Library QR belum tersedia."
+            );
+
+
+            return;
+
+        }
+
 
         finishedUnits.forEach(
             unit => {
@@ -720,9 +874,13 @@
     }
 
 
+    /* =====================================================
+       GENERATE SINGLE QR
+    ===================================================== */
+
     function generateQr(
         unit
-    ){
+    ) {
 
         const container =
             document.getElementById(
@@ -730,7 +888,27 @@
             );
 
 
-        if(!container){
+        if (!container) {
+
+            return;
+
+        }
+
+
+        if (
+            !unit.trace_code
+        ) {
+
+            container.innerHTML = `
+                <span
+                    style="
+                        font-size:10px;
+                        color:#8A9991;
+                    "
+                >
+                    Trace code tidak tersedia
+                </span>
+            `;
 
             return;
 
@@ -748,45 +926,115 @@
             );
 
 
-        new QRCode(
-            container,
-            {
-                text:url,
+        try {
 
-                width:135,
+            new QRCode(
+                container,
+                {
 
-                height:135,
+                    text: url,
 
-                correctLevel:
-                    QRCode.CorrectLevel.M
-            }
-        );
+                    width: 135,
+
+                    height: 135,
+
+                    correctLevel:
+                        QRCode.CorrectLevel.M
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "MERAMU QR Error:",
+                error
+            );
+
+        }
 
     }
 
 
     /* =====================================================
-       COPY TRACE
+       COPY TRACE CODE
     ===================================================== */
 
     async function copyTrace(
         traceCode
-    ){
+    ) {
 
-        try{
+        if (!traceCode) {
 
-            await navigator.clipboard.writeText(
-                traceCode
+            showToast(
+                "Trace code tidak tersedia."
             );
+
+            return;
+
+        }
+
+
+        try {
+
+            if (
+                navigator.clipboard &&
+                navigator.clipboard.writeText
+            ) {
+
+                await navigator.clipboard.writeText(
+                    traceCode
+                );
+
+            } else {
+
+                const textarea =
+                    document.createElement(
+                        "textarea"
+                    );
+
+
+                textarea.value =
+                    traceCode;
+
+
+                textarea.style.position =
+                    "fixed";
+
+                textarea.style.opacity =
+                    "0";
+
+
+                document.body.appendChild(
+                    textarea
+                );
+
+
+                textarea.select();
+
+
+                document.execCommand(
+                    "copy"
+                );
+
+
+                textarea.remove();
+
+            }
 
 
             showToast(
                 "Trace code berhasil disalin."
             );
 
-        }catch(error){
 
-            console.error(error);
+        } catch (error) {
+
+            console.error(
+                "Copy trace error:",
+                error
+            );
+
 
             showToast(
                 "Gagal menyalin trace code."
@@ -798,12 +1046,12 @@
 
 
     /* =====================================================
-       PRINT SINGLE LABEL
+       PRINT SINGLE UNIT
     ===================================================== */
 
     function printUnit(
         unitId
-    ){
+    ) {
 
         const unit =
             finishedUnits.find(
@@ -812,7 +1060,11 @@
             );
 
 
-        if(!unit){
+        if (!unit) {
+
+            showToast(
+                "Finished unit tidak ditemukan."
+            );
 
             return;
 
@@ -827,14 +1079,14 @@
 
 
     /* =====================================================
-       PRINT ALL
+       PRINT ALL UNITS
     ===================================================== */
 
-    function printAll(){
+    function printAll() {
 
-        if(
+        if (
             finishedUnits.length === 0
-        ){
+        ) {
 
             showToast(
                 "Tidak ada bottle untuk dicetak."
@@ -858,7 +1110,7 @@
 
     function printThermalLabel(
         units
-    ){
+    ) {
 
         const items =
             Array.isArray(units)
@@ -866,7 +1118,17 @@
                 : [units];
 
 
+        if (
+            items.length === 0
+        ) {
+
+            return;
+
+        }
+
+
         const product =
+            selectedBatch?.product_name ||
             selectedBatch?.products?.name ||
             "MERAMU";
 
@@ -883,79 +1145,77 @@
             );
 
 
-        const qrJobs =
-            items.map(
-                unit => {
+        const labels =
+            items
+                .map(
+                    unit => {
 
-                    const url =
-                        TRACE_BASE_URL +
-                        encodeURIComponent(
-                            unit.trace_code
-                        );
-
-
-                    return `
-                        <div
-                            class="thermal-label"
-                        >
+                        return `
 
                             <div
-                                class="thermal-brand"
+                                class="thermal-label"
                             >
-                                MERAMU
+
+                                <div
+                                    class="thermal-brand"
+                                >
+                                    MERAMU
+                                </div>
+
+
+                                <div
+                                    class="thermal-product"
+                                >
+                                    ${escapeHtml(
+                                        product
+                                    )}
+                                </div>
+
+
+                                <div
+                                    class="thermal-size"
+                                >
+                                    ${formatNumber(
+                                        bottleSize,
+                                        0
+                                    )}
+                                    ML
+                                </div>
+
+
+                                <div
+                                    class="thermal-best-before"
+                                >
+                                    BB:
+                                    ${escapeHtml(
+                                        bestBefore
+                                    )}
+                                </div>
+
+
+                                <div
+                                    class="thermal-qr"
+                                    data-thermal-qr="${escapeHtml(
+                                        unit.trace_code
+                                    )}"
+                                ></div>
+
+
+                                <div
+                                    class="thermal-code"
+                                >
+                                    ${escapeHtml(
+                                        unit.trace_code
+                                    )}
+                                </div>
+
                             </div>
 
+                        `;
 
-                            <div
-                                class="thermal-product"
-                            >
-                                ${escapeHtml(
-                                    product
-                                )}
-                            </div>
-
-
-                            <div
-                                class="thermal-size"
-                            >
-                                ${formatNumber(
-                                    bottleSize
-                                )}
-                                ML
-                            </div>
-
-
-                            <div
-                                class="thermal-best-before"
-                            >
-                                BB:
-                                ${escapeHtml(
-                                    bestBefore
-                                )}
-                            </div>
-
-
-                            <div
-                                class="thermal-qr"
-                                data-thermal-qr="${escapeHtml(
-                                    unit.trace_code
-                                )}"
-                            ></div>
-
-
-                            <div
-                                class="thermal-code"
-                            >
-                                ${escapeHtml(
-                                    unit.trace_code
-                                )}
-                            </div>
-
-                        </div>
-                    `;
-
-                }
-            ).join("");
+                    }
+                )
+                .join("");
 
 
         const printWindow =
@@ -966,10 +1226,10 @@
             );
 
 
-        if(!printWindow){
+        if (!printWindow) {
 
             showToast(
-                "Popup diblokir browser."
+                "Popup diblokir browser. Izinkan popup untuk print."
             );
 
             return;
@@ -987,6 +1247,10 @@
             <html>
 
             <head>
+
+                <meta
+                    charset="UTF-8"
+                >
 
                 <title>
                     MERAMU Thermal Label
@@ -1020,7 +1284,7 @@
                             Arial,
                             sans-serif;
 
-                        background:#fff;
+                        background:#FFFFFF;
                     }
 
 
@@ -1034,6 +1298,11 @@
                         text-align:center;
 
                         page-break-after:always;
+                    }
+
+
+                    .thermal-label:last-child{
+                        page-break-after:auto;
                     }
 
 
@@ -1079,11 +1348,13 @@
                         display:flex;
 
                         align-items:center;
+
                         justify-content:center;
 
                         margin:3mm auto 2mm;
 
                         width:30mm;
+
                         height:30mm;
                     }
 
@@ -1091,6 +1362,7 @@
                     .thermal-qr img,
                     .thermal-qr canvas{
                         width:30mm !important;
+
                         height:30mm !important;
                     }
 
@@ -1110,7 +1382,7 @@
 
             <body>
 
-                ${qrJobs}
+                ${labels}
 
             </body>
 
@@ -1123,21 +1395,40 @@
 
 
         setTimeout(
-            () => {
+            function () {
+
+                if (
+                    typeof QRCode === "undefined"
+                ) {
+
+                    printWindow.close();
+
+                    showToast(
+                        "Library QR belum tersedia."
+                    );
+
+                    return;
+
+                }
+
 
                 items.forEach(
                     unit => {
 
+                        const selector =
+                            `[data-thermal-qr="${CSS.escape(
+                                unit.trace_code
+                            )}"]`;
+
+
                         const container =
                             printWindow.document
                                 .querySelector(
-                                    `[data-thermal-qr="${CSS.escape(
-                                        unit.trace_code
-                                    )}"]`
+                                    selector
                                 );
 
 
-                        if(!container){
+                        if (!container) {
 
                             return;
 
@@ -1154,14 +1445,16 @@
                         new QRCode(
                             container,
                             {
-                                text:url,
 
-                                width:113,
+                                text: url,
 
-                                height:113,
+                                width: 113,
+
+                                height: 113,
 
                                 correctLevel:
                                     QRCode.CorrectLevel.M
+
                             }
                         );
 
@@ -1170,34 +1463,62 @@
 
 
                 setTimeout(
-                    () => {
+                    function () {
 
                         printWindow.focus();
 
                         printWindow.print();
 
                     },
-                    500
+                    600
                 );
 
+
             },
-            300
+            500
         );
 
     }
 
 
     /* =====================================================
-       EMPTY
+       EMPTY STATE
     ===================================================== */
 
-    function renderEmpty(){
+    function renderEmpty() {
 
         const container =
             $("finishedUnits");
 
 
-        if(!container){
+        const count =
+            $("finishedUnitCount");
+
+
+        const batchInfo =
+            $("finishedBatchInfo");
+
+
+        if (count) {
+
+            count.textContent =
+                "0 bottles";
+
+        }
+
+
+        if (batchInfo) {
+
+            batchInfo.style.display =
+                "none";
+
+            batchInfo.innerHTML =
+                "";
+
+        }
+
+
+        if (!container) {
 
             return;
 
@@ -1229,15 +1550,31 @@
     }
 
 
+    /* =====================================================
+       ERROR STATE
+    ===================================================== */
+
     function renderUnitsError(
         message
-    ){
+    ) {
 
         const container =
             $("finishedUnits");
 
 
-        if(!container){
+        const count =
+            $("finishedUnitCount");
+
+
+        if (count) {
+
+            count.textContent =
+                "Error";
+
+        }
+
+
+        if (!container) {
 
             return;
 
@@ -1256,7 +1593,8 @@
 
                 <span>
                     ${escapeHtml(
-                        message
+                        message ||
+                        "Terjadi kesalahan."
                     )}
                 </span>
 
@@ -1271,27 +1609,12 @@
 
 
     /* =====================================================
-       ICONS
-    ===================================================== */
-
-    function createIcons(){
-
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
-
-    }
-
-
-    /* =====================================================
        TOAST
     ===================================================== */
 
     function showToast(
         message
-    ){
+    ) {
 
         let toast =
             document.getElementById(
@@ -1299,7 +1622,7 @@
             );
 
 
-        if(!toast){
+        if (!toast) {
 
             toast =
                 document.createElement(
@@ -1311,38 +1634,39 @@
                 "meramuToast";
 
 
-            toast.style.position =
-                "fixed";
+            Object.assign(
+                toast.style,
+                {
 
-            toast.style.right =
-                "20px";
+                    position: "fixed",
 
-            toast.style.bottom =
-                "20px";
+                    right: "20px",
 
-            toast.style.zIndex =
-                "99999";
+                    bottom: "20px",
 
-            toast.style.padding =
-                "11px 15px";
+                    zIndex: "99999",
 
-            toast.style.borderRadius =
-                "12px";
+                    padding: "11px 15px",
 
-            toast.style.background =
-                "#17352A";
+                    borderRadius: "12px",
 
-            toast.style.color =
-                "#FFFFFF";
+                    background: "#17352A",
 
-            toast.style.fontFamily =
-                "Poppins,sans-serif";
+                    color: "#FFFFFF",
 
-            toast.style.fontSize =
-                "11px";
+                    fontFamily:
+                        "Poppins,sans-serif",
 
-            toast.style.boxShadow =
-                "0 12px 30px rgba(0,0,0,.18)";
+                    fontSize: "11px",
+
+                    boxShadow:
+                        "0 12px 30px rgba(0,0,0,.18)",
+
+                    transition:
+                        "opacity .2s ease"
+
+                }
+            );
 
 
             document.body.appendChild(
@@ -1367,7 +1691,7 @@
 
         toast._timer =
             setTimeout(
-                () => {
+                function () {
 
                     toast.style.opacity =
                         "0";
@@ -1383,21 +1707,36 @@
        EVENTS
     ===================================================== */
 
-    function bindEvents(){
+    function bindEvents() {
 
         const select =
             $("finishedBatchSelect");
 
 
-        if(select){
+        if (select) {
 
             select.addEventListener(
                 "change",
-                async event => {
+                async function (event) {
 
-                    await selectFinishedBatch(
-                        event.target.value
-                    );
+                    try {
+
+                        await selectFinishedBatch(
+                            event.target.value
+                        );
+
+                    } catch (error) {
+
+                        console.error(
+                            "Select batch error:",
+                            error
+                        );
+
+                        renderUnitsError(
+                            error.message
+                        );
+
+                    }
 
                 }
             );
@@ -1409,13 +1748,43 @@
             $("refreshFinished");
 
 
-        if(refresh){
+        if (refresh) {
 
             refresh.addEventListener(
                 "click",
-                async () => {
+                async function () {
 
-                    await loadFinishedBatches();
+                    try {
+
+                        refresh.disabled =
+                            true;
+
+
+                        await loadFinishedBatches();
+
+
+                        showToast(
+                            "Data Produk Jadi diperbarui."
+                        );
+
+                    } catch (error) {
+
+                        console.error(
+                            "Refresh finished error:",
+                            error
+                        );
+
+
+                        renderUnitsError(
+                            error.message
+                        );
+
+                    } finally {
+
+                        refresh.disabled =
+                            false;
+
+                    }
 
                 }
             );
@@ -1427,13 +1796,14 @@
             $("generateAllQr");
 
 
-        if(generate){
+        if (generate) {
 
             generate.addEventListener(
                 "click",
-                () => {
+                function () {
 
                     generateAllQr();
+
 
                     showToast(
                         "QR semua botol berhasil dibuat."
@@ -1449,7 +1819,7 @@
             $("printAllLabels");
 
 
-        if(printAllButton){
+        if (printAllButton) {
 
             printAllButton.addEventListener(
                 "click",
@@ -1461,7 +1831,7 @@
 
         document.addEventListener(
             "click",
-            event => {
+            function (event) {
 
                 const copyButton =
                     event.target.closest(
@@ -1469,7 +1839,7 @@
                     );
 
 
-                if(copyButton){
+                if (copyButton) {
 
                     copyTrace(
                         copyButton.dataset.copyTrace
@@ -1486,7 +1856,7 @@
                     );
 
 
-                if(printButton){
+                if (printButton) {
 
                     printUnit(
                         printButton.dataset.printUnit
@@ -1504,17 +1874,17 @@
        INIT
     ===================================================== */
 
-    async function init(){
+    async function init() {
 
-        try{
-
-            bindEvents();
+        try {
 
             createIcons();
 
+            bindEvents();
+
             await loadFinishedBatches();
 
-        }catch(error){
+        } catch (error) {
 
             console.error(
                 "MERAMU Finished Error:",
@@ -1532,16 +1902,32 @@
     }
 
 
+    /* =====================================================
+       DOM READY
+    ===================================================== */
+
     document.addEventListener(
         "DOMContentLoaded",
         init
     );
 
 
+    /* =====================================================
+       PUBLIC API
+    ===================================================== */
+
     window.MERAMUFinished = {
-        load:loadFinishedBatches,
-        generateAllQr,
-        printAll
+
+        load:
+            loadFinishedBatches,
+
+        generateAllQr:
+            generateAllQr,
+
+        printAll:
+            printAll
+
     };
+
 
 })();
