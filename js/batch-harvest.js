@@ -335,20 +335,25 @@
         modal.id =
             "actualHarvestModal";
 
-        modal.className =
-            "batch-modal";
+         modal.className =
+             "fermentation-log-modal";
 
         modal.innerHTML = `
 
-            <div
-                class="batch-modal-backdrop"
-                data-close-harvest
-            ></div>
+         <div
+             class="fermentation-log-modal-backdrop"
+             data-close-harvest
+         ></div>
+         
+         
+         <div
+             class="fermentation-log-modal-dialog"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="actualHarvestModalTitle"
+         >
 
-
-            <div class="batch-modal-dialog">
-
-                <div class="batch-modal-header">
+                <div class="fermentation-log-modal-header">
 
                     <div>
 
@@ -356,8 +361,8 @@
                             ACTUAL HARVEST
                         </span>
 
-                        <h3>
-                            Selesaikan Panen
+                        <h3 id="actualHarvestModalTitle">
+                         Selesaikan Panen
                         </h3>
 
                         <p>
@@ -488,7 +493,7 @@
                     ></div>
 
 
-                    <div class="batch-modal-actions">
+                    <div class="fermentation-log-form-actions">
 
                         <button
                             type="button"
