@@ -1,11 +1,25 @@
 /* =========================================================
    MERAMU ACTUAL HARVEST
    Harvest Ready → Actual Harvest
+
+   Version:
+   - Responsive
+   - iOS / MERAMU style
+   - Reuse existing MERAMU modal system
+   - Desktop 2-column form
+   - Mobile 1-column form
 ========================================================= */
 
 (function(){
 
     "use strict";
+
+
+    /* =====================================================
+       CONFIG
+    ===================================================== */
+
+    const MODAL_ID = "actualHarvestModal";
 
 
     /* =====================================================
@@ -61,8 +75,92 @@
 
 
     /* =====================================================
-       FORMAT DATETIME LOCAL
+       HELPERS
     ===================================================== */
+
+    function getElement(id){
+
+        return document.getElementById(id);
+
+    }
+
+
+    function escapeHtml(value){
+
+        return String(
+            value ?? ""
+        )
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+    }
+
+
+    function formatVolume(value){
+
+        if(
+            value === null ||
+            value === undefined ||
+            value === ""
+        ){
+
+            return "—";
+
+        }
+
+        const number =
+            Number(value);
+
+        if(!Number.isFinite(number)){
+
+            return "—";
+
+        }
+
+        return Number.isInteger(number)
+            ? String(number)
+            : number.toFixed(1);
+
+    }
+
+
+    function formatDate(dateValue){
+
+        if(!dateValue){
+
+            return "—";
+
+        }
+
+        const date =
+            new Date(
+                dateValue
+            );
+
+        if(
+            Number.isNaN(
+                date.getTime()
+            )
+        ){
+
+            return "—";
+
+        }
+
+        return new Intl.DateTimeFormat(
+            "id-ID",
+            {
+                day:"2-digit",
+                month:"short",
+                year:"numeric"
+            }
+        ).format(date);
+
+    }
+
 
     function getLocalDateTimeValue(){
 
@@ -86,35 +184,640 @@
 
 
     /* =====================================================
-       FORMAT VOLUME
+       HARVEST MODAL CSS
     ===================================================== */
 
-    function formatVolume(value){
+    function injectHarvestStyles(){
 
         if(
-            value === null ||
-            value === undefined ||
-            value === ""
+            document.getElementById(
+                "meramuActualHarvestStyles"
+            )
         ){
 
-            return "—";
+            return;
 
         }
 
-        const number =
-            Number(value);
 
-        if(
-            !Number.isFinite(number)
-        ){
+        const style =
+            document.createElement(
+                "style"
+            );
 
-            return "—";
+        style.id =
+            "meramuActualHarvestStyles";
 
-        }
 
-        return Number.isInteger(number)
-            ? String(number)
-            : number.toFixed(1);
+        style.textContent = `
+
+            /* =================================================
+               ACTUAL HARVEST MODAL
+            ================================================= */
+
+            #${MODAL_ID}{
+                z-index:9999 !important;
+            }
+
+
+            #${MODAL_ID}
+            .fermentation-log-modal-dialog{
+
+                width:
+                    min(
+                        720px,
+                        calc(100vw - 32px)
+                    ) !important;
+
+                max-width:
+                    720px !important;
+
+                max-height:
+                    calc(100vh - 32px);
+
+                overflow-y:auto;
+
+                border-radius:24px !important;
+
+            }
+
+
+            /* =================================================
+               HEADER
+            ================================================= */
+
+            #${MODAL_ID}
+            .fermentation-log-modal-header{
+
+                padding:
+                    24px 26px 20px !important;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-heading{
+
+                min-width:0;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-heading
+            .section-eyebrow{
+
+                display:block;
+
+                margin-bottom:6px;
+
+                font-size:11px;
+
+                font-weight:700;
+
+                letter-spacing:.12em;
+
+                color:#046738;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-heading h2{
+
+                margin:0;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:22px;
+
+                line-height:1.3;
+
+                font-weight:600;
+
+                color:#18201c;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-heading p{
+
+                margin:5px 0 0;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:12px;
+
+                line-height:1.5;
+
+                color:#8b9690;
+
+            }
+
+
+            /* =================================================
+               FORM
+            ================================================= */
+
+            #${MODAL_ID}
+            .actual-harvest-form{
+
+                padding:
+                    22px 26px 0;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-grid{
+
+                display:grid;
+
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
+
+                gap:
+                    18px 20px;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field{
+
+                min-width:0;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field.full{
+
+                grid-column:
+                    1 / -1;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field label{
+
+                display:block;
+
+                margin-bottom:7px;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:12px;
+
+                line-height:1.4;
+
+                font-weight:600;
+
+                color:#34413a;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field input,
+            #${MODAL_ID}
+            .actual-harvest-field textarea{
+
+                box-sizing:border-box;
+
+                display:block;
+
+                width:100%;
+
+                border:
+                    1px solid #e3e9e5;
+
+                border-radius:12px;
+
+                background:#ffffff;
+
+                color:#18201c;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:13px;
+
+                outline:none;
+
+                transition:
+                    border-color .18s ease,
+                    box-shadow .18s ease,
+                    background .18s ease;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field input{
+
+                height:44px;
+
+                padding:
+                    0 13px;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field textarea{
+
+                min-height:100px;
+
+                resize:vertical;
+
+                padding:
+                    11px 13px;
+
+                line-height:1.55;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field input::placeholder,
+            #${MODAL_ID}
+            .actual-harvest-field textarea::placeholder{
+
+                color:#aab4ae;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field input:focus,
+            #${MODAL_ID}
+            .actual-harvest-field textarea:focus{
+
+                border-color:#046738;
+
+                box-shadow:
+                    0 0 0 3px
+                    rgba(
+                        4,
+                        103,
+                        56,
+                        .08
+                    );
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-field small{
+
+                display:block;
+
+                margin-top:6px;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:10px;
+
+                color:#929d97;
+
+            }
+
+
+            /* =================================================
+               TARGET INFO
+            ================================================= */
+
+            #${MODAL_ID}
+            .harvest-target-box{
+
+                display:flex;
+
+                align-items:center;
+
+                min-height:44px;
+
+                box-sizing:border-box;
+
+                padding:
+                    0 13px;
+
+                border:
+                    1px solid #e5ebe7;
+
+                border-radius:12px;
+
+                background:#f8faf9;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:13px;
+
+                font-weight:500;
+
+                color:#425048;
+
+            }
+
+
+            /* =================================================
+               SUMMARY
+            ================================================= */
+
+            #${MODAL_ID}
+            .harvest-summary{
+
+                display:grid;
+
+                grid-template-columns:
+                    repeat(
+                        3,
+                        minmax(0,1fr)
+                    );
+
+                gap:10px;
+
+                margin-top:20px;
+
+                padding:14px;
+
+                border:
+                    1px solid #e5ebe7;
+
+                border-radius:16px;
+
+                background:#f8faf9;
+
+            }
+
+
+            #${MODAL_ID}
+            .harvest-summary-item{
+
+                min-width:0;
+
+            }
+
+
+            #${MODAL_ID}
+            .harvest-summary-item span{
+
+                display:block;
+
+                margin-bottom:4px;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:10px;
+
+                font-weight:500;
+
+                color:#929d97;
+
+            }
+
+
+            #${MODAL_ID}
+            .harvest-summary-item strong{
+
+                display:block;
+
+                overflow:hidden;
+
+                text-overflow:ellipsis;
+
+                white-space:nowrap;
+
+                font-family:
+                    Poppins,
+                    sans-serif;
+
+                font-size:13px;
+
+                font-weight:600;
+
+                color:#243129;
+
+            }
+
+
+            #${MODAL_ID}
+            .harvest-ready-value{
+
+                color:#046738 !important;
+
+            }
+
+
+            /* =================================================
+               FOOTER
+            ================================================= */
+
+            #${MODAL_ID}
+            .actual-harvest-actions{
+
+                display:flex;
+
+                align-items:center;
+
+                justify-content:flex-end;
+
+                gap:10px;
+
+                margin-top:22px;
+
+                padding:
+                    16px 26px 22px;
+
+                border-top:
+                    1px solid #edf1ee;
+
+            }
+
+
+            #${MODAL_ID}
+            .actual-harvest-actions
+            .page-btn{
+
+                min-height:44px;
+
+                white-space:nowrap;
+
+            }
+
+
+            #${MODAL_ID}
+            #saveActualHarvest{
+
+                min-width:190px;
+
+            }
+
+
+            /* =================================================
+               MOBILE
+            ================================================= */
+
+            @media(max-width:768px){
+
+                #${MODAL_ID}
+                .fermentation-log-modal-dialog{
+
+                    width:
+                        calc(100vw - 24px) !important;
+
+                    max-width:
+                        calc(100vw - 24px) !important;
+
+                    max-height:
+                        calc(100vh - 24px);
+
+                    border-radius:20px !important;
+
+                }
+
+
+                #${MODAL_ID}
+                .fermentation-log-modal-header{
+
+                    padding:
+                        20px 18px 16px !important;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-heading h2{
+
+                    font-size:19px;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-form{
+
+                    padding:
+                        18px 18px 0;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-grid{
+
+                    grid-template-columns:
+                        minmax(0,1fr);
+
+                    gap:15px;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-field.full{
+
+                    grid-column:auto;
+
+                }
+
+
+                #${MODAL_ID}
+                .harvest-summary{
+
+                    grid-template-columns:
+                        minmax(0,1fr);
+
+                    gap:9px;
+
+                }
+
+
+                #${MODAL_ID}
+                .harvest-summary-item{
+
+                    display:flex;
+
+                    align-items:center;
+
+                    justify-content:space-between;
+
+                    gap:15px;
+
+                }
+
+
+                #${MODAL_ID}
+                .harvest-summary-item span{
+
+                    margin:0;
+
+                }
+
+
+                #${MODAL_ID}
+                .harvest-summary-item strong{
+
+                    text-align:right;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-actions{
+
+                    flex-direction:column-reverse;
+
+                    align-items:stretch;
+
+                    padding:
+                        14px 18px 18px;
+
+                }
+
+
+                #${MODAL_ID}
+                .actual-harvest-actions
+                .page-btn{
+
+                    width:100%;
+
+                }
+
+
+                #${MODAL_ID}
+                #saveActualHarvest{
+
+                    min-width:0;
+
+                }
+
+            }
+
+        `;
+
+
+        document.head.appendChild(
+            style
+        );
 
     }
 
@@ -130,6 +833,7 @@
 
         const batchCode =
             getBatchCode();
+
 
         const {
             data,
@@ -156,11 +860,13 @@
             )
             .maybeSingle();
 
+
         if(error){
 
             throw error;
 
         }
+
 
         if(!data){
 
@@ -170,21 +876,427 @@
 
         }
 
+
         return data;
 
     }
 
 
     /* =====================================================
-       INJECT BUTTON
+       CREATE MODAL
     ===================================================== */
 
-    function injectHarvestButton(batch){
+    function createModal(){
+
+        injectHarvestStyles();
+
+
+        if(
+            document.getElementById(
+                MODAL_ID
+            )
+        ){
+
+            return;
+
+        }
+
+
+        const modal =
+            document.createElement(
+                "div"
+            );
+
+
+        modal.id =
+            MODAL_ID;
+
+        modal.className =
+            "fermentation-log-modal";
+
+        modal.hidden =
+            true;
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        modal.innerHTML = `
+
+            <div
+                class="fermentation-log-modal-backdrop"
+                data-close-harvest
+            ></div>
+
+
+            <div
+                class="fermentation-log-modal-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="actualHarvestModalTitle"
+            >
+
+                <!-- =========================================
+                     HEADER
+                ========================================== -->
+
+                <div
+                    class="fermentation-log-modal-header"
+                >
+
+                    <div
+                        class="actual-harvest-heading"
+                    >
+
+                        <span
+                            class="section-eyebrow"
+                        >
+                            ACTUAL HARVEST
+                        </span>
+
+
+                        <h2
+                            id="actualHarvestModalTitle"
+                        >
+                            Selesaikan Panen
+                        </h2>
+
+
+                        <p>
+                            Simpan hasil panen aktual
+                            untuk batch ini.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="icon-detail-btn"
+                        data-close-harvest
+                        aria-label="Tutup"
+                    >
+
+                        <i
+                            data-lucide="x"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+
+                <!-- =========================================
+                     FORM
+                ========================================== -->
+
+                <form
+                    id="actualHarvestForm"
+                    class="actual-harvest-form"
+                >
+
+                    <div
+                        class="actual-harvest-grid"
+                    >
+
+                        <!-- DATE -->
+
+                        <div
+                            class="actual-harvest-field"
+                        >
+
+                            <label
+                                for="harvestActualAt"
+                            >
+                                Tanggal & Waktu Panen
+                            </label>
+
+
+                            <input
+                                id="harvestActualAt"
+                                type="datetime-local"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- VOLUME -->
+
+                        <div
+                            class="actual-harvest-field"
+                        >
+
+                            <label
+                                for="harvestVolume"
+                            >
+                                Volume Panen
+                            </label>
+
+
+                            <input
+                                id="harvestVolume"
+                                type="number"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Contoh: 17.5"
+                                required
+                            >
+
+
+                            <small>
+                                Satuan: Liter (L)
+                            </small>
+
+                        </div>
+
+
+                        <!-- OPERATOR -->
+
+                        <div
+                            class="actual-harvest-field"
+                        >
+
+                            <label
+                                for="harvestOperator"
+                            >
+                                Operator
+                            </label>
+
+
+                            <input
+                                id="harvestOperator"
+                                type="text"
+                                placeholder="Nama operator"
+                            >
+
+                        </div>
+
+
+                        <!-- TARGET -->
+
+                        <div
+                            class="actual-harvest-field"
+                        >
+
+                            <label>
+                                Target Panen
+                            </label>
+
+
+                            <div
+                                id="harvestTargetInfo"
+                                class="harvest-target-box"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+
+                        <!-- NOTES -->
+
+                        <div
+                            class="actual-harvest-field full"
+                        >
+
+                            <label
+                                for="harvestNotes"
+                            >
+                                Catatan Panen
+                            </label>
+
+
+                            <textarea
+                                id="harvestNotes"
+                                rows="4"
+                                placeholder="Contoh: Panen normal, aroma baik, warna sesuai standar."
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SUMMARY -->
+
+                    <div
+                        id="harvestSummary"
+                        class="harvest-summary"
+                    ></div>
+
+
+                </form>
+
+
+                <!-- =========================================
+                     FOOTER
+                ========================================== -->
+
+                <div
+                    class="actual-harvest-actions"
+                >
+
+                    <button
+                        type="button"
+                        class="page-btn secondary"
+                        data-close-harvest
+                    >
+                        Batal
+                    </button>
+
+
+                    <button
+                        id="saveActualHarvest"
+                        type="submit"
+                        form="actualHarvestForm"
+                        class="page-btn primary"
+                    >
+
+                        <i
+                            data-lucide="check-circle"
+                        ></i>
+
+                        Simpan Actual Harvest
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            modal
+        );
+
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+
+        bindModalEvents();
+
+    }
+
+
+    /* =====================================================
+       SHOW MODAL
+    ===================================================== */
+
+    function showModal(){
+
+        const modal =
+            getElement(
+                MODAL_ID
+            );
+
+        if(!modal){
+
+            return;
+
+        }
+
+
+        modal.hidden =
+            false;
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        /*
+           Class show mengikuti
+           sistem modal MERAMU.
+        */
+
+        requestAnimationFrame(
+            () => {
+
+                modal.classList.add(
+                    "show"
+                );
+
+            }
+        );
+
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+    }
+
+
+    /* =====================================================
+       CLOSE MODAL
+    ===================================================== */
+
+    function closeHarvestModal(){
+
+        const modal =
+            getElement(
+                MODAL_ID
+            );
+
+        if(!modal){
+
+            return;
+
+        }
+
+
+        modal.classList.remove(
+            "show"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+
+        setTimeout(
+            () => {
+
+                modal.hidden =
+                    true;
+
+            },
+            180
+        );
+
+    }
+
+
+    /* =====================================================
+       INJECT HEADER BUTTON
+    ===================================================== */
+
+    function injectHarvestButton(
+        batch
+    ){
 
         const actions =
             document.querySelector(
                 ".batch-header-actions"
             );
+
 
         if(!actions){
 
@@ -204,7 +1316,8 @@
 
 
         /*
-           Sudah selesai panen
+           Jika sudah dipanen,
+           tombol dihilangkan.
         */
 
         if(
@@ -222,11 +1335,6 @@
         }
 
 
-        /*
-           Hanya tampil ketika
-           current_stage = harvest
-        */
-
         const stage =
             String(
                 batch.current_stage || ""
@@ -234,6 +1342,11 @@
             .toLowerCase()
             .trim();
 
+
+        /*
+           Tombol hanya muncul
+           ketika stage = harvest.
+        */
 
         if(stage !== "harvest"){
 
@@ -260,6 +1373,7 @@
                 "button"
             );
 
+
         button.id =
             "completeHarvest";
 
@@ -269,20 +1383,25 @@
         button.className =
             "page-btn primary";
 
+
         button.innerHTML = `
-            <i data-lucide="leaf"></i>
-            <span>Selesaikan Panen</span>
+
+            <i
+                data-lucide="leaf"
+            ></i>
+
+            <span>
+                Selesaikan Panen
+            </span>
+
         `;
 
-
-        /*
-           Letakkan sebelum Edit Batch
-        */
 
         const editButton =
             document.getElementById(
                 "editBatch"
             );
+
 
         if(editButton){
 
@@ -306,238 +1425,6 @@
             lucide.createIcons();
 
         }
-
-    }
-
-
-    /* =====================================================
-       MODAL
-    ===================================================== */
-
-    function createModal(){
-
-        if(
-            document.getElementById(
-                "actualHarvestModal"
-            )
-        ){
-
-            return;
-
-        }
-
-
-        const modal =
-            document.createElement(
-                "div"
-            );
-
-        modal.id =
-            "actualHarvestModal";
-
-         modal.className =
-             "fermentation-log-modal";
-
-        modal.innerHTML = `
-
-         <div
-             class="fermentation-log-modal-backdrop"
-             data-close-harvest
-         ></div>
-         
-         
-         <div
-             class="fermentation-log-modal-dialog"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="actualHarvestModalTitle"
-         >
-
-                <div class="fermentation-log-modal-header">
-
-                    <div>
-
-                        <span class="section-eyebrow">
-                            ACTUAL HARVEST
-                        </span>
-
-                        <h3 id="actualHarvestModalTitle">
-                         Selesaikan Panen
-                        </h3>
-
-                        <p>
-                            Simpan hasil panen aktual
-                            untuk batch ini.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="batch-modal-close"
-                        data-close-harvest
-                        aria-label="Tutup"
-                    >
-                        <i data-lucide="x"></i>
-                    </button>
-
-                </div>
-
-
-                <form
-                    id="actualHarvestForm"
-                    class="batch-modal-form"
-                >
-
-                    <div class="form-grid">
-
-                        <div class="form-field">
-
-                            <label
-                                for="harvestActualAt"
-                            >
-                                Tanggal & Waktu Panen
-                            </label>
-
-                            <input
-                                id="harvestActualAt"
-                                type="datetime-local"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-field">
-
-                            <label
-                                for="harvestVolume"
-                            >
-                                Volume Panen
-                            </label>
-
-                            <input
-                                id="harvestVolume"
-                                type="number"
-                                min="0.01"
-                                step="0.01"
-                                placeholder="Contoh: 17.5"
-                                required
-                            >
-
-                            <small>
-                                Satuan: Liter (L)
-                            </small>
-
-                        </div>
-
-
-                        <div class="form-field">
-
-                            <label
-                                for="harvestOperator"
-                            >
-                                Operator
-                            </label>
-
-                            <input
-                                id="harvestOperator"
-                                type="text"
-                                placeholder="Nama operator"
-                            >
-
-                        </div>
-
-
-                        <div class="form-field">
-
-                            <label>
-                                Target Panen
-                            </label>
-
-                            <div
-                                id="harvestTargetInfo"
-                                class="harvest-info-box"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="form-field form-field-full"
-                        >
-
-                            <label
-                                for="harvestNotes"
-                            >
-                                Catatan Panen
-                            </label>
-
-                            <textarea
-                                id="harvestNotes"
-                                rows="4"
-                                placeholder="Contoh: Panen normal, aroma baik, warna sesuai standar."
-                            ></textarea>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        id="harvestSummary"
-                        class="harvest-summary"
-                    ></div>
-
-
-                    <div class="fermentation-log-form-actions">
-
-                        <button
-                            type="button"
-                            class="page-btn secondary"
-                            data-close-harvest
-                        >
-                            Batal
-                        </button>
-
-
-                        <button
-                            id="saveActualHarvest"
-                            type="submit"
-                            class="page-btn primary"
-                        >
-
-                            <i data-lucide="check-circle"></i>
-
-                            Simpan Actual Harvest
-
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        `;
-
-
-        document.body.appendChild(
-            modal
-        );
-
-
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
-
-
-        bindModalEvents();
 
     }
 
@@ -588,48 +1475,58 @@
 
 
             const modal =
-                document.getElementById(
-                    "actualHarvestModal"
+                getElement(
+                    MODAL_ID
                 );
 
+
             const dateInput =
-                document.getElementById(
+                getElement(
                     "harvestActualAt"
                 );
 
+
             const volumeInput =
-                document.getElementById(
+                getElement(
                     "harvestVolume"
                 );
 
+
             const operatorInput =
-                document.getElementById(
+                getElement(
                     "harvestOperator"
                 );
 
+
             const notesInput =
-                document.getElementById(
+                getElement(
                     "harvestNotes"
                 );
 
+
             const targetInfo =
-                document.getElementById(
+                getElement(
                     "harvestTargetInfo"
                 );
 
+
             const summary =
-                document.getElementById(
+                getElement(
                     "harvestSummary"
                 );
 
+
+            /*
+               Default values
+            */
 
             dateInput.value =
                 getLocalDateTimeValue();
 
 
             volumeInput.value =
-                batch.actual_volume ||
-                batch.planned_volume ||
+                batch.actual_volume ??
+                batch.planned_volume ??
                 "";
 
 
@@ -644,66 +1541,83 @@
 
 
             targetInfo.textContent =
-                batch.target_date
-                    ? new Intl.DateTimeFormat(
-                        "id-ID",
-                        {
-                            day:"2-digit",
-                            month:"short",
-                            year:"numeric"
-                        }
-                    ).format(
-                        new Date(
-                            batch.target_date +
-                            "T00:00:00"
-                        )
-                    )
-                    : "—";
+                formatDate(
+                    batch.target_date
+                );
 
 
             summary.innerHTML = `
 
-                <div>
-                    <span>Batch</span>
+                <div
+                    class="harvest-summary-item"
+                >
+
+                    <span>
+                        Batch
+                    </span>
+
                     <strong>
-                        ${batch.batch_code}
+                        ${escapeHtml(
+                            batch.batch_code
+                        )}
                     </strong>
+
                 </div>
 
-                <div>
-                    <span>Planned</span>
+
+                <div
+                    class="harvest-summary-item"
+                >
+
+                    <span>
+                        Planned
+                    </span>
+
                     <strong>
                         ${formatVolume(
                             batch.planned_volume
                         )} L
                     </strong>
+
                 </div>
 
-                <div>
-                    <span>Ready</span>
-                    <strong>
+
+                <div
+                    class="harvest-summary-item"
+                >
+
+                    <span>
+                        Ready
+                    </span>
+
+                    <strong
+                        class="harvest-ready-value"
+                    >
                         ${
                             batch.harvest_ready_at
-                                ? "YES"
+                                ? "READY"
                                 : "—"
                         }
                     </strong>
+
                 </div>
 
             `;
 
 
-            modal.classList.add(
-                "show"
-            );
+            showModal();
 
 
             setTimeout(
-                () =>
-                    volumeInput.focus(),
-                50
-            );
+                () => {
 
+                    volumeInput.focus();
+
+                    volumeInput.select();
+
+                },
+                120
+            );
 
         }
         catch(error){
@@ -712,6 +1626,7 @@
                 "MERAMU Harvest:",
                 error
             );
+
 
             alert(
                 error?.message ||
@@ -724,29 +1639,7 @@
 
 
     /* =====================================================
-       CLOSE MODAL
-    ===================================================== */
-
-    function closeHarvestModal(){
-
-        const modal =
-            document.getElementById(
-                "actualHarvestModal"
-            );
-
-        if(modal){
-
-            modal.classList.remove(
-                "show"
-            );
-
-        }
-
-    }
-
-
-    /* =====================================================
-       SAVE HARVEST
+       SAVE ACTUAL HARVEST
     ===================================================== */
 
     async function saveActualHarvest(
@@ -757,18 +1650,25 @@
 
 
         const saveButton =
-            document.getElementById(
+            getElement(
                 "saveActualHarvest"
             );
 
 
-        const originalText =
+        if(!saveButton){
+
+            return;
+
+        }
+
+
+        const originalHtml =
             saveButton.innerHTML;
 
 
         const volume =
             Number(
-                document.getElementById(
+                getElement(
                     "harvestVolume"
                 )?.value
             );
@@ -789,7 +1689,7 @@
 
 
         const actualAt =
-            document.getElementById(
+            getElement(
                 "harvestActualAt"
             )?.value;
 
@@ -810,8 +1710,22 @@
             saveButton.disabled =
                 true;
 
-            saveButton.innerHTML =
-                "Menyimpan...";
+            saveButton.innerHTML = `
+
+                <i
+                    data-lucide="loader-circle"
+                ></i>
+
+                Menyimpan...
+
+            `;
+
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
 
 
             const supabase =
@@ -822,10 +1736,27 @@
                 await getBatch();
 
 
-            const actualAtIso =
+            const actualAtDate =
                 new Date(
                     actualAt
-                ).toISOString();
+                );
+
+
+            if(
+                Number.isNaN(
+                    actualAtDate.getTime()
+                )
+            ){
+
+                throw new Error(
+                    "Tanggal & waktu panen tidak valid."
+                );
+
+            }
+
+
+            const actualAtIso =
+                actualAtDate.toISOString();
 
 
             const {
@@ -845,13 +1776,13 @@
                         volume,
 
                     p_harvest_operator:
-                        document.getElementById(
+                        getElement(
                             "harvestOperator"
                         )?.value?.trim() ||
                         null,
 
                     p_harvest_notes:
-                        document.getElementById(
+                        getElement(
                             "harvestNotes"
                         )?.value?.trim() ||
                         null
@@ -877,7 +1808,7 @@
 
 
             /*
-               Refresh Batch Detail
+               Refresh batch data
             */
 
             if(
@@ -915,7 +1846,7 @@
 
 
             /*
-               Realtime
+               Custom event
             */
 
             document.dispatchEvent(
@@ -925,6 +1856,7 @@
                         detail:{
                             batchCode:
                                 batch.batch_code,
+
                             batch:
                                 data
                         }
@@ -932,6 +1864,10 @@
                 )
             );
 
+
+            /*
+               Realtime refresh
+            */
 
             if(
                 window.MERAMURealtime &&
@@ -950,13 +1886,11 @@
 
 
             /*
-               Reload satu kali agar
-               seluruh komponen memakai
-               data terbaru.
+               Reload supaya seluruh
+               komponen memakai data terbaru.
             */
 
             window.location.reload();
-
 
         }
         catch(error){
@@ -975,7 +1909,6 @@
                 )
             );
 
-
         }
         finally{
 
@@ -983,7 +1916,14 @@
                 false;
 
             saveButton.innerHTML =
-                originalText;
+                originalHtml;
+
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
 
         }
 
@@ -996,6 +1936,24 @@
 
     function bindModalEvents(){
 
+        /*
+           Hindari event listener
+           terpasang dua kali.
+        */
+
+        if(
+            window.MERAMUActualHarvestEventsBound
+        ){
+
+            return;
+
+        }
+
+
+        window.MERAMUActualHarvestEventsBound =
+            true;
+
+
         document.addEventListener(
             "click",
             function(event){
@@ -1004,6 +1962,7 @@
                     event.target.closest(
                         "#completeHarvest"
                     );
+
 
                 if(completeButton){
 
@@ -1020,6 +1979,7 @@
                     event.target.closest(
                         "[data-close-harvest]"
                     );
+
 
                 if(closeButton){
 
@@ -1060,7 +2020,20 @@
                     event.key === "Escape"
                 ){
 
-                    closeHarvestModal();
+                    const modal =
+                        getElement(
+                            MODAL_ID
+                        );
+
+
+                    if(
+                        modal &&
+                        !modal.hidden
+                    ){
+
+                        closeHarvestModal();
+
+                    }
 
                 }
 
@@ -1080,15 +2053,18 @@
 
             createModal();
 
+
             const batch =
                 await getBatch();
+
 
             injectHarvestButton(
                 batch
             );
 
+
             console.log(
-                "✅ MERAMU Actual Harvest Controller Loaded",
+                "✅ MERAMU Actual Harvest Controller Loaded:",
                 batch.batch_code
             );
 
@@ -1112,19 +2088,22 @@
     window.openHarvestModal =
         openHarvestModal;
 
+
     window.closeHarvestModal =
         closeHarvestModal;
 
+
     window.saveActualHarvest =
         saveActualHarvest;
+
 
     window.initActualHarvest =
         init;
 
 
-    /*
-       Jalankan setelah DOM siap.
-    */
+    /* =====================================================
+       START
+    ===================================================== */
 
     if(
         document.readyState ===
