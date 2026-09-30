@@ -2863,317 +2863,594 @@ batch.timeline =
 }
 
 /* =========================================================
-SAVE EDIT BATCH
+   SAVE EDIT BATCH
+   Supabase Version
 ========================================================= */
 
 function saveEditBatch(event){
 
-event.preventDefault();
+    if(event){
+        event.preventDefault();
+    }
 
 
-const form =
-    document.getElementById(
-        "editBatchForm"
-    );
+    /* =====================================================
+       FORM
+    ===================================================== */
 
+    const form =
+        document.getElementById(
+            "editBatchForm"
+        );
 
-if(!form){
 
-    return;
+    if(!form){
 
-}
+        console.warn(
+            "MERAMU: editBatchForm tidak ditemukan."
+        );
 
-
-if(
-    !form.checkValidity()
-){
-
-    form.reportValidity();
-
-    return;
-
-}
-
-
-const batch =
-    getCurrentBatch();
-
-
-if(!batch){
-
-    return;
-
-}
-
-
-/* =====================================================
-   FORM VALUES
-===================================================== */
-
-const product =
-    document.getElementById(
-        "editProduct"
-    )?.value.trim();
-
-
-const volume =
-    document.getElementById(
-        "editVolume"
-    )?.value.trim();
-
-
-const targetDate =
-    document.getElementById(
-        "editTargetDate"
-    )?.value;
-
-
-const stage =
-    document.getElementById(
-        "editStage"
-    )?.value;
-
-
-const note =
-    document.getElementById(
-        "editNote"
-    )?.value.trim() ||
-    "";
-
-
-/* =====================================================
-   VALIDATION
-===================================================== */
-
-if(!product){
-
-    alert(
-        "Product wajib diisi."
-    );
-
-    return;
-
-}
-
-
-if(
-    !volume ||
-    Number(volume) <= 0
-){
-
-    alert(
-        "Volume harus lebih besar dari 0."
-    );
-
-    return;
-
-}
-
-
-if(!targetDate){
-
-    alert(
-        "Target date wajib diisi."
-    );
-
-    return;
-
-}
-
-
-const normalizedStage =
-    normalizeBatchStage(
-        stage
-    );
-
-
-/* =====================================================
-   UPDATE MAIN BATCH
-===================================================== */
-
-batch.product =
-    product;
-
-
-batch.volume =
-    `${Number(
-        volume
-    ).toFixed(
-        1
-    )} L`;
-
-
-batch.targetDate =
-    formatFermentationDate(
-        targetDate
-    );
-
-
-batch.stage =
-    getStageLabel(
-        normalizedStage
-    );
-
-
-batch.note =
-    note;
-
-
-/* =====================================================
-   UPDATE STATUS
-===================================================== */
-
-if(
-    normalizedStage ===
-    "harvest"
-){
-
-    batch.status =
-        "READY HARVEST";
-
-
-    batch.progress =
-        100;
-
-}
-
-
-else if(
-    normalizedStage ===
-    "finished"
-){
-
-    batch.status =
-        "FINISHED";
-
-
-    batch.progress =
-        100;
-
-}
-
-
-else if(
-    normalizedStage ===
-    "production"
-){
-
-    batch.status =
-        "PRODUCTION ACTIVE";
-
-}
-
-
-else{
-
-    batch.status =
-        `${getStageLabel(
-            normalizedStage
-        )
-        .replace(
-            " Fermentasi",
-            ""
-        )
-        .toUpperCase()} ACTIVE`;
-
-}
-
-
-/* =====================================================
-   UPDATE PROGRESS
-===================================================== */
-
-if(
-    normalizedStage !==
-        "harvest"
-    &&
-    normalizedStage !==
-        "finished"
-){
-
-    const stageProgress = {
-
-        production: 10,
-
-        f1: 50,
-
-        f2: 80,
-
-        bottling: 90,
-
-        label: 95
-
-    };
-
-
-    if(
-        stageProgress[
-            normalizedStage
-        ] !== undefined
-    ){
-
-        batch.progress =
-            stageProgress[
-                normalizedStage
-            ];
+        return;
 
     }
 
-}
+
+    /* =====================================================
+       VALIDATE FORM
+    ===================================================== */
+
+    if(!form.checkValidity()){
+
+        form.reportValidity();
+
+        return;
+
+    }
 
 
-/* =====================================================
-   UPDATE DAY
-===================================================== */
+    /* =====================================================
+       CURRENT BATCH
+    ===================================================== */
 
-if(
-    normalizedStage ===
+    const batch =
+        getCurrentBatch();
+
+
+    if(!batch){
+
+        alert(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       SUPABASE
+    ===================================================== */
+
+    const supabase =
+        window.supabaseClient;
+
+
+    if(!supabase){
+
+        console.error(
+            "MERAMU: Supabase client tidak tersedia."
+        );
+
+        alert(
+            "Koneksi database belum siap. Silakan coba lagi."
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       FORM VALUES
+    ===================================================== */
+
+    const product =
+        document.getElementById(
+            "editProduct"
+        )?.value.trim();
+
+
+    const volume =
+        document.getElementById(
+            "editVolume"
+        )?.value.trim();
+
+
+    const targetDate =
+        document.getElementById(
+            "editTargetDate"
+        )?.value;
+
+
+    const stage =
+        document.getElementById(
+            "editStage"
+        )?.value;
+
+
+    const note =
+        document.getElementById(
+            "editNote"
+        )?.value.trim() || "";
+
+
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
+
+    if(!product){
+
+        alert(
+            "Product wajib diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !volume ||
+        Number(volume) <= 0
+    ){
+
+        alert(
+            "Volume harus lebih besar dari 0."
+        );
+
+        return;
+
+    }
+
+
+    if(!targetDate){
+
+        alert(
+            "Target date wajib diisi."
+        );
+
+        return;
+
+    }
+
+
+    if(!stage){
+
+        alert(
+            "Stage wajib dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const normalizedStage =
+        normalizeBatchStage(
+            stage
+        );
+
+
+    /* =====================================================
+       CALCULATE STATUS
+    ===================================================== */
+
+    let status = "";
+
+
+    if(
+        normalizedStage ===
         "harvest"
-    ||
-    normalizedStage ===
+    ){
+
+        status =
+            "READY HARVEST";
+
+    }
+
+    else if(
+        normalizedStage ===
         "finished"
-){
+    ){
 
-    batch.day =
-        batch.targetDays;
+        status =
+            "FINISHED";
+
+    }
+
+    else if(
+        normalizedStage ===
+        "production"
+    ){
+
+        status =
+            "PRODUCTION ACTIVE";
+
+    }
+
+    else{
+
+        status =
+            `${getStageLabel(
+                normalizedStage
+            )
+            .replace(
+                " Fermentasi",
+                ""
+            )
+            .toUpperCase()} ACTIVE`;
+
+    }
+
+
+    /* =====================================================
+       CALCULATE PROGRESS
+    ===================================================== */
+
+    let progress =
+        batch.progress || 0;
+
+
+    if(
+        normalizedStage ===
+        "harvest"
+        ||
+        normalizedStage ===
+        "finished"
+    ){
+
+        progress =
+            100;
+
+    }
+
+    else{
+
+        const stageProgress = {
+
+            production: 10,
+
+            f1: 50,
+
+            f2: 80,
+
+            bottling: 90,
+
+            label: 95
+
+        };
+
+
+        if(
+            stageProgress[
+                normalizedStage
+            ] !== undefined
+        ){
+
+            progress =
+                stageProgress[
+                    normalizedStage
+                ];
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SUBMIT BUTTON
+    ===================================================== */
+
+    const submitButton =
+        form.querySelector(
+            'button[type="submit"]'
+        );
+
+
+    const originalButtonHTML =
+        submitButton
+            ? submitButton.innerHTML
+            : "";
+
+
+    if(submitButton){
+
+        submitButton.disabled =
+            true;
+
+        submitButton.innerHTML =
+            "Menyimpan...";
+
+    }
+
+
+    /* =====================================================
+       FIND PRODUCT
+    ===================================================== */
+
+    console.log(
+        "MERAMU: Mencari product:",
+        product
+    );
+
+
+    supabase
+
+        .from("products")
+
+        .select(
+            "id,name"
+        )
+
+        .eq(
+            "name",
+            product
+        )
+
+        .maybeSingle()
+
+        .then(function(productResult){
+
+            /* =============================================
+               PRODUCT QUERY ERROR
+            ============================================= */
+
+            if(productResult.error){
+
+                throw productResult.error;
+
+            }
+
+
+            /* =============================================
+               PRODUCT NOT FOUND
+            ============================================= */
+
+            if(!productResult.data){
+
+                throw new Error(
+                    `Product "${product}" tidak ditemukan di database.`
+                );
+
+            }
+
+
+            const productId =
+                productResult.data.id;
+
+
+            console.log(
+                "MERAMU: Product UUID:",
+                productId
+            );
+
+
+            /* =============================================
+               UPDATE PAYLOAD
+            ============================================= */
+
+            const payload = {
+
+                product_id:
+                    productId,
+
+                target_date:
+                    targetDate,
+
+                planned_volume:
+                    Number(volume),
+
+                current_stage:
+                    normalizedStage,
+
+                status:
+                    status,
+
+                notes:
+                    note || null
+
+            };
+
+
+            console.log(
+                "MERAMU: UPDATE batch:",
+                payload
+            );
+
+
+            /* =============================================
+               UPDATE BATCH
+            ============================================= */
+
+            return supabase
+
+                .from(
+                    "batches"
+                )
+
+                .update(
+                    payload
+                )
+
+                .eq(
+                    "id",
+                    batch.id
+                )
+
+                .select(
+                    "*"
+                )
+
+                .single();
+
+        })
+
+
+        /* =================================================
+           UPDATE RESULT
+        ================================================= */
+
+        .then(function(updateResult){
+
+            if(updateResult.error){
+
+                throw updateResult.error;
+
+            }
+
+
+            console.log(
+                "MERAMU: Batch berhasil diperbarui di Supabase.",
+                updateResult.data
+            );
+
+
+            /* =================================================
+               UPDATE LOCAL DATA
+               Supaya UI langsung berubah
+            ================================================= */
+
+            batch.product =
+                product;
+
+
+            batch.volume =
+                `${Number(
+                    volume
+                ).toFixed(
+                    1
+                )} L`;
+
+
+            batch.targetDate =
+                formatFermentationDate(
+                    targetDate
+                );
+
+
+            batch.stage =
+                getStageLabel(
+                    normalizedStage
+                );
+
+
+            batch.note =
+                note;
+
+
+            batch.status =
+                status;
+
+
+            batch.progress =
+                progress;
+
+
+            if(
+                normalizedStage ===
+                "harvest"
+                ||
+                normalizedStage ===
+                "finished"
+            ){
+
+                batch.day =
+                    batch.targetDays;
+
+            }
+
+
+            /* =================================================
+               UPDATE TIMELINE
+            ================================================= */
+
+            updateBatchStageTimeline(
+                batch,
+                normalizedStage
+            );
+
+
+            /* =================================================
+               RENDER
+            ================================================= */
+
+            renderBatchDetail();
+
+
+            /* =================================================
+               CLOSE MODAL
+            ================================================= */
+
+            closeEditBatchModal();
+
+
+            /* =================================================
+               RESET FORM
+            ================================================= */
+
+            resetEditBatchForm();
+
+
+            console.log(
+                "MERAMU: Edit Batch selesai.",
+                batch
+            );
+
+        })
+
+
+        /* =================================================
+           ERROR
+        ================================================= */
+
+        .catch(function(error){
+
+            console.error(
+                "MERAMU: Gagal update batch.",
+                error
+            );
+
+
+            alert(
+                "Batch gagal diperbarui.\n\n" +
+                (
+                    error?.message ||
+                    "Terjadi kesalahan."
+                )
+            );
+
+        })
+
+
+        /* =================================================
+           RESTORE BUTTON
+        ================================================= */
+
+        .finally(function(){
+
+            if(submitButton){
+
+                submitButton.disabled =
+                    false;
+
+                submitButton.innerHTML =
+                    originalButtonHTML;
+
+            }
+
+        });
 
 }
-
-
-/* =====================================================
-   UPDATE TIMELINE
-===================================================== */
-
-updateBatchStageTimeline(
-    batch,
-    normalizedStage
-);
-
-
-/* =====================================================
-   RENDER
-===================================================== */
-
-renderBatchDetail();
-
-
-/* =====================================================
-   CLOSE
-===================================================== */
-
-closeEditBatchModal();
-
-
-resetEditBatchForm();
-
-
-console.log(
-    "MERAMU: Batch berhasil diperbarui.",
-    batch
-);
-
-}
-
 /* =========================================================
 EDIT BATCH EVENTS
 ========================================================= */
