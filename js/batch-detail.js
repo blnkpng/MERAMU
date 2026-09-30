@@ -1,3261 +1,2531 @@
 /* =========================================================
-   MERAMU BATCH DETAIL
-   Dummy Data → Ready for Supabase
+MERAMU BATCH DETAIL
+Dummy Data → Ready for Supabase
 ========================================================= */
 
-
 /* =========================================================
-   BATCH DATA
+BATCH DATA
 ========================================================= */
 
 const batchDetailData = {
 
-    "KB-021": {
-        code: "KB-021",
-        product: "Original Kombucha",
-        type: "kombucha",
-        status: "F1 ACTIVE",
-        stage: "F1 Fermentasi",
-        progress: 60,
-        day: 4,
-        targetDays: 7,
-        startDate: "28 Sep 2026",
-        targetDate: "05 Okt 2026",
-        volume: "20 L",
-        hpp: "Rp 8.200",
-        ph: "3.55",
-        brix: "8.2°",
-        temperature: "25.1°C",
-        duration: "4 Hari"
-    },
+"KB-021": {
+    code: "KB-021",
+    product: "Original Kombucha",
+    type: "kombucha",
+    status: "F1 ACTIVE",
+    stage: "F1 Fermentasi",
+    progress: 60,
+    day: 4,
+    targetDays: 7,
+    startDate: "28 Sep 2026",
+    targetDate: "05 Okt 2026",
+    volume: "20 L",
+    hpp: "Rp 8.200",
+    ph: "3.55",
+    brix: "8.2°",
+    temperature: "25.1°C",
+    duration: "4 Hari"
+},
 
 
-    "KB-022": {
-        code: "KB-022",
-        product: "Lemon Kombucha",
-        type: "kombucha",
-        status: "F2 ACTIVE",
-        stage: "F2 Fermentasi",
-        progress: 80,
-        day: 4,
-        targetDays: 5,
-        startDate: "26 Sep 2026",
-        targetDate: "01 Okt 2026",
-        volume: "20 L",
-        hpp: "Rp 8.450",
-        ph: "3.42",
-        brix: "7.8°",
-        temperature: "25.4°C",
-        duration: "4 Hari",
+"KB-022": {
+    code: "KB-022",
+    product: "Lemon Kombucha",
+    type: "kombucha",
+    status: "F2 ACTIVE",
+    stage: "F2 Fermentasi",
+    progress: 80,
+    day: 4,
+    targetDays: 5,
+    startDate: "26 Sep 2026",
+    targetDate: "01 Okt 2026",
+    volume: "20 L",
+    hpp: "Rp 8.450",
+    ph: "3.42",
+    brix: "7.8°",
+    temperature: "25.4°C",
+    duration: "4 Hari",
 
-        /* =====================================================
-           FERMENTATION LOG
-        ===================================================== */
+    /* =====================================================
+       FERMENTATION LOG
+    ===================================================== */
 
-        fermentationLogs: [
+    fermentationLogs: [
 
-            {
-                id: 1,
-                stage: "f2",
-                date: "29 Sep 2026",
-                time: "10:15",
-                ph: "3.42",
-                brix: "7.8°",
-                temperature: "25.4°C",
-                volume: "20 L",
-                operator: "Arif",
-                qc: "passed",
-                note: "Aroma normal, fermentasi berjalan baik."
-            },
+        {
+            id: 1,
+            stage: "f2",
+            date: "29 Sep 2026",
+            time: "10:15",
+            ph: "3.42",
+            brix: "7.8°",
+            temperature: "25.4°C",
+            volume: "20 L",
+            operator: "Arif",
+            qc: "passed",
+            note: "Aroma normal, fermentasi berjalan baik."
+        },
 
-            {
-                id: 2,
-                stage: "f2",
-                date: "28 Sep 2026",
-                time: "10:20",
-                ph: "3.51",
-                brix: "8.1°",
-                temperature: "25.6°C",
-                volume: "20 L",
-                operator: "Arif",
-                qc: "passed",
-                note: "Fermentasi berjalan normal."
-            }
+        {
+            id: 2,
+            stage: "f2",
+            date: "28 Sep 2026",
+            time: "10:20",
+            ph: "3.51",
+            brix: "8.1°",
+            temperature: "25.6°C",
+            volume: "20 L",
+            operator: "Arif",
+            qc: "passed",
+            note: "Fermentasi berjalan normal."
+        }
 
-        ],
-
-
-        /* =====================================================
-           BATCH TIMELINE
-        ===================================================== */
-
-        timeline: [
-
-            {
-                stage: "production",
-                date: "26 Sep 2026",
-                time: "10:15",
-                status: "completed",
-                note: "Batch dibuat."
-            },
-
-            {
-                stage: "f1",
-                date: "27 Sep 2026",
-                time: "09:20",
-                status: "completed",
-                note: "F1 selesai."
-            },
-
-            {
-                stage: "f2",
-                date: "29 Sep 2026",
-                time: "10:15",
-                status: "active",
-                note: "Sedang berjalan."
-            },
-
-            {
-                stage: "harvest",
-                date: "01 Okt 2026",
-                time: null,
-                status: "upcoming",
-                note: "Menunggu F2 selesai."
-            },
-
-            {
-                stage: "bottling",
-                date: null,
-                time: null,
-                status: "upcoming",
-                note: "Menunggu Harvest."
-            },
-
-            {
-                stage: "label",
-                date: null,
-                time: null,
-                status: "upcoming",
-                note: "Menunggu Bottling."
-            },
-
-            {
-                stage: "finished",
-                date: null,
-                time: null,
-                status: "upcoming",
-                note: "Menunggu proses sebelumnya."
-            }
-
-        ]
-    },
+    ],
 
 
-    "KB-023": {
-        code: "KB-023",
-        product: "Berry Kombucha",
-        type: "kombucha",
-        status: "F1 ACTIVE",
-        stage: "F1 Fermentasi",
-        progress: 70,
-        day: 5,
-        targetDays: 7,
-        startDate: "25 Sep 2026",
-        targetDate: "02 Okt 2026",
-        volume: "24 L",
-        hpp: "Rp 9.100",
-        ph: "3.48",
-        brix: "8.0°",
-        temperature: "24.9°C",
-        duration: "5 Hari"
-    },
+    /* =====================================================
+       BATCH TIMELINE
+    ===================================================== */
+
+    timeline: [
+
+        {
+            stage: "production",
+            date: "26 Sep 2026",
+            time: "10:15",
+            status: "completed",
+            note: "Batch dibuat."
+        },
+
+        {
+            stage: "f1",
+            date: "27 Sep 2026",
+            time: "09:20",
+            status: "completed",
+            note: "F1 selesai."
+        },
+
+        {
+            stage: "f2",
+            date: "29 Sep 2026",
+            time: "10:15",
+            status: "active",
+            note: "Sedang berjalan."
+        },
+
+        {
+            stage: "harvest",
+            date: "01 Okt 2026",
+            time: null,
+            status: "upcoming",
+            note: "Menunggu F2 selesai."
+        },
+
+        {
+            stage: "bottling",
+            date: null,
+            time: null,
+            status: "upcoming",
+            note: "Menunggu Harvest."
+        },
+
+        {
+            stage: "label",
+            date: null,
+            time: null,
+            status: "upcoming",
+            note: "Menunggu Bottling."
+        },
+
+        {
+            stage: "finished",
+            date: null,
+            time: null,
+            status: "upcoming",
+            note: "Menunggu proses sebelumnya."
+        }
+
+    ]
+},
 
 
-    "KB-024": {
-        code: "KB-024",
-        product: "Jahe Kombucha",
-        type: "kombucha",
-        status: "F2 ACTIVE",
-        stage: "F2 Fermentasi",
-        progress: 90,
-        day: 5,
-        targetDays: 5,
-        startDate: "24 Sep 2026",
-        targetDate: "29 Sep 2026",
-        volume: "18 L",
-        hpp: "Rp 8.900",
-        ph: "3.38",
-        brix: "7.2°",
-        temperature: "25.8°C",
-        duration: "5 Hari"
-    },
+"KB-023": {
+    code: "KB-023",
+    product: "Berry Kombucha",
+    type: "kombucha",
+    status: "F1 ACTIVE",
+    stage: "F1 Fermentasi",
+    progress: 70,
+    day: 5,
+    targetDays: 7,
+    startDate: "25 Sep 2026",
+    targetDate: "02 Okt 2026",
+    volume: "24 L",
+    hpp: "Rp 9.100",
+    ph: "3.48",
+    brix: "8.0°",
+    temperature: "24.9°C",
+    duration: "5 Hari"
+},
 
 
-    "KB-025": {
-        code: "KB-025",
-        product: "Telang Kombucha",
-        type: "kombucha",
-        status: "READY HARVEST",
-        stage: "Harvest",
-        progress: 100,
-        day: 7,
-        targetDays: 7,
-        startDate: "20 Sep 2026",
-        targetDate: "27 Sep 2026",
-        volume: "20 L",
-        hpp: "Rp 8.750",
-        ph: "3.30",
-        brix: "7.1°",
-        temperature: "25.0°C",
-        duration: "7 Hari"
-    },
+"KB-024": {
+    code: "KB-024",
+    product: "Jahe Kombucha",
+    type: "kombucha",
+    status: "F2 ACTIVE",
+    stage: "F2 Fermentasi",
+    progress: 90,
+    day: 5,
+    targetDays: 5,
+    startDate: "24 Sep 2026",
+    targetDate: "29 Sep 2026",
+    volume: "18 L",
+    hpp: "Rp 8.900",
+    ph: "3.38",
+    brix: "7.2°",
+    temperature: "25.8°C",
+    duration: "5 Hari"
+},
 
 
-    "KB-026": {
-        code: "KB-026",
-        product: "Original Kombucha",
-        type: "kombucha",
-        status: "F2 ACTIVE",
-        stage: "F2 Fermentasi",
-        progress: 40,
-        day: 2,
-        targetDays: 5,
-        startDate: "28 Sep 2026",
-        targetDate: "03 Okt 2026",
-        volume: "20 L",
-        hpp: "Rp 8.300",
-        ph: "3.60",
-        brix: "8.4°",
-        temperature: "25.2°C",
-        duration: "2 Hari"
-    },
+"KB-025": {
+    code: "KB-025",
+    product: "Telang Kombucha",
+    type: "kombucha",
+    status: "READY HARVEST",
+    stage: "Harvest",
+    progress: 100,
+    day: 7,
+    targetDays: 7,
+    startDate: "20 Sep 2026",
+    targetDate: "27 Sep 2026",
+    volume: "20 L",
+    hpp: "Rp 8.750",
+    ph: "3.30",
+    brix: "7.1°",
+    temperature: "25.0°C",
+    duration: "7 Hari"
+},
 
 
-    "KB-027": {
-        code: "KB-027",
-        product: "Lemon Kombucha",
-        type: "kombucha",
-        status: "F1 ACTIVE",
-        stage: "F1 Fermentasi",
-        progress: 15,
-        day: 1,
-        targetDays: 7,
-        startDate: "29 Sep 2026",
-        targetDate: "06 Okt 2026",
-        volume: "20 L",
-        hpp: "Rp 8.500",
-        ph: "3.70",
-        brix: "8.7°",
-        temperature: "24.8°C",
-        duration: "1 Hari"
-    },
+"KB-026": {
+    code: "KB-026",
+    product: "Original Kombucha",
+    type: "kombucha",
+    status: "F2 ACTIVE",
+    stage: "F2 Fermentasi",
+    progress: 40,
+    day: 2,
+    targetDays: 5,
+    startDate: "28 Sep 2026",
+    targetDate: "03 Okt 2026",
+    volume: "20 L",
+    hpp: "Rp 8.300",
+    ph: "3.60",
+    brix: "8.4°",
+    temperature: "25.2°C",
+    duration: "2 Hari"
+},
 
 
-    "KB-028": {
-        code: "KB-028",
-        product: "Berry Kombucha",
-        type: "kombucha",
-        status: "F2 ACTIVE",
-        stage: "F2 Fermentasi",
-        progress: 20,
-        day: 1,
-        targetDays: 5,
-        startDate: "29 Sep 2026",
-        targetDate: "04 Okt 2026",
-        volume: "24 L",
-        hpp: "Rp 9.050",
-        ph: "3.68",
-        brix: "8.3°",
-        temperature: "25.3°C",
-        duration: "1 Hari"
-    }
+"KB-027": {
+    code: "KB-027",
+    product: "Lemon Kombucha",
+    type: "kombucha",
+    status: "F1 ACTIVE",
+    stage: "F1 Fermentasi",
+    progress: 15,
+    day: 1,
+    targetDays: 7,
+    startDate: "29 Sep 2026",
+    targetDate: "06 Okt 2026",
+    volume: "20 L",
+    hpp: "Rp 8.500",
+    ph: "3.70",
+    brix: "8.7°",
+    temperature: "24.8°C",
+    duration: "1 Hari"
+},
+
+
+"KB-028": {
+    code: "KB-028",
+    product: "Berry Kombucha",
+    type: "kombucha",
+    status: "F2 ACTIVE",
+    stage: "F2 Fermentasi",
+    progress: 20,
+    day: 1,
+    targetDays: 5,
+    startDate: "29 Sep 2026",
+    targetDate: "04 Okt 2026",
+    volume: "24 L",
+    hpp: "Rp 9.050",
+    ph: "3.68",
+    brix: "8.3°",
+    temperature: "25.3°C",
+    duration: "1 Hari"
+}
 
 };
 
-
 /* =========================================================
-   GET BATCH ID
+GET BATCH ID
 ========================================================= */
 
 function getBatchId(){
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    return (
-        params.get("id") ||
-        "KB-022"
+const params =
+    new URLSearchParams(
+        window.location.search
     );
+
+return (
+    params.get("id") ||
+    "KB-022"
+);
 
 }
 
-
 /* =========================================================
-   LOAD BATCH
+LOAD BATCH
 ========================================================= */
 
 function getCurrentBatch(){
 
-    const batchId =
-        getBatchId();
+const batchId =
+    getBatchId();
 
-    return (
-        batchDetailData[batchId] ||
-        batchDetailData["KB-022"]
-    );
+return (
+    batchDetailData[batchId] ||
+    batchDetailData["KB-022"]
+);
 
 }
 
-
 /* =========================================================
-   NORMALIZE STAGE
+NORMALIZE STAGE
 ========================================================= */
 
 function normalizeBatchStage(stage){
 
-    if(!stage){
-
-        return "production";
-
-    }
-
-
-    const normalized =
-        String(stage)
-            .trim()
-            .toLowerCase();
-
-
-    if(
-        normalized === "production"
-        ||
-        normalized === "produksi"
-    ){
-
-        return "production";
-
-    }
-
-
-    if(
-        normalized === "f1"
-        ||
-        normalized.includes("f1")
-    ){
-
-        return "f1";
-
-    }
-
-
-    if(
-        normalized === "f2"
-        ||
-        normalized.includes("f2")
-    ){
-
-        return "f2";
-
-    }
-
-
-    if(
-        normalized === "harvest"
-        ||
-        normalized === "panen"
-    ){
-
-        return "harvest";
-
-    }
-
-
-    if(
-        normalized === "bottling"
-        ||
-        normalized === "bottle"
-        ||
-        normalized === "pembotolan"
-    ){
-
-        return "bottling";
-
-    }
-
-
-    if(
-        normalized === "label"
-        ||
-        normalized.includes("qr")
-    ){
-
-        return "label";
-
-    }
-
-
-    if(
-        normalized === "finished"
-        ||
-        normalized === "selesai"
-    ){
-
-        return "finished";
-
-    }
-
+if(!stage){
 
     return "production";
 
 }
 
 
+const normalized =
+    String(stage)
+        .trim()
+        .toLowerCase();
+
+
+if(
+    normalized === "production"
+    ||
+    normalized === "produksi"
+){
+
+    return "production";
+
+}
+
+
+if(
+    normalized === "f1"
+    ||
+    normalized.includes("f1")
+){
+
+    return "f1";
+
+}
+
+
+if(
+    normalized === "f2"
+    ||
+    normalized.includes("f2")
+){
+
+    return "f2";
+
+}
+
+
+if(
+    normalized === "harvest"
+    ||
+    normalized === "panen"
+){
+
+    return "harvest";
+
+}
+
+
+if(
+    normalized === "bottling"
+    ||
+    normalized === "bottle"
+    ||
+    normalized === "pembotolan"
+){
+
+    return "bottling";
+
+}
+
+
+if(
+    normalized === "label"
+    ||
+    normalized.includes("qr")
+){
+
+    return "label";
+
+}
+
+
+if(
+    normalized === "finished"
+    ||
+    normalized === "selesai"
+){
+
+    return "finished";
+
+}
+
+
+return "production";
+
+}
+
 /* =========================================================
-   STATUS CLASS
+STATUS CLASS
 ========================================================= */
 
 function getBatchStatusClass(status){
 
-    if(!status){
-
-        return "active";
-
-    }
-
-
-    const normalized =
-        String(status)
-            .toLowerCase();
-
-
-    if(
-        normalized.includes("harvest")
-        ||
-        normalized.includes("ready")
-    ){
-
-        return "harvest";
-
-    }
-
-
-    if(
-        normalized.includes("delay")
-        ||
-        normalized.includes("terlambat")
-    ){
-
-        return "delayed";
-
-    }
-
+if(!status){
 
     return "active";
 
 }
 
 
+const normalized =
+    String(status)
+        .toLowerCase();
+
+
+if(
+    normalized.includes("harvest")
+    ||
+    normalized.includes("ready")
+){
+
+    return "harvest";
+
+}
+
+
+if(
+    normalized.includes("delay")
+    ||
+    normalized.includes("terlambat")
+){
+
+    return "delayed";
+
+}
+
+
+return "active";
+
+}
+
 /* =========================================================
-   FORMAT DATE
-   YYYY-MM-DD → DD Mon YYYY
+FORMAT DATE
+YYYY-MM-DD → DD Mon YYYY
 ========================================================= */
 
 function formatFermentationDate(value){
 
-    if(!value){
+if(!value){
 
-        return "—";
-
-    }
-
-
-    const parts =
-        String(value).split("-");
-
-
-    if(parts.length !== 3){
-
-        return value;
-
-    }
-
-
-    const year =
-        parts[0];
-
-    const month =
-        Number(parts[1]);
-
-    const day =
-        Number(parts[2]);
-
-
-    const monthNames = [
-
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mei",
-        "Jun",
-        "Jul",
-        "Agu",
-        "Sep",
-        "Okt",
-        "Nov",
-        "Des"
-
-    ];
-
-
-    return `${day} ${monthNames[month - 1]} ${year}`;
+    return "—";
 
 }
 
 
+const parts =
+    String(value).split("-");
+
+
+if(parts.length !== 3){
+
+    return value;
+
+}
+
+
+const year =
+    parts[0];
+
+const month =
+    Number(parts[1]);
+
+const day =
+    Number(parts[2]);
+
+
+const monthNames = [
+
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des"
+
+];
+
+
+return `${day} ${monthNames[month - 1]} ${year}`;
+
+}
+
 /* =========================================================
-   GET CURRENT LOCAL DATE
+GET CURRENT LOCAL DATE
 ========================================================= */
 
 function getLocalDateValue(){
 
-    const now =
-        new Date();
+const now =
+    new Date();
 
 
-    const year =
-        now.getFullYear();
+const year =
+    now.getFullYear();
 
 
-    const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
+const month =
+    String(
+        now.getMonth() + 1
+    ).padStart(
+        2,
+        "0"
+    );
 
 
-    const day =
-        String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
+const day =
+    String(
+        now.getDate()
+    ).padStart(
+        2,
+        "0"
+    );
 
 
-    return `${year}-${month}-${day}`;
+return `${year}-${month}-${day}`;
 
 }
 
-
 /* =========================================================
-   GET CURRENT LOCAL TIME
+GET CURRENT LOCAL TIME
 ========================================================= */
 
 function getLocalTimeValue(){
 
-    const now =
-        new Date();
+const now =
+    new Date();
 
 
-    const hours =
-        String(
-            now.getHours()
-        ).padStart(
-            2,
-            "0"
-        );
+const hours =
+    String(
+        now.getHours()
+    ).padStart(
+        2,
+        "0"
+    );
 
 
-    const minutes =
-        String(
-            now.getMinutes()
-        ).padStart(
-            2,
-            "0"
-        );
+const minutes =
+    String(
+        now.getMinutes()
+    ).padStart(
+        2,
+        "0"
+    );
 
 
-    return `${hours}:${minutes}`;
+return `${hours}:${minutes}`;
 
 }
 
-
 /* =========================================================
-   RENDER BATCH
+RENDER BATCH
 ========================================================= */
 
 function renderBatchDetail(){
 
-    const batch =
-        getCurrentBatch();
+const batch =
+    getCurrentBatch();
 
 
-    if(!batch){
+if(!batch){
 
-        console.warn(
-            "MERAMU: Batch tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    /* -----------------------------------------------
-       BASIC INFO
-    ------------------------------------------------ */
-
-    const product =
-        document.getElementById(
-            "batchProduct"
-        );
-
-    const code =
-        document.getElementById(
-            "batchCode"
-        );
-
-    const status =
-        document.getElementById(
-            "batchStatus"
-        );
-
-
-    if(product){
-
-        product.textContent =
-            batch.product;
-
-    }
-
-
-    if(code){
-
-        code.textContent =
-            batch.code;
-
-    }
-
-
-    if(status){
-
-        status.textContent =
-            batch.status;
-
-        status.className =
-            `batch-status ${getBatchStatusClass(batch.status)}`;
-
-    }
-
-
-    /* -----------------------------------------------
-       STAGE
-    ------------------------------------------------ */
-
-    const stage =
-        document.getElementById(
-            "batchStage"
-        );
-
-
-    if(stage){
-
-        stage.textContent =
-            batch.stage;
-
-    }
-
-
-    /* -----------------------------------------------
-       PROGRESS
-    ------------------------------------------------ */
-
-    const progress =
-        document.getElementById(
-            "batchProgress"
-        );
-
-    const progressBar =
-        document.getElementById(
-            "batchProgressBar"
-        );
-
-
-    if(progress){
-
-        progress.textContent =
-            `${batch.progress}%`;
-
-    }
-
-
-    if(progressBar){
-
-        progressBar.style.width =
-            `${batch.progress}%`;
-
-    }
-
-
-    /* -----------------------------------------------
-       PROGRESS META
-    ------------------------------------------------ */
-
-    const progressMeta =
-        document.querySelector(
-            ".batch-progress-meta"
-        );
-
-
-    if(progressMeta){
-
-        progressMeta.innerHTML = `
-
-            <span>
-                Hari ke-${batch.day}
-                dari ${batch.targetDays} hari
-            </span>
-
-            <span>
-                Target ${batch.targetDate}
-            </span>
-
-        `;
-
-    }
-
-
-    /* -----------------------------------------------
-       KPI
-    ------------------------------------------------ */
-
-    const kpiCards =
-        document.querySelectorAll(
-            ".batch-kpi-card"
-        );
-
-
-    if(kpiCards.length >= 4){
-
-        const startValue =
-            kpiCards[0]
-                .querySelector("strong");
-
-
-        if(startValue){
-
-            startValue.textContent =
-                batch.startDate;
-
-        }
-
-
-        const targetValue =
-            kpiCards[1]
-                .querySelector("strong");
-
-
-        if(targetValue){
-
-            targetValue.textContent =
-                batch.targetDate;
-
-        }
-
-
-        const targetMeta =
-            kpiCards[1]
-                .querySelector(
-                    "span:last-child"
-                );
-
-
-        if(targetMeta){
-
-            targetMeta.textContent =
-                `${batch.targetDays} hari`;
-
-        }
-
-
-        const volumeValue =
-            kpiCards[2]
-                .querySelector("strong");
-
-
-        if(volumeValue){
-
-            volumeValue.textContent =
-                batch.volume;
-
-        }
-
-
-        const hppValue =
-            kpiCards[3]
-                .querySelector("strong");
-
-
-        if(hppValue){
-
-            hppValue.textContent =
-                batch.hpp;
-
-        }
-
-    }
-
-
-    /* -----------------------------------------------
-       FERMENTATION METRICS
-    ------------------------------------------------ */
-
-    const metrics =
-        document.querySelectorAll(
-            ".fermentation-metric strong"
-        );
-
-
-    if(metrics.length >= 4){
-
-        metrics[0].textContent =
-            batch.ph;
-
-        metrics[1].textContent =
-            batch.brix;
-
-        metrics[2].textContent =
-            batch.temperature;
-
-        metrics[3].textContent =
-            batch.duration;
-
-    }
-
-
-    /* -----------------------------------------------
-       BATCH TIMELINE
-    ------------------------------------------------ */
-
-    renderBatchTimeline(
-        batch
+    console.warn(
+        "MERAMU: Batch tidak ditemukan."
     );
 
-
-    /* -----------------------------------------------
-       FERMENTATION LOG
-    ------------------------------------------------ */
-
-    renderFermentationLogs(
-        batch
-    );
-
-
-    console.log(
-        "MERAMU Batch Detail:",
-        batch
-    );
+    return;
 
 }
 
 
-/* =========================================================
+/* -----------------------------------------------
+   BASIC INFO
+------------------------------------------------ */
+
+const product =
+    document.getElementById(
+        "batchProduct"
+    );
+
+const code =
+    document.getElementById(
+        "batchCode"
+    );
+
+const status =
+    document.getElementById(
+        "batchStatus"
+    );
+
+
+if(product){
+
+    product.textContent =
+        batch.product;
+
+}
+
+
+if(code){
+
+    code.textContent =
+        batch.code;
+
+}
+
+
+if(status){
+
+    status.textContent =
+        batch.status;
+
+    status.className =
+        `batch-status ${getBatchStatusClass(batch.status)}`;
+
+}
+
+
+/* -----------------------------------------------
+   STAGE
+------------------------------------------------ */
+
+const stage =
+    document.getElementById(
+        "batchStage"
+    );
+
+
+if(stage){
+
+    stage.textContent =
+        batch.stage;
+
+}
+
+
+/* -----------------------------------------------
+   PROGRESS
+------------------------------------------------ */
+
+const progress =
+    document.getElementById(
+        "batchProgress"
+    );
+
+const progressBar =
+    document.getElementById(
+        "batchProgressBar"
+    );
+
+
+if(progress){
+
+    progress.textContent =
+        `${batch.progress}%`;
+
+}
+
+
+if(progressBar){
+
+    progressBar.style.width =
+        `${batch.progress}%`;
+
+}
+
+
+/* -----------------------------------------------
+   PROGRESS META
+------------------------------------------------ */
+
+const progressMeta =
+    document.querySelector(
+        ".batch-progress-meta"
+    );
+
+
+if(progressMeta){
+
+    progressMeta.innerHTML = `
+
+        <span>
+            Hari ke-${batch.day}
+            dari ${batch.targetDays} hari
+        </span>
+
+        <span>
+            Target ${batch.targetDate}
+        </span>
+
+    `;
+
+}
+
+
+/* -----------------------------------------------
+   KPI
+------------------------------------------------ */
+
+const kpiCards =
+    document.querySelectorAll(
+        ".batch-kpi-card"
+    );
+
+
+if(kpiCards.length >= 4){
+
+    const startValue =
+        kpiCards[0]
+            .querySelector("strong");
+
+
+    if(startValue){
+
+        startValue.textContent =
+            batch.startDate;
+
+    }
+
+
+    const targetValue =
+        kpiCards[1]
+            .querySelector("strong");
+
+
+    if(targetValue){
+
+        targetValue.textContent =
+            batch.targetDate;
+
+    }
+
+
+    const targetMeta =
+        kpiCards[1]
+            .querySelector(
+                "span:last-child"
+            );
+
+
+    if(targetMeta){
+
+        targetMeta.textContent =
+            `${batch.targetDays} hari`;
+
+    }
+
+
+    const volumeValue =
+        kpiCards[2]
+            .querySelector("strong");
+
+
+    if(volumeValue){
+
+        volumeValue.textContent =
+            batch.volume;
+
+    }
+
+
+    const hppValue =
+        kpiCards[3]
+            .querySelector("strong");
+
+
+    if(hppValue){
+
+        hppValue.textContent =
+            batch.hpp;
+
+    }
+
+}
+
+
+/* -----------------------------------------------
+   FERMENTATION METRICS
+------------------------------------------------ */
+
+const metrics =
+    document.querySelectorAll(
+        ".fermentation-metric strong"
+    );
+
+
+if(metrics.length >= 4){
+
+    metrics[0].textContent =
+        batch.ph;
+
+    metrics[1].textContent =
+        batch.brix;
+
+    metrics[2].textContent =
+        batch.temperature;
+
+    metrics[3].textContent =
+        batch.duration;
+
+}
+
+
+/* -----------------------------------------------
    BATCH TIMELINE
+------------------------------------------------ */
+
+renderBatchTimeline(
+    batch
+);
+
+
+/* -----------------------------------------------
+   FERMENTATION LOG
+------------------------------------------------ */
+
+renderFermentationLogs(
+    batch
+);
+
+
+console.log(
+    "MERAMU Batch Detail:",
+    batch
+);
+
+}
+
+/* =========================================================
+BATCH TIMELINE
 ========================================================= */
 
 function renderBatchTimeline(batch){
 
-    const container =
-        document.getElementById(
-            "batchTimeline"
-        );
+const container =
+    document.getElementById(
+        "batchTimeline"
+    );
 
 
-    if(!container){
+if(!container){
 
-        console.warn(
-            "MERAMU: #batchTimeline tidak ditemukan."
-        );
+    console.warn(
+        "MERAMU: #batchTimeline tidak ditemukan."
+    );
 
-        return;
+    return;
+
+}
+
+
+if(!batch){
+
+    container.innerHTML = "";
+
+    return;
+
+}
+
+
+/* =====================================================
+   STAGE CONFIG
+===================================================== */
+
+const stageConfig = {
+
+    production: {
+
+        title: "Production",
+
+        description:
+            "Batch dibuat dan proses produksi dimulai.",
+
+        icon: "flask-conical"
+
+    },
+
+
+    f1: {
+
+        title: "F1 Fermentasi",
+
+        description:
+            "Fermentasi primer.",
+
+        icon: "beaker"
+
+    },
+
+
+    f2: {
+
+        title: "F2 Fermentasi",
+
+        description:
+            "Fermentasi sekunder dan pengembangan rasa.",
+
+        icon: "wine"
+
+    },
+
+
+    harvest: {
+
+        title: "Harvest",
+
+        description:
+            "Batch siap dipanen.",
+
+        icon: "leaf"
+
+    },
+
+
+     bottling: {
+     
+         title: "Bottling",
+     
+         description:
+             "Produk masuk proses pembotolan.",
+     
+         icon: "cylinder"
+     
+     },
+
+    label: {
+
+        title: "Label / QR",
+
+        description:
+            "Label dan QR traceability.",
+
+        icon: "qr-code"
+
+    },
+
+
+    finished: {
+
+        title: "Finished",
+
+        description:
+            "Batch selesai dan siap masuk inventory.",
+
+        icon: "package-check"
 
     }
 
-
-    if(!batch){
-
-        container.innerHTML = "";
-
-        return;
-
-    }
+};
 
 
-    /* =====================================================
-       STAGE CONFIG
-    ===================================================== */
+/* =====================================================
+   DEFAULT STAGES
+===================================================== */
 
-    const stageConfig = {
+const defaultStages = [
 
-        production: {
+    "production",
 
-            title: "Production",
+    "f1",
 
-            description:
-                "Batch dibuat dan proses produksi dimulai.",
+    "f2",
 
-            icon: "flask-conical"
+    "harvest",
 
-        },
+    "bottling",
 
+    "label",
 
-        f1: {
+    "finished"
 
-            title: "F1 Fermentasi",
-
-            description:
-                "Fermentasi primer.",
-
-            icon: "beaker"
-
-        },
+];
 
 
-        f2: {
+/* =====================================================
+   GET EVENTS
+===================================================== */
 
-            title: "F2 Fermentasi",
-
-            description:
-                "Fermentasi sekunder dan pengembangan rasa.",
-
-            icon: "wine"
-
-        },
+let events =
+    Array.isArray(batch.timeline)
+        ? batch.timeline
+        : [];
 
 
-        harvest: {
+/* =====================================================
+   FALLBACK
+===================================================== */
 
-            title: "Harvest",
+if(!events.length){
 
-            description:
-                "Batch siap dipanen.",
-
-            icon: "leaf"
-
-        },
-
-
-         bottling: {
-         
-             title: "Bottling",
-         
-             description:
-                 "Produk masuk proses pembotolan.",
-         
-             icon: "cylinder"
-         
-         },
-
-        label: {
-
-            title: "Label / QR",
-
-            description:
-                "Label dan QR traceability.",
-
-            icon: "qr-code"
-
-        },
+    const currentStage =
+        normalizeBatchStage(
+            batch.stage
+        );
 
 
-        finished: {
+    const stageOrder = {
 
-            title: "Finished",
+        production: 0,
 
-            description:
-                "Batch selesai dan siap masuk inventory.",
+        f1: 1,
 
-            icon: "package-check"
+        f2: 2,
 
-        }
+        harvest: 3,
+
+        bottling: 4,
+
+        label: 5,
+
+        finished: 6
 
     };
-
-
-    /* =====================================================
-       DEFAULT STAGES
-    ===================================================== */
-
-    const defaultStages = [
-
-        "production",
-
-        "f1",
-
-        "f2",
-
-        "harvest",
-
-        "bottling",
-
-        "label",
-
-        "finished"
-
-    ];
-
-
-    /* =====================================================
-       GET EVENTS
-    ===================================================== */
-
-    let events =
-        Array.isArray(batch.timeline)
-            ? batch.timeline
-            : [];
-
-
-    /* =====================================================
-       FALLBACK
-    ===================================================== */
-
-    if(!events.length){
-
-        const currentStage =
-            normalizeBatchStage(
-                batch.stage
-            );
-
-
-        const stageOrder = {
-
-            production: 0,
-
-            f1: 1,
-
-            f2: 2,
-
-            harvest: 3,
-
-            bottling: 4,
-
-            label: 5,
-
-            finished: 6
-
-        };
-
-
-        const currentIndex =
-            stageOrder[currentStage] ?? 0;
-
-
-        events =
-            defaultStages.map(
-                (stage,index) => {
-
-                    let status =
-                        "upcoming";
-
-
-                    if(index < currentIndex){
-
-                        status =
-                            "completed";
-
-                    }
-
-                    else if(
-                        index === currentIndex
-                    ){
-
-                        status =
-                            "active";
-
-                    }
-
-
-                    return {
-
-                        stage: stage,
-
-                        date: null,
-
-                        time: null,
-
-                        status: status,
-
-                        note:
-                            stageConfig[stage]
-                                ?.description || ""
-
-                    };
-
-                }
-            );
-
-    }
-
-
-    /* =====================================================
-       DIRECT PRODUCTION
-    ===================================================== */
-
-    if(batch.type === "direct"){
-
-        events =
-            events.filter(
-                event => {
-
-                    return ![
-                        "f1",
-                        "f2",
-                        "harvest"
-                    ].includes(
-                        event.stage
-                    );
-
-                }
-            );
-
-    }
-
-
-    /* =====================================================
-       RENDER TIMELINE
-    ===================================================== */
-
-    container.innerHTML =
-        events.map(
-            (event,index) => {
-
-                const config =
-                    stageConfig[event.stage];
-
-
-                if(!config){
-
-                    return "";
-
-                }
-
-
-                const status =
-                    event.status ||
-                    "upcoming";
-
-
-                /* -----------------------------------------
-                   DATE
-                ----------------------------------------- */
-
-                let dateText =
-                    "—";
-
-
-                if(event.date){
-
-                    dateText =
-                        event.date;
-
-                }
-
-
-                if(
-                    event.date &&
-                    event.time
-                ){
-
-                    dateText =
-                        `${event.date} • ${event.time}`;
-
-                }
-
-
-                /* -----------------------------------------
-                   NOTE
-                ----------------------------------------- */
-
-                const note =
-                    event.note ||
-                    config.description;
-
-
-                /* -----------------------------------------
-                   CONNECTOR
-                ----------------------------------------- */
-
-                const connector =
-                    index <
-                    events.length - 1
-
-                    ? `
-                        <div
-                            class="history-line"
-                        ></div>
-                    `
-
-                    : "";
-
-
-                return `
-
-                    <div
-                        class="history-item ${status}"
-                    >
-
-                        <div class="history-icon">
-
-                            <i
-                                data-lucide="${config.icon}"
-                            ></i>
-
-                        </div>
-
-
-                        <div class="history-content">
-
-                            <strong>
-                                ${config.title}
-                            </strong>
-
-                            <span>
-                                ${note}
-                            </span>
-
-                        </div>
-
-
-                        <time>
-                            ${dateText}
-                        </time>
-
-                    </div>
-
-                    ${connector}
-
-                `;
-
-            }
-        ).join("");
-
-
-    if(window.lucide){
-
-        lucide.createIcons();
-
-    }
-
-}
-
-
-/* =========================================================
-   FERMENTATION LOG
-========================================================= */
-
-function renderFermentationLogs(batch){
-
-    const container =
-        document.getElementById(
-            "fermentationLogList"
-        );
-
-
-    const count =
-        document.getElementById(
-            "fermentationLogCount"
-        );
-
-
-    if(!container){
-
-        console.warn(
-            "MERAMU: #fermentationLogList tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    const logs =
-        Array.isArray(batch?.fermentationLogs)
-            ? batch.fermentationLogs
-            : [];
-
-
-    if(count){
-
-        count.textContent =
-            logs.length;
-
-    }
-
-
-    if(!logs.length){
-
-        container.innerHTML = `
-
-            <div class="fermentation-log-empty">
-
-                <i data-lucide="clipboard-list"></i>
-
-                <strong>
-                    Belum ada fermentation log
-                </strong>
-
-                <span>
-                    Belum ada pengukuran yang tercatat
-                    untuk batch ini.
-                </span>
-
-            </div>
-
-        `;
-
-
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
-
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        logs.map(
-            log => {
-
-                const qcClass =
-                    log.qc === "passed"
-                        ? "passed"
-                        : "failed";
-
-
-                const qcLabel =
-                    log.qc === "passed"
-                        ? "Passed"
-                        : log.qc === "warning"
-                            ? "Warning"
-                            : "Failed";
-
-
-                const stageLabel =
-                    log.stage
-                        ? String(log.stage)
-                            .toUpperCase()
-                        : "—";
-
-
-                return `
-
-                    <article
-                        class="fermentation-log-item"
-                    >
-
-
-                        <div
-                            class="fermentation-log-top"
-                        >
-
-                            <div
-                                class="fermentation-log-date"
-                            >
-
-                                <div
-                                    class="fermentation-log-icon"
-                                >
-
-                                    <i
-                                        data-lucide="activity"
-                                    ></i>
-
-                                </div>
-
-
-                                <div>
-
-                                    <strong>
-                                        ${log.date || "—"}
-                                    </strong>
-
-                                    <span>
-                                        ${log.time || "—"}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            <span
-                                class="log-stage"
-                            >
-                                ${stageLabel}
-                            </span>
-
-
-                        </div>
-
-
-                        <div
-                            class="fermentation-log-metrics"
-                        >
-
-                            <div class="log-metric">
-
-                                <span>
-                                    pH
-                                </span>
-
-                                <strong>
-                                    ${log.ph || "—"}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="log-metric">
-
-                                <span>
-                                    Brix
-                                </span>
-
-                                <strong>
-                                    ${log.brix || "—"}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="log-metric">
-
-                                <span>
-                                    Suhu
-                                </span>
-
-                                <strong>
-                                    ${log.temperature || "—"}
-                                </strong>
-
-                            </div>
-
-
-                            <div class="log-metric">
-
-                                <span>
-                                    Volume
-                                </span>
-
-                                <strong>
-                                    ${log.volume || "—"}
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-
-                        <div
-                            class="fermentation-log-bottom"
-                        >
-
-                            <div
-                                class="log-operator"
-                            >
-
-                                <i
-                                    data-lucide="user-round"
-                                ></i>
-
-                                <span>
-                                    ${log.operator || "—"}
-                                </span>
-
-                            </div>
-
-
-                            <span
-                                class="log-qc ${qcClass}"
-                            >
-                                ${qcLabel}
-                            </span>
-
-                        </div>
-
-
-                        ${
-                            log.note
-                                ? `
-
-                                    <div
-                                        class="fermentation-log-note"
-                                    >
-
-                                        <i
-                                            data-lucide="message-square"
-                                        ></i>
-
-                                        <span>
-                                            ${log.note}
-                                        </span>
-
-                                    </div>
-
-                                `
-                                : ""
-                        }
-
-
-                    </article>
-
-                `;
-
-            }
-        ).join("");
-
-
-    if(window.lucide){
-
-        lucide.createIcons();
-
-    }
-
-}
-
-
-/* =========================================================
-   OPEN FERMENTATION LOG MODAL
-========================================================= */
-
-function openFermentationLogModal(){
-
-    const modal =
-        document.getElementById(
-            "fermentationLogModal"
-        );
-
-
-    if(!modal){
-
-        console.warn(
-            "MERAMU: Modal fermentation log tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    const batch =
-        getCurrentBatch();
-
-
-    /* -----------------------------------------------------
-       DEFAULT FORM
-    ----------------------------------------------------- */
-
-    const stageInput =
-        document.getElementById(
-            "logStage"
-        );
-
-    const dateInput =
-        document.getElementById(
-            "logDate"
-        );
-
-    const timeInput =
-        document.getElementById(
-            "logTime"
-        );
-
-    const operatorInput =
-        document.getElementById(
-            "logOperator"
-        );
-
-
-    if(stageInput){
-
-        stageInput.value =
-            normalizeBatchStage(
-                batch?.stage
-            ) === "f1"
-
-                ? "f1"
-
-                : "f2";
-
-    }
-
-
-    if(dateInput){
-
-        dateInput.value =
-            getLocalDateValue();
-
-    }
-
-
-    if(timeInput){
-
-        timeInput.value =
-            getLocalTimeValue();
-
-    }
-
-
-    const logs =
-        Array.isArray(
-            batch?.fermentationLogs
-        )
-            ? batch.fermentationLogs
-            : [];
-
-
-    const latestLog =
-        logs.length
-            ? logs[0]
-            : null;
-
-
-    if(operatorInput){
-
-        operatorInput.value =
-            latestLog?.operator ||
-            "Arif";
-
-    }
-
-
-    /* -----------------------------------------------------
-       OPEN
-    ----------------------------------------------------- */
-
-    modal.hidden =
-        false;
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    document.body.classList.add(
-        "modal-open"
-    );
-
-
-    /* -----------------------------------------------------
-       FOCUS
-    ----------------------------------------------------- */
-
-    setTimeout(
-        () => {
-
-            const firstInput =
-                document.getElementById(
-                    "logPh"
-                );
-
-
-            if(firstInput){
-
-                firstInput.focus();
-
-            }
-
-        },
-        50
-    );
-
-
-    if(window.lucide){
-
-        lucide.createIcons();
-
-    }
-
-}
-
-
-/* =========================================================
-   CLOSE FERMENTATION LOG MODAL
-========================================================= */
-
-function closeFermentationLogModal(){
-
-    const modal =
-        document.getElementById(
-            "fermentationLogModal"
-        );
-
-
-    if(!modal){
-
-        return;
-
-    }
-
-
-    modal.hidden =
-        true;
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-
-    document.body.classList.remove(
-        "modal-open"
-    );
-
-}
-
-
-/* =========================================================
-   RESET FORM
-========================================================= */
-
-function resetFermentationLogForm(){
-
-    const form =
-        document.getElementById(
-            "fermentationLogForm"
-        );
-
-
-    if(!form){
-
-        return;
-
-    }
-
-
-    form.reset();
-
-
-    const batch =
-        getCurrentBatch();
-
-
-    const stageInput =
-        document.getElementById(
-            "logStage"
-        );
-
-    const dateInput =
-        document.getElementById(
-            "logDate"
-        );
-
-    const timeInput =
-        document.getElementById(
-            "logTime"
-        );
-
-    const qcInput =
-        document.getElementById(
-            "logQc"
-        );
-
-    const operatorInput =
-        document.getElementById(
-            "logOperator"
-        );
-
-
-    if(stageInput){
-
-        stageInput.value =
-            normalizeBatchStage(
-                batch?.stage
-            ) === "f1"
-
-                ? "f1"
-
-                : "f2";
-
-    }
-
-
-    if(dateInput){
-
-        dateInput.value =
-            getLocalDateValue();
-
-    }
-
-
-    if(timeInput){
-
-        timeInput.value =
-            getLocalTimeValue();
-
-    }
-
-
-    if(qcInput){
-
-        qcInput.value =
-            "passed";
-
-    }
-
-
-    const logs =
-        Array.isArray(
-            batch?.fermentationLogs
-        )
-            ? batch.fermentationLogs
-            : [];
-
-
-    if(operatorInput){
-
-        operatorInput.value =
-            logs[0]?.operator ||
-            "Arif";
-
-    }
-
-}
-
-
-/* =========================================================
-   SAVE FERMENTATION LOG
-========================================================= */
-
-/* =========================================================
-   SAVE FERMENTATION LOG
-   Supabase Version
-========================================================= */
-
-async function saveFermentationLog(event){
-
-    /* =====================================================
-       PREVENT DEFAULT FORM SUBMIT
-    ===================================================== */
-
-    if(event){
-        event.preventDefault();
-    }
-
-
-    /* =====================================================
-       GET FORM
-    ===================================================== */
-
-    const form =
-        document.getElementById(
-            "fermentationLogForm"
-        );
-
-
-    if(!form){
-
-        console.warn(
-            "MERAMU: Form fermentation log tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       VALIDATE FORM
-    ===================================================== */
-
-    if(!form.checkValidity()){
-
-        form.reportValidity();
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       GET CURRENT BATCH
-    ===================================================== */
-
-    const batch =
-        getCurrentBatch();
-
-
-    if(!batch){
-
-        alert(
-            "Batch tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       GET SUPABASE CLIENT
-    ===================================================== */
-
-    const supabase =
-        window.supabaseClient;
-
-
-    if(!supabase){
-
-        console.error(
-            "MERAMU: Supabase client belum tersedia."
-        );
-
-        alert(
-            "Koneksi database belum siap. Silakan tunggu sebentar lalu coba lagi."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       GET FORM VALUES
-    ===================================================== */
-
-    const stage =
-        document.getElementById(
-            "logStage"
-        )?.value || "f2";
-
-
-    const date =
-        document.getElementById(
-            "logDate"
-        )?.value || "";
-
-
-    const time =
-        document.getElementById(
-            "logTime"
-        )?.value || "";
-
-
-    const phInput =
-        document.getElementById(
-            "logPh"
-        )?.value;
-
-
-    const brixInput =
-        document.getElementById(
-            "logBrix"
-        )?.value;
-
-
-    const temperatureInput =
-        document.getElementById(
-            "logTemperature"
-        )?.value;
-
-
-    const volumeInput =
-        document.getElementById(
-            "logVolume"
-        )?.value;
-
-
-    const qc =
-        document.getElementById(
-            "logQc"
-        )?.value || "passed";
-
-
-    const operator =
-        document.getElementById(
-            "logOperator"
-        )?.value.trim() || "Arif";
-
-
-    const note =
-        document.getElementById(
-            "logNote"
-        )?.value.trim() || "";
-
-
-    /* =====================================================
-       CONVERT NUMERIC VALUES
-    ===================================================== */
-
-    const ph =
-        Number(phInput);
-
-
-    const brix =
-        Number(brixInput);
-
-
-    const temperature =
-        Number(temperatureInput);
-
-
-    const volume =
-        Number(volumeInput);
-
-
-    /* =====================================================
-       VALIDATE NUMERIC VALUES
-    ===================================================== */
-
-    if(
-        !Number.isFinite(ph) ||
-        !Number.isFinite(brix) ||
-        !Number.isFinite(temperature) ||
-        !Number.isFinite(volume)
-    ){
-
-        alert(
-            "Nilai pH, Brix, suhu, dan volume harus berupa angka yang valid."
-        );
-
-        return;
-
-    }
-
-
-    if(volume <= 0){
-
-        alert(
-            "Volume harus lebih besar dari 0."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       VALIDATE DATE & TIME
-    ===================================================== */
-
-    if(
-        !date ||
-        !time
-    ){
-
-        alert(
-            "Tanggal dan waktu pengukuran wajib diisi."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       BUILD MEASURED AT
-    ===================================================== */
-
-    const measuredDate =
-        new Date(
-            `${date}T${time}:00`
-        );
-
-
-    if(
-        Number.isNaN(
-            measuredDate.getTime()
-        )
-    ){
-
-        alert(
-            "Tanggal atau waktu pengukuran tidak valid."
-        );
-
-        return;
-
-    }
-
-
-    const measuredAt =
-        measuredDate.toISOString();
-
-
-    /* =====================================================
-       GET REAL BATCH UUID
-       
-       batch.code = KB-022
-       batches.id = UUID
-
-       fermentation_logs.batch_id
-       membutuhkan UUID.
-    ===================================================== */
-
-    let batchUuid =
-        batch?.id ||
-        batch?.batch_id ||
-        null;
-
-
-    /* =====================================================
-       UUID VALIDATION
-    ===================================================== */
-
-    const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-
-    if(
-        !uuidPattern.test(
-            String(
-                batchUuid || ""
-            )
-        )
-    ){
-
-        batchUuid =
-            null;
-
-    }
-
-
-    /* =====================================================
-       LOOKUP BATCH UUID FROM SUPABASE
-    ===================================================== */
-
-    if(!batchUuid){
-
-        console.log(
-            "MERAMU: Mencari UUID batch:",
-            batch.code
-        );
-
-
-        const {
-            data: batchRow,
-            error: batchError
-        } =
-            await supabase
-                .from("batches")
-                .select(
-                    "id,batch_code"
-                )
-                .eq(
-                    "batch_code",
-                    batch.code
-                )
-                .maybeSingle();
-
-
-        if(batchError){
-
-            console.error(
-                "MERAMU: Gagal mencari UUID batch.",
-                batchError
-            );
-
-
-            alert(
-                `Gagal mencari batch ${batch.code} di database.\n\n${batchError.message || "Unknown error"}`
-            );
-
-
-            return;
-
-        }
-
-
-        if(!batchRow?.id){
-
-            alert(
-                `Batch ${batch.code} tidak ditemukan di database.`
-            );
-
-
-            return;
-
-        }
-
-
-        batchUuid =
-            batchRow.id;
-
-
-        console.log(
-            "MERAMU: UUID batch ditemukan:",
-            batchUuid
-        );
-
-    }
-
-
-    /* =====================================================
-       GET SUBMIT BUTTON
-    ===================================================== */
-
-    const submitButton =
-        form.querySelector(
-            'button[type="submit"]'
-        );
-
-
-    const originalSubmitText =
-        submitButton?.innerHTML ||
-        "Simpan Log";
-
-
-    /* =====================================================
-       PREVENT DOUBLE SUBMIT
-    ===================================================== */
-
-    if(submitButton){
-
-        submitButton.disabled =
-            true;
-
-
-        submitButton.innerHTML =
-            `
-                <span
-                    style="
-                        display:inline-flex;
-                        align-items:center;
-                        gap:8px;
-                    "
-                >
-                    <span
-                        style="
-                            width:14px;
-                            height:14px;
-                            border:2px solid currentColor;
-                            border-right-color:transparent;
-                            border-radius:50%;
-                            display:inline-block;
-                            animation:meramuSpin .7s linear infinite;
-                        "
-                    ></span>
-
-                    Menyimpan...
-                </span>
-            `;
-
-    }
-
-
-    /* =====================================================
-       INSERT TO SUPABASE
-    ===================================================== */
-
-    try{
-
-        const payload = {
-
-            batch_id:
-                batchUuid,
-
-            stage:
-                stage,
-
-            measured_at:
-                measuredAt,
-
-            ph:
-                ph,
-
-            brix:
-                brix,
-
-            temperature:
-                temperature,
-
-            volume:
-                volume,
-
-            operator:
-                operator,
-
-            qc:
-                qc,
-
-            note:
-                note || null
-
-        };
-
-
-        console.log(
-            "MERAMU: INSERT fermentation_logs...",
-            payload
-        );
-
-
-        const {
-            data: insertedLog,
-            error: insertError
-        } =
-            await supabase
-                .from(
-                    "fermentation_logs"
-                )
-                .insert(
-                    payload
-                )
-                .select("*")
-                .single();
-
-
-        /* =================================================
-           HANDLE INSERT ERROR
-        ================================================= */
-
-        if(insertError){
-
-            console.error(
-                "MERAMU: Gagal INSERT fermentation log.",
-                insertError
-            );
-
-
-            alert(
-                `Fermentation Log gagal disimpan.\n\n${insertError.message || "Unknown error"}`
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           INSERT SUCCESS
-        ================================================= */
-
-        console.log(
-            "MERAMU: Fermentation Log berhasil disimpan.",
-            insertedLog
-        );
-
-
-        /* =================================================
-           CLOSE MODAL
-        ================================================= */
-
-        closeFermentationLogModal();
-
-
-        /* =================================================
-           RESET FORM
-        ================================================= */
-
-        resetFermentationLogForm();
-
-
-        /* =================================================
-           RELOAD FROM SUPABASE
-           
-           Jangan hanya menggunakan data lokal.
-           Database menjadi sumber data utama.
-        ================================================= */
-
-        if(
-            typeof window.initBatchFermentationLogs ===
-            "function"
-        ){
-
-            await
-                window.initBatchFermentationLogs();
-
-        }
-        else{
-
-            /* =================================================
-               FALLBACK
-            ================================================= */
-
-            const newLog = {
-
-                id:
-                    insertedLog?.id ||
-                    Date.now(),
-
-                stage:
-                    insertedLog?.stage ||
-                    stage,
-
-                date:
-                    formatFermentationDate(
-                        date
-                    ),
-
-                time:
-                    time,
-
-                ph:
-                    Number(ph)
-                        .toFixed(2),
-
-                brix:
-                    `${Number(brix).toFixed(1)}°`,
-
-                temperature:
-                    `${Number(temperature).toFixed(1)}°C`,
-
-                volume:
-                    `${Number(volume).toFixed(1)} L`,
-
-                operator:
-                    operator,
-
-                qc:
-                    qc,
-
-                note:
-                    note
-
-            };
-
-
-            if(
-                !Array.isArray(
-                    batch.fermentationLogs
-                )
-            ){
-
-                batch.fermentationLogs = [];
-
-            }
-
-
-            batch.fermentationLogs.unshift(
-                newLog
-            );
-
-
-            batch.ph =
-                newLog.ph;
-
-
-            batch.brix =
-                newLog.brix;
-
-
-            batch.temperature =
-                newLog.temperature;
-
-
-            batch.volume =
-                newLog.volume;
-
-
-            renderBatchDetail();
-
-        }
-
-
-        /* =================================================
-           SUCCESS MESSAGE
-        ================================================= */
-
-        console.log(
-            "MERAMU: Fermentation Log selesai diproses."
-        );
-
-    }
-    catch(error){
-
-        console.error(
-            "MERAMU: Exception saat menyimpan fermentation log.",
-            error
-        );
-
-
-        alert(
-            `Terjadi error saat menyimpan Fermentation Log.\n\n${error?.message || error}`
-        );
-
-    }
-    finally{
-
-        /* =================================================
-           RESTORE SUBMIT BUTTON
-        ================================================= */
-
-        if(submitButton){
-
-            submitButton.disabled =
-                false;
-
-
-            submitButton.innerHTML =
-                originalSubmitText;
-
-        }
-
-    }
-
-}(event){
-
-    event.preventDefault();
-
-
-    const form =
-        document.getElementById(
-            "fermentationLogForm"
-        );
-
-
-    if(!form){
-
-        return;
-
-    }
-
-
-    if(!form.checkValidity()){
-
-        form.reportValidity();
-
-        return;
-
-    }
-
-
-    const batch =
-        getCurrentBatch();
-
-
-    if(!batch){
-
-        return;
-
-    }
-
-
-    if(!Array.isArray(
-        batch.fermentationLogs
-    )){
-
-        batch.fermentationLogs = [];
-
-    }
-
-
-    /* -----------------------------------------------------
-       GET FORM VALUES
-    ----------------------------------------------------- */
-
-    const stage =
-        document.getElementById(
-            "logStage"
-        )?.value || "f2";
-
-
-    const date =
-        document.getElementById(
-            "logDate"
-        )?.value || "";
-
-
-    const time =
-        document.getElementById(
-            "logTime"
-        )?.value || "";
-
-
-    const ph =
-        document.getElementById(
-            "logPh"
-        )?.value || "";
-
-
-    const brix =
-        document.getElementById(
-            "logBrix"
-        )?.value || "";
-
-
-    const temperature =
-        document.getElementById(
-            "logTemperature"
-        )?.value || "";
-
-
-    const volume =
-        document.getElementById(
-            "logVolume"
-        )?.value || "";
-
-
-    const qc =
-        document.getElementById(
-            "logQc"
-        )?.value || "passed";
-
-
-    const operator =
-        document.getElementById(
-            "logOperator"
-        )?.value.trim() || "Arif";
-
-
-    const note =
-        document.getElementById(
-            "logNote"
-        )?.value.trim() || "";
-
-
-    /* -----------------------------------------------------
-       CREATE LOG
-    ----------------------------------------------------- */
-
-    const newLog = {
-
-        id:
-            Date.now(),
-
-        stage:
-            stage,
-
-        date:
-            formatFermentationDate(
-                date
-            ),
-
-        time:
-            time,
-
-        ph:
-            Number(ph)
-                .toFixed(2),
-
-        brix:
-            `${Number(brix).toFixed(1)}°`,
-
-        temperature:
-            `${Number(temperature).toFixed(1)}°C`,
-
-        volume:
-            `${Number(volume).toFixed(1)} L`,
-
-        operator:
-            operator,
-
-        qc:
-            qc,
-
-        note:
-            note
-
-    };
-
-
-    /* -----------------------------------------------------
-       ADD TO TOP
-    ----------------------------------------------------- */
-
-    batch.fermentationLogs.unshift(
-        newLog
-    );
-
-
-    /* -----------------------------------------------------
-       UPDATE CURRENT METRICS
-    ----------------------------------------------------- */
-
-    batch.ph =
-        newLog.ph;
-
-
-    batch.brix =
-        newLog.brix;
-
-
-    batch.temperature =
-        newLog.temperature;
-
-
-    batch.volume =
-        newLog.volume;
-
-
-    /* -----------------------------------------------------
-       RENDER AGAIN
-    ----------------------------------------------------- */
-
-    renderBatchDetail();
-
-
-    /* -----------------------------------------------------
-       CLOSE MODAL
-    ----------------------------------------------------- */
-
-    closeFermentationLogModal();
-
-
-    /* -----------------------------------------------------
-       RESET FORM
-    ----------------------------------------------------- */
-
-    resetFermentationLogForm();
-
-
-    console.log(
-        "MERAMU: Fermentation Log berhasil ditambahkan.",
-        newLog
-    );
-
-}
-
-/* =========================================================
-   EDIT BATCH
-========================================================= */
-
-function formatDateForInput(value){
-
-    if(!value){
-        return "";
-    }
-
-    const text =
-        String(value).trim();
-
-    /* Jika sudah YYYY-MM-DD */
-    const isoMatch =
-        text.match(
-            /^(\d{4})-(\d{2})-(\d{2})$/
-        );
-
-    if(isoMatch){
-
-        return text;
-
-    }
-
-
-    /* Format: 01 Okt 2026 */
-    const parts =
-        text.split(/\s+/);
-
-    if(parts.length !== 3){
-
-        return "";
-
-    }
-
-
-    const day =
-        String(
-            parts[0]
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const monthMap = {
-
-        Jan: "01",
-        Feb: "02",
-        Mar: "03",
-        Apr: "04",
-        Mei: "05",
-        Jun: "06",
-        Jul: "07",
-        Agu: "08",
-        Sep: "09",
-        Okt: "10",
-        Nov: "11",
-        Des: "12"
-
-    };
-
-
-    const month =
-        monthMap[
-            parts[1]
-        ];
-
-
-    if(
-        !month ||
-        !/^\d{4}$/.test(parts[2])
-    ){
-
-        return "";
-
-    }
-
-
-    return `${parts[2]}-${month}-${day}`;
-
-}
-
-
-/* =========================================================
-   GET EDIT MODAL
-========================================================= */
-
-function getEditBatchModal(){
-
-    return document.getElementById(
-        "editBatchModal"
-    );
-
-}
-
-
-/* =========================================================
-   OPEN EDIT BATCH
-========================================================= */
-
-function openEditBatchModal(){
-
-    const modal =
-        getEditBatchModal();
-
-
-    const batch =
-        getCurrentBatch();
-
-
-    if(
-        !modal ||
-        !batch
-    ){
-
-        console.warn(
-            "MERAMU: Edit Batch modal atau batch tidak ditemukan."
-        );
-
-        return;
-
-    }
-
-
-    const productInput =
-        document.getElementById(
-            "editProduct"
-        );
-
-
-    const volumeInput =
-        document.getElementById(
-            "editVolume"
-        );
-
-
-    const targetDateInput =
-        document.getElementById(
-            "editTargetDate"
-        );
-
-
-    const stageInput =
-        document.getElementById(
-            "editStage"
-        );
-
-
-    const noteInput =
-        document.getElementById(
-            "editNote"
-        );
-
-
-    /* PRODUCT */
-
-    if(productInput){
-
-        productInput.value =
-            batch.product || "";
-
-    }
-
-
-    /* VOLUME */
-
-    if(volumeInput){
-
-        const numericVolume =
-            String(
-                batch.volume || ""
-            )
-            .replace(",",".")
-            .match(
-                /[\d.]+/
-            );
-
-
-        volumeInput.value =
-            numericVolume
-                ? numericVolume[0]
-                : "";
-
-    }
-
-
-    /* TARGET DATE */
-
-    if(targetDateInput){
-
-        targetDateInput.value =
-            formatDateForInput(
-                batch.targetDate
-            );
-
-    }
-
-
-    /* STAGE */
-
-    if(stageInput){
-
-        const normalizedStage =
-            normalizeBatchStage(
-                batch.stage
-            );
-
-
-        stageInput.value =
-            normalizedStage;
-
-    }
-
-
-    /* NOTE */
-
-    if(noteInput){
-
-        noteInput.value =
-            batch.note || "";
-
-    }
-
-
-    /* OPEN */
-
-    modal.hidden =
-        false;
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-    document.body.classList.add(
-        "modal-open"
-    );
-
-
-    /* FOCUS */
-
-    setTimeout(
-        () => {
-
-            if(productInput){
-
-                productInput.focus();
-
-            }
-
-        },
-        50
-    );
-
-
-    if(window.lucide){
-
-        lucide.createIcons();
-
-    }
-
-}
-
-
-/* =========================================================
-   CLOSE EDIT BATCH
-========================================================= */
-
-function closeEditBatchModal(){
-
-    const modal =
-        getEditBatchModal();
-
-
-    if(!modal){
-
-        return;
-
-    }
-
-
-    modal.hidden =
-        true;
-
-
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-
-    document.body.classList.remove(
-        "modal-open"
-    );
-
-}
-
-
-/* =========================================================
-   RESET EDIT FORM
-========================================================= */
-
-function resetEditBatchForm(){
-
-    const form =
-        document.getElementById(
-            "editBatchForm"
-        );
-
-
-    if(form){
-
-        form.reset();
-
-    }
-
-}
-
-
-/* =========================================================
-   STAGE LABEL
-========================================================= */
-
-function getStageLabel(stage){
-
-    const labels = {
-
-        production:
-            "Production",
-
-        f1:
-            "F1 Fermentasi",
-
-        f2:
-            "F2 Fermentasi",
-
-        harvest:
-            "Harvest",
-
-        bottling:
-            "Bottling",
-
-        label:
-            "Label / QR",
-
-        finished:
-            "Finished"
-
-    };
-
-
-    return (
-        labels[stage] ||
-        stage
-    );
-
-}
-
-
-/* =========================================================
-   UPDATE TIMELINE
-========================================================= */
-
-function updateBatchStageTimeline(
-    batch,
-    normalizedStage
-){
-
-    if(!batch){
-
-        return;
-
-    }
-
-
-    if(
-        !Array.isArray(
-            batch.timeline
-        )
-    ){
-
-        batch.timeline = [];
-
-    }
-
-
-    const stageOrder = [
-
-        "production",
-
-        "f1",
-
-        "f2",
-
-        "harvest",
-
-        "bottling",
-
-        "label",
-
-        "finished"
-
-    ];
 
 
     const currentIndex =
-        Math.max(
-            0,
-            stageOrder.indexOf(
-                normalizedStage
-            )
-        );
+        stageOrder[currentStage] ?? 0;
 
 
-    const now =
-        new Date();
+    events =
+        defaultStages.map(
+            (stage,index) => {
+
+                let status =
+                    "upcoming";
 
 
-    const monthNames = [
+                if(index < currentIndex){
 
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "Mei",
-        "Jun",
-        "Jul",
-        "Agu",
-        "Sep",
-        "Okt",
-        "Nov",
-        "Des"
+                    status =
+                        "completed";
 
-    ];
+                }
 
+                else if(
+                    index === currentIndex
+                ){
 
-    const date =
-        `${String(
-            now.getDate()
-        ).padStart(
-            2,
-            "0"
-        )} ${
-            monthNames[
-                now.getMonth()
-            ]
-        } ${
-            now.getFullYear()
-        }`;
-
-
-    const time =
-        `${String(
-            now.getHours()
-        ).padStart(
-            2,
-            "0"
-        )}:${
-            String(
-                now.getMinutes()
-            ).padStart(
-                2,
-                "0"
-            )
-        }`;
-
-
-    batch.timeline =
-        stageOrder.map(
-            (
-                stage,
-                index
-            ) => {
-
-                const existing =
-                    batch.timeline.find(
-                        item =>
-                            normalizeBatchStage(
-                                item.stage
-                            ) === stage
-                    );
-
-
-                if(existing){
-
-                    return {
-
-                        ...existing,
-
-                        stage:
-
-                            stage,
-
-                        status:
-
-                            index <
-                            currentIndex
-
-                                ? "completed"
-
-                                : index ===
-                                  currentIndex
-
-                                    ? "active"
-
-                                    : "upcoming"
-
-                    };
+                    status =
+                        "active";
 
                 }
 
 
                 return {
 
+                    stage: stage,
+
+                    date: null,
+
+                    time: null,
+
+                    status: status,
+
+                    note:
+                        stageConfig[stage]
+                            ?.description || ""
+
+                };
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   DIRECT PRODUCTION
+===================================================== */
+
+if(batch.type === "direct"){
+
+    events =
+        events.filter(
+            event => {
+
+                return ![
+                    "f1",
+                    "f2",
+                    "harvest"
+                ].includes(
+                    event.stage
+                );
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   RENDER TIMELINE
+===================================================== */
+
+container.innerHTML =
+    events.map(
+        (event,index) => {
+
+            const config =
+                stageConfig[event.stage];
+
+
+            if(!config){
+
+                return "";
+
+            }
+
+
+            const status =
+                event.status ||
+                "upcoming";
+
+
+            /* -----------------------------------------
+               DATE
+            ----------------------------------------- */
+
+            let dateText =
+                "—";
+
+
+            if(event.date){
+
+                dateText =
+                    event.date;
+
+            }
+
+
+            if(
+                event.date &&
+                event.time
+            ){
+
+                dateText =
+                    `${event.date} • ${event.time}`;
+
+            }
+
+
+            /* -----------------------------------------
+               NOTE
+            ----------------------------------------- */
+
+            const note =
+                event.note ||
+                config.description;
+
+
+            /* -----------------------------------------
+               CONNECTOR
+            ----------------------------------------- */
+
+            const connector =
+                index <
+                events.length - 1
+
+                ? `
+                    <div
+                        class="history-line"
+                    ></div>
+                `
+
+                : "";
+
+
+            return `
+
+                <div
+                    class="history-item ${status}"
+                >
+
+                    <div class="history-icon">
+
+                        <i
+                            data-lucide="${config.icon}"
+                        ></i>
+
+                    </div>
+
+
+                    <div class="history-content">
+
+                        <strong>
+                            ${config.title}
+                        </strong>
+
+                        <span>
+                            ${note}
+                        </span>
+
+                    </div>
+
+
+                    <time>
+                        ${dateText}
+                    </time>
+
+                </div>
+
+                ${connector}
+
+            `;
+
+        }
+    ).join("");
+
+
+if(window.lucide){
+
+    lucide.createIcons();
+
+}
+
+}
+
+/* =========================================================
+FERMENTATION LOG
+========================================================= */
+
+function renderFermentationLogs(batch){
+
+const container =
+    document.getElementById(
+        "fermentationLogList"
+    );
+
+
+const count =
+    document.getElementById(
+        "fermentationLogCount"
+    );
+
+
+if(!container){
+
+    console.warn(
+        "MERAMU: #fermentationLogList tidak ditemukan."
+    );
+
+    return;
+
+}
+
+
+const logs =
+    Array.isArray(batch?.fermentationLogs)
+        ? batch.fermentationLogs
+        : [];
+
+
+if(count){
+
+    count.textContent =
+        logs.length;
+
+}
+
+
+if(!logs.length){
+
+    container.innerHTML = `
+
+        <div class="fermentation-log-empty">
+
+            <i data-lucide="clipboard-list"></i>
+
+            <strong>
+                Belum ada fermentation log
+            </strong>
+
+            <span>
+                Belum ada pengukuran yang tercatat
+                untuk batch ini.
+            </span>
+
+        </div>
+
+    `;
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+
+    return;
+
+}
+
+
+container.innerHTML =
+    logs.map(
+        log => {
+
+            const qcClass =
+                log.qc === "passed"
+                    ? "passed"
+                    : "failed";
+
+
+            const qcLabel =
+                log.qc === "passed"
+                    ? "Passed"
+                    : log.qc === "warning"
+                        ? "Warning"
+                        : "Failed";
+
+
+            const stageLabel =
+                log.stage
+                    ? String(log.stage)
+                        .toUpperCase()
+                    : "—";
+
+
+            return `
+
+                <article
+                    class="fermentation-log-item"
+                >
+
+
+                    <div
+                        class="fermentation-log-top"
+                    >
+
+                        <div
+                            class="fermentation-log-date"
+                        >
+
+                            <div
+                                class="fermentation-log-icon"
+                            >
+
+                                <i
+                                    data-lucide="activity"
+                                ></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    ${log.date || "—"}
+                                </strong>
+
+                                <span>
+                                    ${log.time || "—"}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <span
+                            class="log-stage"
+                        >
+                            ${stageLabel}
+                        </span>
+
+
+                    </div>
+
+
+                    <div
+                        class="fermentation-log-metrics"
+                    >
+
+                        <div class="log-metric">
+
+                            <span>
+                                pH
+                            </span>
+
+                            <strong>
+                                ${log.ph || "—"}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="log-metric">
+
+                            <span>
+                                Brix
+                            </span>
+
+                            <strong>
+                                ${log.brix || "—"}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="log-metric">
+
+                            <span>
+                                Suhu
+                            </span>
+
+                            <strong>
+                                ${log.temperature || "—"}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="log-metric">
+
+                            <span>
+                                Volume
+                            </span>
+
+                            <strong>
+                                ${log.volume || "—"}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="fermentation-log-bottom"
+                    >
+
+                        <div
+                            class="log-operator"
+                        >
+
+                            <i
+                                data-lucide="user-round"
+                            ></i>
+
+                            <span>
+                                ${log.operator || "—"}
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            class="log-qc ${qcClass}"
+                        >
+                            ${qcLabel}
+                        </span>
+
+                    </div>
+
+
+                    ${
+                        log.note
+                            ? `
+
+                                <div
+                                    class="fermentation-log-note"
+                                >
+
+                                    <i
+                                        data-lucide="message-square"
+                                    ></i>
+
+                                    <span>
+                                        ${log.note}
+                                    </span>
+
+                                </div>
+
+                            `
+                            : ""
+                    }
+
+
+                </article>
+
+            `;
+
+        }
+    ).join("");
+
+
+if(window.lucide){
+
+    lucide.createIcons();
+
+}
+
+}
+
+/* =========================================================
+OPEN FERMENTATION LOG MODAL
+========================================================= */
+
+function openFermentationLogModal(){
+
+const modal =
+    document.getElementById(
+        "fermentationLogModal"
+    );
+
+
+if(!modal){
+
+    console.warn(
+        "MERAMU: Modal fermentation log tidak ditemukan."
+    );
+
+    return;
+
+}
+
+
+const batch =
+    getCurrentBatch();
+
+
+/* -----------------------------------------------------
+   DEFAULT FORM
+----------------------------------------------------- */
+
+const stageInput =
+    document.getElementById(
+        "logStage"
+    );
+
+const dateInput =
+    document.getElementById(
+        "logDate"
+    );
+
+const timeInput =
+    document.getElementById(
+        "logTime"
+    );
+
+const operatorInput =
+    document.getElementById(
+        "logOperator"
+    );
+
+
+if(stageInput){
+
+    stageInput.value =
+        normalizeBatchStage(
+            batch?.stage
+        ) === "f1"
+
+            ? "f1"
+
+            : "f2";
+
+}
+
+
+if(dateInput){
+
+    dateInput.value =
+        getLocalDateValue();
+
+}
+
+
+if(timeInput){
+
+    timeInput.value =
+        getLocalTimeValue();
+
+}
+
+
+const logs =
+    Array.isArray(
+        batch?.fermentationLogs
+    )
+        ? batch.fermentationLogs
+        : [];
+
+
+const latestLog =
+    logs.length
+        ? logs[0]
+        : null;
+
+
+if(operatorInput){
+
+    operatorInput.value =
+        latestLog?.operator ||
+        "Arif";
+
+}
+
+
+/* -----------------------------------------------------
+   OPEN
+----------------------------------------------------- */
+
+modal.hidden =
+    false;
+
+modal.setAttribute(
+    "aria-hidden",
+    "false"
+);
+
+
+document.body.classList.add(
+    "modal-open"
+);
+
+
+/* -----------------------------------------------------
+   FOCUS
+----------------------------------------------------- */
+
+setTimeout(
+    () => {
+
+        const firstInput =
+            document.getElementById(
+                "logPh"
+            );
+
+
+        if(firstInput){
+
+            firstInput.focus();
+
+        }
+
+    },
+    50
+);
+
+
+if(window.lucide){
+
+    lucide.createIcons();
+
+}
+
+}
+
+/* =========================================================
+CLOSE FERMENTATION LOG MODAL
+========================================================= */
+
+function closeFermentationLogModal(){
+
+const modal =
+    document.getElementById(
+        "fermentationLogModal"
+    );
+
+
+if(!modal){
+
+    return;
+
+}
+
+
+modal.hidden =
+    true;
+
+
+modal.setAttribute(
+    "aria-hidden",
+    "true"
+);
+
+
+document.body.classList.remove(
+    "modal-open"
+);
+
+}
+
+/* =========================================================
+RESET FORM
+========================================================= */
+
+function resetFermentationLogForm(){
+
+const form =
+    document.getElementById(
+        "fermentationLogForm"
+    );
+
+
+if(!form){
+
+    return;
+
+}
+
+
+form.reset();
+
+
+const batch =
+    getCurrentBatch();
+
+
+const stageInput =
+    document.getElementById(
+        "logStage"
+    );
+
+const dateInput =
+    document.getElementById(
+        "logDate"
+    );
+
+const timeInput =
+    document.getElementById(
+        "logTime"
+    );
+
+const qcInput =
+    document.getElementById(
+        "logQc"
+    );
+
+const operatorInput =
+    document.getElementById(
+        "logOperator"
+    );
+
+
+if(stageInput){
+
+    stageInput.value =
+        normalizeBatchStage(
+            batch?.stage
+        ) === "f1"
+
+            ? "f1"
+
+            : "f2";
+
+}
+
+
+if(dateInput){
+
+    dateInput.value =
+        getLocalDateValue();
+
+}
+
+
+if(timeInput){
+
+    timeInput.value =
+        getLocalTimeValue();
+
+}
+
+
+if(qcInput){
+
+    qcInput.value =
+        "passed";
+
+}
+
+
+const logs =
+    Array.isArray(
+        batch?.fermentationLogs
+    )
+        ? batch.fermentationLogs
+        : [];
+
+
+if(operatorInput){
+
+    operatorInput.value =
+        logs[0]?.operator ||
+        "Arif";
+
+}
+
+}
+
+/* =========================================================
+SAVE FERMENTATION LOG
+========================================================= */
+
+function saveFermentationLog(event){
+
+event.preventDefault();
+
+
+const form =
+    document.getElementById(
+        "fermentationLogForm"
+    );
+
+
+if(!form){
+
+    return;
+
+}
+
+
+if(!form.checkValidity()){
+
+    form.reportValidity();
+
+    return;
+
+}
+
+
+const batch =
+    getCurrentBatch();
+
+
+if(!batch){
+
+    return;
+
+}
+
+
+if(!Array.isArray(
+    batch.fermentationLogs
+)){
+
+    batch.fermentationLogs = [];
+
+}
+
+
+/* -----------------------------------------------------
+   GET FORM VALUES
+----------------------------------------------------- */
+
+const stage =
+    document.getElementById(
+        "logStage"
+    )?.value || "f2";
+
+
+const date =
+    document.getElementById(
+        "logDate"
+    )?.value || "";
+
+
+const time =
+    document.getElementById(
+        "logTime"
+    )?.value || "";
+
+
+const ph =
+    document.getElementById(
+        "logPh"
+    )?.value || "";
+
+
+const brix =
+    document.getElementById(
+        "logBrix"
+    )?.value || "";
+
+
+const temperature =
+    document.getElementById(
+        "logTemperature"
+    )?.value || "";
+
+
+const volume =
+    document.getElementById(
+        "logVolume"
+    )?.value || "";
+
+
+const qc =
+    document.getElementById(
+        "logQc"
+    )?.value || "passed";
+
+
+const operator =
+    document.getElementById(
+        "logOperator"
+    )?.value.trim() || "Arif";
+
+
+const note =
+    document.getElementById(
+        "logNote"
+    )?.value.trim() || "";
+
+
+/* -----------------------------------------------------
+   CREATE LOG
+----------------------------------------------------- */
+
+const newLog = {
+
+    id:
+        Date.now(),
+
+    stage:
+        stage,
+
+    date:
+        formatFermentationDate(
+            date
+        ),
+
+    time:
+        time,
+
+    ph:
+        Number(ph)
+            .toFixed(2),
+
+    brix:
+        `${Number(brix).toFixed(1)}°`,
+
+    temperature:
+        `${Number(temperature).toFixed(1)}°C`,
+
+    volume:
+        `${Number(volume).toFixed(1)} L`,
+
+    operator:
+        operator,
+
+    qc:
+        qc,
+
+    note:
+        note
+
+};
+
+
+/* -----------------------------------------------------
+   ADD TO TOP
+----------------------------------------------------- */
+
+batch.fermentationLogs.unshift(
+    newLog
+);
+
+
+/* -----------------------------------------------------
+   UPDATE CURRENT METRICS
+----------------------------------------------------- */
+
+batch.ph =
+    newLog.ph;
+
+
+batch.brix =
+    newLog.brix;
+
+
+batch.temperature =
+    newLog.temperature;
+
+
+batch.volume =
+    newLog.volume;
+
+
+/* -----------------------------------------------------
+   RENDER AGAIN
+----------------------------------------------------- */
+
+renderBatchDetail();
+
+
+/* -----------------------------------------------------
+   CLOSE MODAL
+----------------------------------------------------- */
+
+closeFermentationLogModal();
+
+
+/* -----------------------------------------------------
+   RESET FORM
+----------------------------------------------------- */
+
+resetFermentationLogForm();
+
+
+console.log(
+    "MERAMU: Fermentation Log berhasil ditambahkan.",
+    newLog
+);
+
+}
+
+/* =========================================================
+EDIT BATCH
+========================================================= */
+
+function formatDateForInput(value){
+
+if(!value){
+    return "";
+}
+
+const text =
+    String(value).trim();
+
+/* Jika sudah YYYY-MM-DD */
+const isoMatch =
+    text.match(
+        /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+if(isoMatch){
+
+    return text;
+
+}
+
+
+/* Format: 01 Okt 2026 */
+const parts =
+    text.split(/\s+/);
+
+if(parts.length !== 3){
+
+    return "";
+
+}
+
+
+const day =
+    String(
+        parts[0]
+    ).padStart(
+        2,
+        "0"
+    );
+
+
+const monthMap = {
+
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    Mei: "05",
+    Jun: "06",
+    Jul: "07",
+    Agu: "08",
+    Sep: "09",
+    Okt: "10",
+    Nov: "11",
+    Des: "12"
+
+};
+
+
+const month =
+    monthMap[
+        parts[1]
+    ];
+
+
+if(
+    !month ||
+    !/^\d{4}$/.test(parts[2])
+){
+
+    return "";
+
+}
+
+
+return `${parts[2]}-${month}-${day}`;
+
+}
+
+/* =========================================================
+GET EDIT MODAL
+========================================================= */
+
+function getEditBatchModal(){
+
+return document.getElementById(
+    "editBatchModal"
+);
+
+}
+
+/* =========================================================
+OPEN EDIT BATCH
+========================================================= */
+
+function openEditBatchModal(){
+
+const modal =
+    getEditBatchModal();
+
+
+const batch =
+    getCurrentBatch();
+
+
+if(
+    !modal ||
+    !batch
+){
+
+    console.warn(
+        "MERAMU: Edit Batch modal atau batch tidak ditemukan."
+    );
+
+    return;
+
+}
+
+
+const productInput =
+    document.getElementById(
+        "editProduct"
+    );
+
+
+const volumeInput =
+    document.getElementById(
+        "editVolume"
+    );
+
+
+const targetDateInput =
+    document.getElementById(
+        "editTargetDate"
+    );
+
+
+const stageInput =
+    document.getElementById(
+        "editStage"
+    );
+
+
+const noteInput =
+    document.getElementById(
+        "editNote"
+    );
+
+
+/* PRODUCT */
+
+if(productInput){
+
+    productInput.value =
+        batch.product || "";
+
+}
+
+
+/* VOLUME */
+
+if(volumeInput){
+
+    const numericVolume =
+        String(
+            batch.volume || ""
+        )
+        .replace(",",".")
+        .match(
+            /[\d.]+/
+        );
+
+
+    volumeInput.value =
+        numericVolume
+            ? numericVolume[0]
+            : "";
+
+}
+
+
+/* TARGET DATE */
+
+if(targetDateInput){
+
+    targetDateInput.value =
+        formatDateForInput(
+            batch.targetDate
+        );
+
+}
+
+
+/* STAGE */
+
+if(stageInput){
+
+    const normalizedStage =
+        normalizeBatchStage(
+            batch.stage
+        );
+
+
+    stageInput.value =
+        normalizedStage;
+
+}
+
+
+/* NOTE */
+
+if(noteInput){
+
+    noteInput.value =
+        batch.note || "";
+
+}
+
+
+/* OPEN */
+
+modal.hidden =
+    false;
+
+
+modal.setAttribute(
+    "aria-hidden",
+    "false"
+);
+
+
+document.body.classList.add(
+    "modal-open"
+);
+
+
+/* FOCUS */
+
+setTimeout(
+    () => {
+
+        if(productInput){
+
+            productInput.focus();
+
+        }
+
+    },
+    50
+);
+
+
+if(window.lucide){
+
+    lucide.createIcons();
+
+}
+
+}
+
+/* =========================================================
+CLOSE EDIT BATCH
+========================================================= */
+
+function closeEditBatchModal(){
+
+const modal =
+    getEditBatchModal();
+
+
+if(!modal){
+
+    return;
+
+}
+
+
+modal.hidden =
+    true;
+
+
+modal.setAttribute(
+    "aria-hidden",
+    "true"
+);
+
+
+document.body.classList.remove(
+    "modal-open"
+);
+
+}
+
+/* =========================================================
+RESET EDIT FORM
+========================================================= */
+
+function resetEditBatchForm(){
+
+const form =
+    document.getElementById(
+        "editBatchForm"
+    );
+
+
+if(form){
+
+    form.reset();
+
+}
+
+}
+
+/* =========================================================
+STAGE LABEL
+========================================================= */
+
+function getStageLabel(stage){
+
+const labels = {
+
+    production:
+        "Production",
+
+    f1:
+        "F1 Fermentasi",
+
+    f2:
+        "F2 Fermentasi",
+
+    harvest:
+        "Harvest",
+
+    bottling:
+        "Bottling",
+
+    label:
+        "Label / QR",
+
+    finished:
+        "Finished"
+
+};
+
+
+return (
+    labels[stage] ||
+    stage
+);
+
+}
+
+/* =========================================================
+UPDATE TIMELINE
+========================================================= */
+
+function updateBatchStageTimeline(
+batch,
+normalizedStage
+){
+
+if(!batch){
+
+    return;
+
+}
+
+
+if(
+    !Array.isArray(
+        batch.timeline
+    )
+){
+
+    batch.timeline = [];
+
+}
+
+
+const stageOrder = [
+
+    "production",
+
+    "f1",
+
+    "f2",
+
+    "harvest",
+
+    "bottling",
+
+    "label",
+
+    "finished"
+
+];
+
+
+const currentIndex =
+    Math.max(
+        0,
+        stageOrder.indexOf(
+            normalizedStage
+        )
+    );
+
+
+const now =
+    new Date();
+
+
+const monthNames = [
+
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des"
+
+];
+
+
+const date =
+    `${String(
+        now.getDate()
+    ).padStart(
+        2,
+        "0"
+    )} ${
+        monthNames[
+            now.getMonth()
+        ]
+    } ${
+        now.getFullYear()
+    }`;
+
+
+const time =
+    `${String(
+        now.getHours()
+    ).padStart(
+        2,
+        "0"
+    )}:${
+        String(
+            now.getMinutes()
+        ).padStart(
+            2,
+            "0"
+        )
+    }`;
+
+
+batch.timeline =
+    stageOrder.map(
+        (
+            stage,
+            index
+        ) => {
+
+            const existing =
+                batch.timeline.find(
+                    item =>
+                        normalizeBatchStage(
+                            item.stage
+                        ) === stage
+                );
+
+
+            if(existing){
+
+                return {
+
+                    ...existing,
+
                     stage:
 
                         stage,
-
-                    date:
-
-                        index ===
-                        currentIndex
-
-                            ? date
-
-                            : null,
-
-                    time:
-
-                        index ===
-                        currentIndex
-
-                            ? time
-
-                            : null,
 
                     status:
 
@@ -3269,762 +2539,801 @@ function updateBatchStageTimeline(
 
                                 ? "active"
 
-                                : "upcoming",
-
-                    note:
-
-                        index ===
-                        currentIndex
-
-                            ? `Stage diubah ke ${getStageLabel(stage)}.`
-
-                            : ""
+                                : "upcoming"
 
                 };
 
             }
-        );
+
+
+            return {
+
+                stage:
+
+                    stage,
+
+                date:
+
+                    index ===
+                    currentIndex
+
+                        ? date
+
+                        : null,
+
+                time:
+
+                    index ===
+                    currentIndex
+
+                        ? time
+
+                        : null,
+
+                status:
+
+                    index <
+                    currentIndex
+
+                        ? "completed"
+
+                        : index ===
+                          currentIndex
+
+                            ? "active"
+
+                            : "upcoming",
+
+                note:
+
+                    index ===
+                    currentIndex
+
+                        ? `Stage diubah ke ${getStageLabel(stage)}.`
+
+                        : ""
+
+            };
+
+        }
+    );
 
 }
 
-
 /* =========================================================
-   SAVE EDIT BATCH
+SAVE EDIT BATCH
 ========================================================= */
 
 function saveEditBatch(event){
 
-    event.preventDefault();
+event.preventDefault();
 
 
-    const form =
-        document.getElementById(
-            "editBatchForm"
-        );
+const form =
+    document.getElementById(
+        "editBatchForm"
+    );
 
 
-    if(!form){
+if(!form){
 
-        return;
+    return;
 
-    }
+}
 
 
-    if(
-        !form.checkValidity()
-    ){
+if(
+    !form.checkValidity()
+){
 
-        form.reportValidity();
+    form.reportValidity();
 
-        return;
+    return;
 
-    }
+}
 
 
-    const batch =
-        getCurrentBatch();
+const batch =
+    getCurrentBatch();
 
 
-    if(!batch){
+if(!batch){
 
-        return;
+    return;
 
-    }
+}
 
 
-    /* =====================================================
-       FORM VALUES
-    ===================================================== */
+/* =====================================================
+   FORM VALUES
+===================================================== */
 
-    const product =
-        document.getElementById(
-            "editProduct"
-        )?.value.trim();
+const product =
+    document.getElementById(
+        "editProduct"
+    )?.value.trim();
 
 
-    const volume =
-        document.getElementById(
-            "editVolume"
-        )?.value.trim();
+const volume =
+    document.getElementById(
+        "editVolume"
+    )?.value.trim();
 
 
-    const targetDate =
-        document.getElementById(
-            "editTargetDate"
-        )?.value;
+const targetDate =
+    document.getElementById(
+        "editTargetDate"
+    )?.value;
 
 
-    const stage =
-        document.getElementById(
-            "editStage"
-        )?.value;
+const stage =
+    document.getElementById(
+        "editStage"
+    )?.value;
 
 
-    const note =
-        document.getElementById(
-            "editNote"
-        )?.value.trim() ||
-        "";
+const note =
+    document.getElementById(
+        "editNote"
+    )?.value.trim() ||
+    "";
 
 
-    /* =====================================================
-       VALIDATION
-    ===================================================== */
+/* =====================================================
+   VALIDATION
+===================================================== */
 
-    if(!product){
+if(!product){
 
-        alert(
-            "Product wajib diisi."
-        );
+    alert(
+        "Product wajib diisi."
+    );
 
-        return;
+    return;
 
-    }
+}
 
 
-    if(
-        !volume ||
-        Number(volume) <= 0
-    ){
+if(
+    !volume ||
+    Number(volume) <= 0
+){
 
-        alert(
-            "Volume harus lebih besar dari 0."
-        );
+    alert(
+        "Volume harus lebih besar dari 0."
+    );
 
-        return;
+    return;
 
-    }
+}
 
 
-    if(!targetDate){
+if(!targetDate){
 
-        alert(
-            "Target date wajib diisi."
-        );
+    alert(
+        "Target date wajib diisi."
+    );
 
-        return;
+    return;
 
-    }
+}
 
 
-    const normalizedStage =
-        normalizeBatchStage(
-            stage
-        );
+const normalizedStage =
+    normalizeBatchStage(
+        stage
+    );
 
 
-    /* =====================================================
-       UPDATE MAIN BATCH
-    ===================================================== */
+/* =====================================================
+   UPDATE MAIN BATCH
+===================================================== */
 
-    batch.product =
-        product;
+batch.product =
+    product;
 
 
-    batch.volume =
-        `${Number(
-            volume
-        ).toFixed(
-            1
-        )} L`;
+batch.volume =
+    `${Number(
+        volume
+    ).toFixed(
+        1
+    )} L`;
 
 
-    batch.targetDate =
-        formatFermentationDate(
-            targetDate
-        );
+batch.targetDate =
+    formatFermentationDate(
+        targetDate
+    );
 
 
-    batch.stage =
-        getStageLabel(
-            normalizedStage
-        );
-
-
-    batch.note =
-        note;
-
-
-    /* =====================================================
-       UPDATE STATUS
-    ===================================================== */
-
-    if(
-        normalizedStage ===
-        "harvest"
-    ){
-
-        batch.status =
-            "READY HARVEST";
-
-
-        batch.progress =
-            100;
-
-    }
-
-
-    else if(
-        normalizedStage ===
-        "finished"
-    ){
-
-        batch.status =
-            "FINISHED";
-
-
-        batch.progress =
-            100;
-
-    }
-
-
-    else if(
-        normalizedStage ===
-        "production"
-    ){
-
-        batch.status =
-            "PRODUCTION ACTIVE";
-
-    }
-
-
-    else{
-
-        batch.status =
-            `${getStageLabel(
-                normalizedStage
-            )
-            .replace(
-                " Fermentasi",
-                ""
-            )
-            .toUpperCase()} ACTIVE`;
-
-    }
-
-
-    /* =====================================================
-       UPDATE PROGRESS
-    ===================================================== */
-
-    if(
-        normalizedStage !==
-            "harvest"
-        &&
-        normalizedStage !==
-            "finished"
-    ){
-
-        const stageProgress = {
-
-            production: 10,
-
-            f1: 50,
-
-            f2: 80,
-
-            bottling: 90,
-
-            label: 95
-
-        };
-
-
-        if(
-            stageProgress[
-                normalizedStage
-            ] !== undefined
-        ){
-
-            batch.progress =
-                stageProgress[
-                    normalizedStage
-                ];
-
-        }
-
-    }
-
-
-    /* =====================================================
-       UPDATE DAY
-    ===================================================== */
-
-    if(
-        normalizedStage ===
-            "harvest"
-        ||
-        normalizedStage ===
-            "finished"
-    ){
-
-        batch.day =
-            batch.targetDays;
-
-    }
-
-
-    /* =====================================================
-       UPDATE TIMELINE
-    ===================================================== */
-
-    updateBatchStageTimeline(
-        batch,
+batch.stage =
+    getStageLabel(
         normalizedStage
     );
 
 
-    /* =====================================================
-       RENDER
-    ===================================================== */
-
-    renderBatchDetail();
+batch.note =
+    note;
 
 
-    /* =====================================================
+/* =====================================================
+   UPDATE STATUS
+===================================================== */
+
+if(
+    normalizedStage ===
+    "harvest"
+){
+
+    batch.status =
+        "READY HARVEST";
+
+
+    batch.progress =
+        100;
+
+}
+
+
+else if(
+    normalizedStage ===
+    "finished"
+){
+
+    batch.status =
+        "FINISHED";
+
+
+    batch.progress =
+        100;
+
+}
+
+
+else if(
+    normalizedStage ===
+    "production"
+){
+
+    batch.status =
+        "PRODUCTION ACTIVE";
+
+}
+
+
+else{
+
+    batch.status =
+        `${getStageLabel(
+            normalizedStage
+        )
+        .replace(
+            " Fermentasi",
+            ""
+        )
+        .toUpperCase()} ACTIVE`;
+
+}
+
+
+/* =====================================================
+   UPDATE PROGRESS
+===================================================== */
+
+if(
+    normalizedStage !==
+        "harvest"
+    &&
+    normalizedStage !==
+        "finished"
+){
+
+    const stageProgress = {
+
+        production: 10,
+
+        f1: 50,
+
+        f2: 80,
+
+        bottling: 90,
+
+        label: 95
+
+    };
+
+
+    if(
+        stageProgress[
+            normalizedStage
+        ] !== undefined
+    ){
+
+        batch.progress =
+            stageProgress[
+                normalizedStage
+            ];
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE DAY
+===================================================== */
+
+if(
+    normalizedStage ===
+        "harvest"
+    ||
+    normalizedStage ===
+        "finished"
+){
+
+    batch.day =
+        batch.targetDays;
+
+}
+
+
+/* =====================================================
+   UPDATE TIMELINE
+===================================================== */
+
+updateBatchStageTimeline(
+    batch,
+    normalizedStage
+);
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+renderBatchDetail();
+
+
+/* =====================================================
+   CLOSE
+===================================================== */
+
+closeEditBatchModal();
+
+
+resetEditBatchForm();
+
+
+console.log(
+    "MERAMU: Batch berhasil diperbarui.",
+    batch
+);
+
+}
+
+/* =========================================================
+EDIT BATCH EVENTS
+========================================================= */
+
+document.addEventListener(
+"click",
+event => {
+
+    /* -----------------------------------------------
+       OPEN
+    ----------------------------------------------- */
+
+    const editButton =
+        event.target.closest(
+            "#editBatch"
+        );
+
+
+    if(editButton){
+
+        openEditBatchModal();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
        CLOSE
-    ===================================================== */
+    ----------------------------------------------- */
 
-    closeEditBatchModal();
+    const closeEditButton =
+        event.target.closest(
+            "#closeEditBatch"
+        );
 
 
-    resetEditBatchForm();
+    if(closeEditButton){
+
+        closeEditBatchModal();
+
+        return;
+
+    }
 
 
-    console.log(
-        "MERAMU: Batch berhasil diperbarui.",
-        batch
+    /* -----------------------------------------------
+       CANCEL
+    ----------------------------------------------- */
+
+    const cancelEditButton =
+        event.target.closest(
+            "#cancelEditBatch"
+        );
+
+
+    if(cancelEditButton){
+
+        closeEditBatchModal();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       BACKDROP
+    ----------------------------------------------- */
+
+    const editBackdrop =
+        event.target.closest(
+            "[data-close-edit-batch]"
+        );
+
+
+    if(editBackdrop){
+
+        closeEditBatchModal();
+
+    }
+
+}
+
+);
+
+/* =========================================================
+EDIT FORM SUBMIT
+========================================================= */
+
+document.addEventListener(
+"submit",
+event => {
+
+    if(
+        event.target.id !==
+        "editBatchForm"
+    ){
+
+        return;
+
+    }
+
+
+    saveEditBatch(
+        event
     );
 
 }
 
-
-/* =========================================================
-   EDIT BATCH EVENTS
-========================================================= */
-
-document.addEventListener(
-    "click",
-    event => {
-
-
-        /* -----------------------------------------------
-           OPEN
-        ----------------------------------------------- */
-
-        const editButton =
-            event.target.closest(
-                "#editBatch"
-            );
-
-
-        if(editButton){
-
-            openEditBatchModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           CLOSE
-        ----------------------------------------------- */
-
-        const closeEditButton =
-            event.target.closest(
-                "#closeEditBatch"
-            );
-
-
-        if(closeEditButton){
-
-            closeEditBatchModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           CANCEL
-        ----------------------------------------------- */
-
-        const cancelEditButton =
-            event.target.closest(
-                "#cancelEditBatch"
-            );
-
-
-        if(cancelEditButton){
-
-            closeEditBatchModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           BACKDROP
-        ----------------------------------------------- */
-
-        const editBackdrop =
-            event.target.closest(
-                "[data-close-edit-batch]"
-            );
-
-
-        if(editBackdrop){
-
-            closeEditBatchModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   EDIT FORM SUBMIT
-========================================================= */
-
-document.addEventListener(
-    "submit",
-    event => {
-
-        if(
-            event.target.id !==
-            "editBatchForm"
-        ){
-
-            return;
-
-        }
-
-
-        saveEditBatch(
-            event
-        );
-
-    }
-);
-
-
-/* =========================================================
-   ESCAPE
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if(
-            event.key !==
-            "Escape"
-        ){
-
-            return;
-
-        }
-
-
-        const modal =
-            getEditBatchModal();
-
-
-        if(
-            modal &&
-            !modal.hidden
-        ){
-
-            closeEditBatchModal();
-
-        }
-
-    }
 );
 
 /* =========================================================
-   PRINT BATCH SHEET
+ESCAPE
+========================================================= */
+
+document.addEventListener(
+"keydown",
+event => {
+
+    if(
+        event.key !==
+        "Escape"
+    ){
+
+        return;
+
+    }
+
+
+    const modal =
+        getEditBatchModal();
+
+
+    if(
+        modal &&
+        !modal.hidden
+    ){
+
+        closeEditBatchModal();
+
+    }
+
+}
+
+);
+
+/* =========================================================
+PRINT BATCH SHEET
 ========================================================= */
 
 function escapePrintHtml(value){
 
-    if(value === null || value === undefined){
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
+if(value === null || value === undefined){
+    return "";
 }
 
+return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
 
 function getPrintQcLabel(qc){
 
-    if(qc === "passed"){
-        return "Passed";
-    }
+if(qc === "passed"){
+    return "Passed";
+}
 
-    if(qc === "warning"){
-        return "Warning";
-    }
+if(qc === "warning"){
+    return "Warning";
+}
 
-    if(qc === "failed"){
-        return "Failed";
-    }
+if(qc === "failed"){
+    return "Failed";
+}
 
-    return "—";
+return "—";
+
+}
+
+function printBatchSheet(){
+
+const batch =
+    getCurrentBatch();
+
+
+if(!batch){
+
+    console.warn(
+        "MERAMU: Batch untuk print tidak ditemukan."
+    );
+
+    return;
 
 }
 
 
-function printBatchSheet(){
-
-    const batch =
-        getCurrentBatch();
-
-
-    if(!batch){
-
-        console.warn(
-            "MERAMU: Batch untuk print tidak ditemukan."
-        );
-
-        return;
-
-    }
+const logs =
+    Array.isArray(
+        batch.fermentationLogs
+    )
+        ? batch.fermentationLogs
+        : [];
 
 
-    const logs =
-        Array.isArray(
-            batch.fermentationLogs
-        )
-            ? batch.fermentationLogs
-            : [];
+const timeline =
+    Array.isArray(
+        batch.timeline
+    )
+        ? batch.timeline
+        : [];
 
 
-    const timeline =
-        Array.isArray(
-            batch.timeline
-        )
-            ? batch.timeline
-            : [];
+const printWindow =
+    window.open(
+        "",
+        "_blank",
+        "width=1100,height=800"
+    );
 
 
-    const printWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=1100,height=800"
-        );
+if(!printWindow){
+
+    alert(
+        "Popup print diblokir browser. Izinkan popup untuk MERAMU."
+    );
+
+    return;
+
+}
 
 
-    if(!printWindow){
+const logRows =
+    logs.length
 
-        alert(
-            "Popup print diblokir browser. Izinkan popup untuk MERAMU."
-        );
-
-        return;
-
-    }
-
-
-    const logRows =
-        logs.length
-
-            ? logs.map(
-                log => `
-
-                    <tr>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.date || "—"
-                            )}
-                            <br>
-                            <small>
-                                ${escapePrintHtml(
-                                    log.time || "—"
-                                )}
-                            </small>
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                String(
-                                    log.stage || "—"
-                                ).toUpperCase()
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.ph || "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.brix || "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.temperature || "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.volume || "—"
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.operator || "—"
-                            )}
-                        </td>
-
-                        <td>
-                            <span class="
-                                qc-badge
-                                ${escapePrintHtml(
-                                    log.qc || ""
-                                )}
-                            ">
-                                ${escapePrintHtml(
-                                    getPrintQcLabel(
-                                        log.qc
-                                    )
-                                )}
-                            </span>
-                        </td>
-
-                        <td>
-                            ${escapePrintHtml(
-                                log.note || "—"
-                            )}
-                        </td>
-
-                    </tr>
-
-                `
-            ).join("")
-
-            : `
+        ? logs.map(
+            log => `
 
                 <tr>
 
-                    <td
-                        colspan="9"
-                        class="empty-row"
-                    >
-                        Belum ada fermentation log.
+                    <td>
+                        ${escapePrintHtml(
+                            log.date || "—"
+                        )}
+                        <br>
+                        <small>
+                            ${escapePrintHtml(
+                                log.time || "—"
+                            )}
+                        </small>
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            String(
+                                log.stage || "—"
+                            ).toUpperCase()
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.ph || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.brix || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.temperature || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.volume || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.operator || "—"
+                        )}
+                    </td>
+
+                    <td>
+                        <span class="
+                            qc-badge
+                            ${escapePrintHtml(
+                                log.qc || ""
+                            )}
+                        ">
+                            ${escapePrintHtml(
+                                getPrintQcLabel(
+                                    log.qc
+                                )
+                            )}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${escapePrintHtml(
+                            log.note || "—"
+                        )}
                     </td>
 
                 </tr>
 
-            `;
+            `
+        ).join("")
+
+        : `
+
+            <tr>
+
+                <td
+                    colspan="9"
+                    class="empty-row"
+                >
+                    Belum ada fermentation log.
+                </td>
+
+            </tr>
+
+        `;
 
 
-    const timelineRows =
-        timeline.length
+const timelineRows =
+    timeline.length
 
-            ? timeline.map(
-                event => `
+        ? timeline.map(
+            event => `
 
-                    <div class="timeline-row">
+                <div class="timeline-row">
 
-                        <div class="timeline-stage">
+                    <div class="timeline-stage">
 
-                            <strong>
-                                ${escapePrintHtml(
-                                    getStageLabel(
-                                        normalizeBatchStage(
-                                            event.stage
-                                        )
+                        <strong>
+                            ${escapePrintHtml(
+                                getStageLabel(
+                                    normalizeBatchStage(
+                                        event.stage
                                     )
-                                )}
-                            </strong>
-
-                            <span>
-                                ${escapePrintHtml(
-                                    event.note || "—"
-                                )}
-                            </span>
-
-                        </div>
-
-                        <div class="timeline-date">
-
-                            ${escapePrintHtml(
-                                event.date || "—"
+                                )
                             )}
+                        </strong>
 
-                            ${
-                                event.time
-                                    ? `
-                                        <br>
-                                        <small>
-                                            ${escapePrintHtml(
-                                                event.time
-                                            )}
-                                        </small>
-                                    `
-                                    : ""
-                            }
-
-                        </div>
-
-                        <div
-                            class="
-                                timeline-status
-                                ${escapePrintHtml(
-                                    event.status || "upcoming"
-                                )}
-                            "
-                        >
+                        <span>
                             ${escapePrintHtml(
-                                event.status || "upcoming"
+                                event.note || "—"
                             )}
-                        </div>
+                        </span>
 
                     </div>
 
-                `
-            ).join("")
+                    <div class="timeline-date">
 
-            : `
+                        ${escapePrintHtml(
+                            event.date || "—"
+                        )}
 
-                <div class="empty-timeline">
-                    Belum ada timeline batch.
+                        ${
+                            event.time
+                                ? `
+                                    <br>
+                                    <small>
+                                        ${escapePrintHtml(
+                                            event.time
+                                        )}
+                                    </small>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                    <div
+                        class="
+                            timeline-status
+                            ${escapePrintHtml(
+                                event.status || "upcoming"
+                            )}
+                        "
+                    >
+                        ${escapePrintHtml(
+                            event.status || "upcoming"
+                        )}
+                    </div>
+
                 </div>
 
-            `;
+            `
+        ).join("")
+
+        : `
+
+            <div class="empty-timeline">
+                Belum ada timeline batch.
+            </div>
+
+        `;
 
 
-    const generatedAt =
-        new Date().toLocaleString(
-            "id-ID",
-            {
-                dateStyle: "medium",
-                timeStyle: "short"
-            }
-        );
+const generatedAt =
+    new Date().toLocaleString(
+        "id-ID",
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }
+    );
 
 
-    const printHtml = `
+const printHtml = `
 
 <!DOCTYPE html>
 
@@ -4037,7 +3346,6 @@ function printBatchSheet(){
 <title>
     MERAMU • Batch ${escapePrintHtml(batch.code)}
 </title>
-
 
 <style>
 
@@ -4690,425 +3998,421 @@ td small{
 
 </head>
 
-
 <body>
 
 <div class="print-page">
 
+<header class="header">
 
-    <header class="header">
+    <div class="brand">
 
-        <div class="brand">
-
-            <div class="brand-name">
-                MERAMU
-            </div>
-
-            <div class="brand-subtitle">
-                Botanical Beverage Production System
-            </div>
-
+        <div class="brand-name">
+            MERAMU
         </div>
 
-
-        <div class="document-info">
-
-            <div class="document-title">
-                BATCH SHEET
-            </div>
-
-            <div class="document-meta">
-                ${escapePrintHtml(generatedAt)}
-            </div>
-
+        <div class="brand-subtitle">
+            Botanical Beverage Production System
         </div>
 
-    </header>
+    </div>
 
 
-    <section class="batch-header">
+    <div class="document-info">
 
-        <div>
-
-            <h1 class="batch-product">
-                ${escapePrintHtml(
-                    batch.product
-                )}
-            </h1>
-
-            <div class="batch-code">
-                Batch ${escapePrintHtml(
-                    batch.code
-                )}
-            </div>
-
+        <div class="document-title">
+            BATCH SHEET
         </div>
 
+        <div class="document-meta">
+            ${escapePrintHtml(generatedAt)}
+        </div>
 
-        <div class="status">
+    </div>
 
+</header>
+
+
+<section class="batch-header">
+
+    <div>
+
+        <h1 class="batch-product">
             ${escapePrintHtml(
-                batch.status || "—"
+                batch.product
             )}
+        </h1>
 
-        </div>
-
-    </section>
-
-
-    <section class="section">
-
-        <h2 class="section-title">
-            Batch Information
-        </h2>
-
-
-        <div class="info-grid">
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Stage
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.stage || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Start Date
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.startDate || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Target Date
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.targetDate || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Volume
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.volume || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    HPP
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.hpp || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Progress
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        `${batch.progress || 0}%`
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Day
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        `Hari ke-${batch.day || 0} / ${batch.targetDays || 0}`
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span class="info-label">
-                    Duration
-                </span>
-
-                <span class="info-value">
-                    ${escapePrintHtml(
-                        batch.duration || "—"
-                    )}
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="progress-wrap">
-
-            <div class="progress-header">
-
-                <strong>
-                    Fermentation Progress
-                </strong>
-
-                <span>
-                    ${escapePrintHtml(
-                        `${batch.progress || 0}%`
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="progress-track">
-
-                <div class="progress-bar"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="section">
-
-        <h2 class="section-title">
-            Current Fermentation Metrics
-        </h2>
-
-
-        <div class="metric-grid">
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    pH
-                </span>
-
-                <span class="metric-value">
-                    ${escapePrintHtml(
-                        batch.ph || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    Brix
-                </span>
-
-                <span class="metric-value">
-                    ${escapePrintHtml(
-                        batch.brix || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    Suhu
-                </span>
-
-                <span class="metric-value">
-                    ${escapePrintHtml(
-                        batch.temperature || "—"
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span class="metric-label">
-                    Volume
-                </span>
-
-                <span class="metric-value">
-                    ${escapePrintHtml(
-                        batch.volume || "—"
-                    )}
-                </span>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="section">
-
-        <h2 class="section-title">
-            Fermentation Log
-        </h2>
-
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        Tanggal
-                    </th>
-
-                    <th>
-                        Stage
-                    </th>
-
-                    <th>
-                        pH
-                    </th>
-
-                    <th>
-                        Brix
-                    </th>
-
-                    <th>
-                        Suhu
-                    </th>
-
-                    <th>
-                        Volume
-                    </th>
-
-                    <th>
-                        Operator
-                    </th>
-
-                    <th>
-                        QC
-                    </th>
-
-                    <th>
-                        Catatan
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                ${logRows}
-
-            </tbody>
-
-        </table>
-
-    </section>
-
-
-    <section class="section">
-
-        <h2 class="section-title">
-            Batch Timeline
-        </h2>
-
-
-        <div class="timeline">
-
-            ${timelineRows}
-
-        </div>
-
-    </section>
-
-
-    ${
-        batch.note
-            ? `
-
-                <section class="section">
-
-                    <h2 class="section-title">
-                        Catatan Produksi
-                    </h2>
-
-                    <div class="note-box">
-                        ${escapePrintHtml(
-                            batch.note
-                        )}
-                    </div>
-
-                </section>
-
-            `
-            : ""
-    }
-
-
-    <footer class="footer">
-
-        <span>
-            MERAMU • Batch ${escapePrintHtml(
+        <div class="batch-code">
+            Batch ${escapePrintHtml(
                 batch.code
             )}
-        </span>
+        </div>
 
-        <span>
-            Dokumen produksi internal
-        </span>
+    </div>
 
-    </footer>
 
+    <div class="status">
+
+        ${escapePrintHtml(
+            batch.status || "—"
+        )}
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <h2 class="section-title">
+        Batch Information
+    </h2>
+
+
+    <div class="info-grid">
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Stage
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.stage || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Start Date
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.startDate || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Target Date
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.targetDate || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Volume
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.volume || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                HPP
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.hpp || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Progress
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    `${batch.progress || 0}%`
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Day
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    `Hari ke-${batch.day || 0} / ${batch.targetDays || 0}`
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-label">
+                Duration
+            </span>
+
+            <span class="info-value">
+                ${escapePrintHtml(
+                    batch.duration || "—"
+                )}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="progress-wrap">
+
+        <div class="progress-header">
+
+            <strong>
+                Fermentation Progress
+            </strong>
+
+            <span>
+                ${escapePrintHtml(
+                    `${batch.progress || 0}%`
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="progress-track">
+
+            <div class="progress-bar"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <h2 class="section-title">
+        Current Fermentation Metrics
+    </h2>
+
+
+    <div class="metric-grid">
+
+        <div class="metric">
+
+            <span class="metric-label">
+                pH
+            </span>
+
+            <span class="metric-value">
+                ${escapePrintHtml(
+                    batch.ph || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-label">
+                Brix
+            </span>
+
+            <span class="metric-value">
+                ${escapePrintHtml(
+                    batch.brix || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-label">
+                Suhu
+            </span>
+
+            <span class="metric-value">
+                ${escapePrintHtml(
+                    batch.temperature || "—"
+                )}
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-label">
+                Volume
+            </span>
+
+            <span class="metric-value">
+                ${escapePrintHtml(
+                    batch.volume || "—"
+                )}
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="section">
+
+    <h2 class="section-title">
+        Fermentation Log
+    </h2>
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Tanggal
+                </th>
+
+                <th>
+                    Stage
+                </th>
+
+                <th>
+                    pH
+                </th>
+
+                <th>
+                    Brix
+                </th>
+
+                <th>
+                    Suhu
+                </th>
+
+                <th>
+                    Volume
+                </th>
+
+                <th>
+                    Operator
+                </th>
+
+                <th>
+                    QC
+                </th>
+
+                <th>
+                    Catatan
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            ${logRows}
+
+        </tbody>
+
+    </table>
+
+</section>
+
+
+<section class="section">
+
+    <h2 class="section-title">
+        Batch Timeline
+    </h2>
+
+
+    <div class="timeline">
+
+        ${timelineRows}
+
+    </div>
+
+</section>
+
+
+${
+    batch.note
+        ? `
+
+            <section class="section">
+
+                <h2 class="section-title">
+                    Catatan Produksi
+                </h2>
+
+                <div class="note-box">
+                    ${escapePrintHtml(
+                        batch.note
+                    )}
+                </div>
+
+            </section>
+
+        `
+        : ""
+}
+
+
+<footer class="footer">
+
+    <span>
+        MERAMU • Batch ${escapePrintHtml(
+            batch.code
+        )}
+    </span>
+
+    <span>
+        Dokumen produksi internal
+    </span>
+
+</footer>
 
 </div>
-
 
 <script>
 
@@ -5134,177 +4438,172 @@ window.onafterprint = function(){
 
 </script>
 
-
 </body>
 
 </html>
 
 `;
 
+printWindow.document.open();
 
-    printWindow.document.open();
+printWindow.document.write(
+    printHtml
+);
 
-    printWindow.document.write(
-        printHtml
-    );
-
-    printWindow.document.close();
+printWindow.document.close();
 
 
-    console.log(
-        "MERAMU: Print Batch Sheet dibuka.",
-        batch.code
-    );
+console.log(
+    "MERAMU: Print Batch Sheet dibuka.",
+    batch.code
+);
 
 }
 
-
 /* =========================================================
-   PRINT BATCH EVENTS
+PRINT BATCH EVENTS
 ========================================================= */
 
 document.addEventListener(
-    "click",
-    event => {
+"click",
+event => {
 
-        const printButton =
-            event.target.closest(
-                "#printBatch"
-            );
-
-
-        if(!printButton){
-            return;
-        }
+    const printButton =
+        event.target.closest(
+            "#printBatch"
+        );
 
 
-        event.preventDefault();
-
-
-        printBatchSheet();
-
+    if(!printButton){
+        return;
     }
+
+
+    event.preventDefault();
+
+
+    printBatchSheet();
+
+}
+
 );
 
 /* =========================================================
-   THERMAL LABEL
-   80mm + QR + BEST BEFORE
+THERMAL LABEL
+80mm + QR + BEST BEFORE
 ========================================================= */
 
 function escapeLabelHtml(value){
 
-    if(
-        value === null ||
-        value === undefined
-    ){
-        return "";
-    }
+if(
+    value === null ||
+    value === undefined
+){
+    return "";
+}
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
 
-
 /* =========================================================
-   GET LABEL TRACE URL
+GET LABEL TRACE URL
 ========================================================= */
 
 function getBatchTraceUrl(batch){
 
-    if(!batch || !batch.code){
-        return "";
-    }
-
-
-    const baseUrl =
-        window.location.origin;
-
-
-    return `${baseUrl}/trace/${encodeURIComponent(
-        batch.code
-    )}`;
-
+if(!batch || !batch.code){
+    return "";
 }
 
 
+const baseUrl =
+    window.location.origin;
+
+
+return `${baseUrl}/trace/${encodeURIComponent(
+    batch.code
+)}`;
+
+}
+
 /* =========================================================
-   GET BEST BEFORE
+GET BEST BEFORE
 ========================================================= */
 
 function getBatchBestBefore(batch){
 
-    if(!batch){
-        return "—";
-    }
-
-
-    return (
-        batch.expiryDate ||
-        batch.bestBefore ||
-        "—"
-    );
-
+if(!batch){
+    return "—";
 }
 
 
+return (
+    batch.expiryDate ||
+    batch.bestBefore ||
+    "—"
+);
+
+}
+
 /* =========================================================
-   PRINT THERMAL LABEL
+PRINT THERMAL LABEL
 ========================================================= */
 
 function printThermalLabel(){
 
-    const batch =
-        getCurrentBatch();
+const batch =
+    getCurrentBatch();
 
 
-    if(!batch){
+if(!batch){
 
-        console.warn(
-            "MERAMU: Batch untuk thermal label tidak ditemukan."
-        );
+    console.warn(
+        "MERAMU: Batch untuk thermal label tidak ditemukan."
+    );
 
-        return;
+    return;
 
-    }
-
-
-    const traceUrl =
-        getBatchTraceUrl(
-            batch
-        );
+}
 
 
-    const bestBefore =
-        getBatchBestBefore(
-            batch
-        );
+const traceUrl =
+    getBatchTraceUrl(
+        batch
+    );
 
 
-    const printWindow =
-        window.open(
-            "",
-            "_blank",
-            "width=500,height=800"
-        );
+const bestBefore =
+    getBatchBestBefore(
+        batch
+    );
 
 
-    if(!printWindow){
-
-        alert(
-            "Popup print diblokir browser. Izinkan popup untuk MERAMU."
-        );
-
-        return;
-
-    }
+const printWindow =
+    window.open(
+        "",
+        "_blank",
+        "width=500,height=800"
+    );
 
 
-    const labelHtml = `
+if(!printWindow){
+
+    alert(
+        "Popup print diblokir browser. Izinkan popup untuk MERAMU."
+    );
+
+    return;
+
+}
+
+
+const labelHtml = `
 
 <!DOCTYPE html>
 
@@ -5318,11 +4617,9 @@ function printThermalLabel(){
     MERAMU • ${escapeLabelHtml(batch.code)}
 </title>
 
-
 <script
     src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
 ></script>
-
 
 <style>
 
@@ -5604,142 +4901,100 @@ body{
 
 </head>
 
-
 <body>
-
 
 <div class="label">
 
-
-    <div class="brand">
-        MERAMU
-    </div>
-
-
-    <div class="brand-subtitle">
-        BOTANICAL BEVERAGE
-    </div>
+<div class="brand">
+    MERAMU
+</div>
 
 
-    <div class="divider"></div>
+<div class="brand-subtitle">
+    BOTANICAL BEVERAGE
+</div>
 
 
-    <div class="product">
-
-        ${escapeLabelHtml(
-            batch.product || "Produk MERAMU"
-        )}
-
-    </div>
+<div class="divider"></div>
 
 
-    <div class="batch">
+<div class="product">
 
-        BATCH
-        ${escapeLabelHtml(
-            batch.code || "—"
-        )}
+    ${escapeLabelHtml(
+        batch.product || "Produk MERAMU"
+    )}
 
-    </div>
-
-
-    <div class="info-grid">
+</div>
 
 
-        <div class="info">
+<div class="batch">
 
-            <span class="info-label">
-                Volume
-            </span>
+    BATCH
+    ${escapeLabelHtml(
+        batch.code || "—"
+    )}
 
-            <span class="info-value">
-                ${escapeLabelHtml(
-                    batch.volume || "—"
-                )}
-            </span>
-
-        </div>
+</div>
 
 
-        <div class="info">
-
-            <span class="info-label">
-                Stage
-            </span>
-
-            <span class="info-value">
-                ${escapeLabelHtml(
-                    batch.stage || "—"
-                )}
-            </span>
-
-        </div>
+<div class="info-grid">
 
 
-        <div class="info">
+    <div class="info">
 
-            <span class="info-label">
-                Production
-            </span>
+        <span class="info-label">
+            Volume
+        </span>
 
-            <span class="info-value">
-                ${escapeLabelHtml(
-                    batch.startDate || "—"
-                )}
-            </span>
-
-        </div>
-
-
-        <div class="info">
-
-            <span class="info-label">
-                Best Before
-            </span>
-
-            <span class="info-value">
-                ${escapeLabelHtml(
-                    bestBefore
-                )}
-            </span>
-
-        </div>
-
-
-    </div>
-
-
-    <div class="qr-section">
-
-
-        <div id="qrcode"></div>
-
-
-        <div class="qr-caption">
-            Scan untuk melihat informasi batch
-        </div>
-
-
-        <div class="trace-code">
+        <span class="info-value">
             ${escapeLabelHtml(
-                traceUrl
-            )}
-        </div>
-
-
-    </div>
-
-
-    <div class="footer">
-
-        <span>
-            ${escapeLabelHtml(
-                batch.hpp || ""
+                batch.volume || "—"
             )}
         </span>
 
-        <span>
-            MERAMU
+    </div>
+
+
+    <div class="info">
+
+        <span class="info-label">
+            Stage
+        </span>
+
+        <span class="info-value">
+            ${escapeLabelHtml(
+                batch.stage || "—"
+            )}
+        </span>
+
+    </div>
+
+
+    <div class="info">
+
+        <span class="info-label">
+            Production
+        </span>
+
+        <span class="info-value">
+            ${escapeLabelHtml(
+                batch.startDate || "—"
+            )}
+        </span>
+
+    </div>
+
+
+    <div class="info">
+
+        <span class="info-label">
+            Best Before
+        </span>
+
+        <span class="info-value">
+            ${escapeLabelHtml(
+                bestBefore
+            )}
         </span>
 
     </div>
@@ -5747,6 +5002,43 @@ body{
 
 </div>
 
+
+<div class="qr-section">
+
+
+    <div id="qrcode"></div>
+
+
+    <div class="qr-caption">
+        Scan untuk melihat informasi batch
+    </div>
+
+
+    <div class="trace-code">
+        ${escapeLabelHtml(
+            traceUrl
+        )}
+    </div>
+
+
+</div>
+
+
+<div class="footer">
+
+    <span>
+        ${escapeLabelHtml(
+            batch.hpp || ""
+        )}
+    </span>
+
+    <span>
+        MERAMU
+    </span>
+
+</div>
+
+</div>
 
 <script>
 
@@ -5805,290 +5097,286 @@ window.onafterprint =
 
 </script>
 
-
 </body>
 
 </html>
 
 `;
 
+printWindow.document.open();
 
-    printWindow.document.open();
+printWindow.document.write(
+    labelHtml
+);
 
-    printWindow.document.write(
-        labelHtml
-    );
-
-    printWindow.document.close();
+printWindow.document.close();
 
 
-    console.log(
-        "MERAMU: Thermal Label 80mm dibuka.",
-        batch.code
-    );
+console.log(
+    "MERAMU: Thermal Label 80mm dibuka.",
+    batch.code
+);
 
 }
 
-
 /* =========================================================
-   THERMAL LABEL EVENT
+THERMAL LABEL EVENT
 ========================================================= */
 
 document.addEventListener(
-    "click",
-    event => {
+"click",
+event => {
 
-        const labelButton =
-            event.target.closest(
-                "#printThermalLabel"
-            );
-
-
-        if(!labelButton){
-            return;
-        }
+    const labelButton =
+        event.target.closest(
+            "#printThermalLabel"
+        );
 
 
-        event.preventDefault();
-
-
-        printThermalLabel();
-
+    if(!labelButton){
+        return;
     }
+
+
+    event.preventDefault();
+
+
+    printThermalLabel();
+
+}
+
 );
 
 /* =========================================================
-   BACK TO CALENDAR
+BACK TO CALENDAR
 ========================================================= */
 
 function backToCalendar(){
 
-    window.location.href =
-        "fermentation-calendar.html";
+window.location.href =
+    "fermentation-calendar.html";
 
 }
 
-
 /* =========================================================
-   EVENTS
+EVENTS
 ========================================================= */
 
 document.addEventListener(
-    "click",
-    event => {
+"click",
+event => {
 
-        /* -----------------------------------------------
-           BACK TO CALENDAR
-        ----------------------------------------------- */
+    /* -----------------------------------------------
+       BACK TO CALENDAR
+    ----------------------------------------------- */
 
-        const backButton =
-            event.target.closest(
-                "#backToCalendar"
-            );
-
-
-        if(backButton){
-
-            backToCalendar();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           OPEN ADD LOG
-        ----------------------------------------------- */
-
-        const addLogButton =
-            event.target.closest(
-                "#addFermentationLog"
-            );
-
-
-        if(addLogButton){
-
-            openFermentationLogModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           CLOSE BUTTON
-        ----------------------------------------------- */
-
-        const closeButton =
-            event.target.closest(
-                "#closeFermentationLog"
-            );
-
-
-        if(closeButton){
-
-            closeFermentationLogModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           CANCEL BUTTON
-        ----------------------------------------------- */
-
-        const cancelButton =
-            event.target.closest(
-                "#cancelFermentationLog"
-            );
-
-
-        if(cancelButton){
-
-            closeFermentationLogModal();
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------------
-           CLICK BACKDROP
-        ----------------------------------------------- */
-
-        const backdrop =
-            event.target.closest(
-                "[data-close-fermentation-log]"
-            );
-
-
-        if(backdrop){
-
-            closeFermentationLogModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   FORM SUBMIT
-========================================================= */
-
-document.addEventListener(
-    "submit",
-    event => {
-
-        if(
-            event.target.id !==
-            "fermentationLogForm"
-        ){
-
-            return;
-
-        }
-
-
-        saveFermentationLog(
-            event
+    const backButton =
+        event.target.closest(
+            "#backToCalendar"
         );
 
+
+    if(backButton){
+
+        backToCalendar();
+
+        return;
+
     }
+
+
+    /* -----------------------------------------------
+       OPEN ADD LOG
+    ----------------------------------------------- */
+
+    const addLogButton =
+        event.target.closest(
+            "#addFermentationLog"
+        );
+
+
+    if(addLogButton){
+
+        openFermentationLogModal();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       CLOSE BUTTON
+    ----------------------------------------------- */
+
+    const closeButton =
+        event.target.closest(
+            "#closeFermentationLog"
+        );
+
+
+    if(closeButton){
+
+        closeFermentationLogModal();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       CANCEL BUTTON
+    ----------------------------------------------- */
+
+    const cancelButton =
+        event.target.closest(
+            "#cancelFermentationLog"
+        );
+
+
+    if(cancelButton){
+
+        closeFermentationLogModal();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       CLICK BACKDROP
+    ----------------------------------------------- */
+
+    const backdrop =
+        event.target.closest(
+            "[data-close-fermentation-log]"
+        );
+
+
+    if(backdrop){
+
+        closeFermentationLogModal();
+
+    }
+
+}
+
 );
 
-
 /* =========================================================
-   ESCAPE KEY
+FORM SUBMIT
 ========================================================= */
 
 document.addEventListener(
-    "keydown",
-    event => {
+"submit",
+event => {
 
-        if(
-            event.key !== "Escape"
-        ){
+    if(
+        event.target.id !==
+        "fermentationLogForm"
+    ){
 
-            return;
-
-        }
-
-
-        const modal =
-            document.getElementById(
-                "fermentationLogModal"
-            );
-
-
-        if(
-            modal &&
-            !modal.hidden
-        ){
-
-            closeFermentationLogModal();
-
-        }
+        return;
 
     }
+
+
+    saveFermentationLog(
+        event
+    );
+
+}
+
 );
 
+/* =========================================================
+ESCAPE KEY
+========================================================= */
+
+document.addEventListener(
+"keydown",
+event => {
+
+    if(
+        event.key !== "Escape"
+    ){
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "fermentationLogModal"
+        );
+
+
+    if(
+        modal &&
+        !modal.hidden
+    ){
+
+        closeFermentationLogModal();
+
+    }
+
+}
+
+);
 
 /* =========================================================
-   INIT
+INIT
 ========================================================= */
 
 function initBatchDetail(){
 
-    renderBatchDetail();
+renderBatchDetail();
 
 
-    if(window.lucide){
+if(window.lucide){
 
-        lucide.createIcons();
-
-    }
+    lucide.createIcons();
 
 }
 
+}
 
 /* =========================================================
-   EXPORT
+EXPORT
 ========================================================= */
 
 window.initBatchDetail =
-    initBatchDetail;
+initBatchDetail;
 
 window.renderBatchDetail =
-    renderBatchDetail;
+renderBatchDetail;
 
 window.renderBatchTimeline =
-    renderBatchTimeline;
+renderBatchTimeline;
 
 window.renderFermentationLogs =
-    renderFermentationLogs;
+renderFermentationLogs;
 
 window.openFermentationLogModal =
-    openFermentationLogModal;
+openFermentationLogModal;
 
 window.closeFermentationLogModal =
-    closeFermentationLogModal;
+closeFermentationLogModal;
 
 window.saveFermentationLog =
-    saveFermentationLog;
+saveFermentationLog;
 
 window.openEditBatchModal =
-    openEditBatchModal;
+openEditBatchModal;
 
 window.closeEditBatchModal =
-    closeEditBatchModal;
+closeEditBatchModal;
 
 window.saveEditBatch =
-    saveEditBatch;
+saveEditBatch;
 
 window.printBatchSheet =
-    printBatchSheet;
+printBatchSheet;
 
 window.printThermalLabel =
-    printThermalLabel;
+printThermalLabel;
