@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MERAMU • Product Trace</title>
+
+    <link rel="icon" href="../assets/branding/favicon-32.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* =====================================================
+           MERAMU PUBLIC TRACE
+        ===================================================== */
+
+        body{
+            margin:0;
+            background:#FCFCFB;
+            font-family:"Poppins",sans-serif;
+            color:#17352A;
+        }
+
+        .trace-page{
+            width:100%;
+            min-height:100vh;
+            padding:32px 20px 60px;
+        }
+
+        .trace-container{
+            width:100%;
+            max-width:760px;
+            margin:0 auto;
+        }
+
+        .trace-brand{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            margin-bottom:30px;
+        }
+
+        .trace-brand img{
+            display:block;
+            object-fit:contain;
+        }
+
+        .trace-brand .brand-icon{
+            width:42px;
+            height:42px;
+        }
+
+        .trace-brand .brand-text{
+            width:120px;
+            height:auto;
+        }
+
+        .trace-card{
+            background:#fff;
+            border:1px solid rgba(4,103,56,.10);
+            border-radius:28px;
+            box-shadow:0 18px 50px rgba(4,103,56,.08);
+            overflow:hidden;
+        }
+
+        .trace-hero{
+            padding:34px 30px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(4,103,56,.07),
+                    rgba(4,103,56,.015)
+                );
+            border-bottom:1px solid rgba(4,103,56,.08);
+            text-align:center;
+        }
+
+        .trace-status{
+            display:inline-flex;
+            align-items:center;
+            gap:7px;
+            padding:7px 12px;
+            border-radius:999px;
+            background:#EAF7F0;
+            color:#046738;
+            font-size:12px;
+            font-weight:600;
+            margin-bottom:16px;
+        }
+
+        .trace-status-dot{
+            width:7px;
+            height:7px;
+            border-radius:50%;
+            background:#046738;
+        }
+
+        .trace-product{
+            margin:0;
+            font-size:28px;
+            line-height:1.2;
+            font-weight:700;
+            color:#17352A;
+        }
+
+        .trace-volume{
+            margin-top:8px;
+            font-size:15px;
+            color:#6B7C74;
+        }
+
+        .trace-code{
+            margin-top:18px;
+            display:inline-block;
+            padding:8px 12px;
+            border-radius:10px;
+            background:#F5F8F6;
+            color:#52675D;
+            font-size:12px;
+            font-weight:500;
+            letter-spacing:.3px;
+        }
+
+        .trace-body{
+            padding:30px;
+        }
+
+        .trace-section{
+            margin-bottom:28px;
+        }
+
+        .trace-section:last-child{
+            margin-bottom:0;
+        }
+
+        .trace-section-title{
+            display:flex;
+            align-items:center;
+            gap:9px;
+            margin-bottom:15px;
+            font-size:14px;
+            font-weight:700;
+            color:#17352A;
+        }
+
+        .trace-section-title i{
+            width:18px;
+            height:18px;
+            color:#046738;
+        }
+
+        .trace-grid{
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:10px;
+        }
+
+        .trace-item{
+            padding:14px;
+            background:#FAFCFB;
+            border:1px solid rgba(4,103,56,.08);
+            border-radius:14px;
+        }
+
+        .trace-label{
+            font-size:11px;
+            color:#83928B;
+            margin-bottom:4px;
+        }
+
+        .trace-value{
+            font-size:13px;
+            font-weight:600;
+            color:#28483B;
+        }
+
+        .trace-timeline{
+            position:relative;
+            padding-left:28px;
+        }
+
+        .trace-timeline::before{
+            content:"";
+            position:absolute;
+            left:7px;
+            top:7px;
+            bottom:7px;
+            width:1px;
+            background:rgba(4,103,56,.16);
+        }
+
+        .trace-step{
+            position:relative;
+            padding-bottom:20px;
+        }
+
+        .trace-step:last-child{
+            padding-bottom:0;
+        }
+
+        .trace-step::before{
+            content:"";
+            position:absolute;
+            left:-25px;
+            top:4px;
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#046738;
+            box-shadow:0 0 0 4px #EAF7F0;
+        }
+
+        .trace-step-title{
+            font-size:13px;
+            font-weight:600;
+            color:#28483B;
+        }
+
+        .trace-step-meta{
+            margin-top:3px;
+            font-size:11px;
+            color:#83928B;
+        }
+
+        .trace-component{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:15px;
+            padding:13px 14px;
+            border:1px solid rgba(4,103,56,.08);
+            border-radius:14px;
+            background:#FAFCFB;
+            margin-bottom:8px;
+        }
+
+        .trace-component:last-child{
+            margin-bottom:0;
+        }
+
+        .trace-component-name{
+            font-size:13px;
+            font-weight:600;
+            color:#28483B;
+        }
+
+        .trace-component-meta{
+            margin-top:3px;
+            font-size:11px;
+            color:#83928B;
+        }
+
+        .trace-component-qty{
+            white-space:nowrap;
+            font-size:13px;
+            font-weight:700;
+            color:#046738;
+        }
+
+        .trace-footer{
+            margin-top:22px;
+            text-align:center;
+            font-size:11px;
+            line-height:1.6;
+            color:#94A29C;
+        }
+
+        .trace-loading,
+        .trace-error{
+            padding:50px 25px;
+            text-align:center;
+        }
+
+        .trace-error-icon{
+            width:48px;
+            height:48px;
+            margin:0 auto 15px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#FEF2F2;
+            color:#B42318;
+        }
+
+        .trace-error h2{
+            margin:0;
+            font-size:18px;
+            color:#3A403D;
+        }
+
+        .trace-error p{
+            margin:8px auto 0;
+            max-width:460px;
+            font-size:13px;
+            color:#7A8580;
+        }
+
+        @media(max-width:600px){
+
+            .trace-page{
+                padding:20px 12px 40px;
+            }
+
+            .trace-hero{
+                padding:28px 20px;
+            }
+
+            .trace-body{
+                padding:22px 18px;
+            }
+
+            .trace-product{
+                font-size:23px;
+            }
+
+            .trace-grid{
+                grid-template-columns:1fr;
+            }
+
+            .trace-component{
+                align-items:flex-start;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="trace-page">
+
+    <div class="trace-container">
+
+        <div class="trace-brand">
+            <img
+                src="../assets/branding/logo-icon.png"
+                class="brand-icon"
+                alt="MERAMU"
+            >
+
+            <img
+                src="../assets/branding/logo-text.png"
+                class="brand-text"
+                alt="MERAMU"
+            >
+        </div>
+
+        <div id="traceApp" class="trace-card">
+
+            <div class="trace-loading">
+                <i data-lucide="loader-circle"></i>
+                <p>Memuat data produk...</p>
+            </div>
+
+        </div>
+
+        <div class="trace-footer">
+            Informasi traceability produk MERAMU.<br>
+            Data HPP dan informasi internal produksi tidak ditampilkan pada halaman publik.
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../js/trace.js"></script>
+
+</body>
+</html>
