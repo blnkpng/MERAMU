@@ -31,308 +31,877 @@
            MERAMU PUBLIC TRACE
         ===================================================== */
 
+        *{
+            box-sizing:border-box;
+        }
+
+        html{
+            margin:0;
+            padding:0;
+            background:#F7FAF8;
+        }
+
         body{
             margin:0;
-            background:#FCFCFB;
-            font-family:"Poppins",sans-serif;
-            color:#17352A;
-        }
+            padding:0;
 
-        .trace-page{
-            width:100%;
             min-height:100vh;
-            padding:32px 20px 60px;
+
+            font-family:"Poppins",sans-serif;
+
+            color:#18352A;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(4,103,56,.07),
+                    transparent 32%
+                ),
+                #F7FAF8;
         }
 
-        .trace-container{
+        /* =====================================================
+           APP
+        ===================================================== */
+
+        #traceApp{
             width:100%;
-            max-width:760px;
-            margin:0 auto;
-        }
-
-        .trace-brand{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:10px;
-            margin-bottom:30px;
-        }
-
-        .trace-brand img{
-            display:block;
-            object-fit:contain;
-        }
-
-        .trace-brand .brand-icon{
-            width:42px;
-            height:42px;
-        }
-
-        .trace-brand .brand-text{
-            width:120px;
-            height:auto;
         }
 
         .trace-card{
-            background:#fff;
-            border:1px solid rgba(4,103,56,.10);
-            border-radius:28px;
-            box-shadow:0 18px 50px rgba(4,103,56,.08);
+            width:100%;
+            max-width:760px;
+
+            margin:32px auto 60px;
+
             overflow:hidden;
+
+            background:rgba(255,255,255,.97);
+
+            border:1px solid rgba(4,103,56,.10);
+
+            border-radius:30px;
+
+            box-shadow:
+                0 24px 70px rgba(18,67,45,.10);
         }
 
-        .trace-hero{
-            padding:34px 30px;
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(4,103,56,.07),
-                    rgba(4,103,56,.015)
-                );
-            border-bottom:1px solid rgba(4,103,56,.08);
+        /* =====================================================
+           BRAND
+        ===================================================== */
+
+        .trace-brand{
+            display:flex !important;
+
+            align-items:center;
+            justify-content:center;
+
+            gap:10px;
+
+            margin:28px auto 0;
+
+            padding:0 20px;
+
+            width:100%;
+
             text-align:center;
         }
 
+        .trace-brand img{
+            display:block !important;
+
+            object-fit:contain !important;
+
+            max-width:none !important;
+        }
+
+        .trace-brand .trace-logo-icon{
+            width:38px !important;
+            height:38px !important;
+
+            min-width:38px !important;
+            max-width:38px !important;
+
+            min-height:38px !important;
+            max-height:38px !important;
+
+            object-fit:contain !important;
+        }
+
+        .trace-brand .trace-logo-text{
+            width:126px !important;
+            height:auto !important;
+
+            min-width:0 !important;
+            max-width:126px !important;
+
+            max-height:42px !important;
+
+            object-fit:contain !important;
+        }
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .trace-hero{
+            position:relative;
+
+            padding:34px 34px 38px;
+
+            text-align:center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #F2F9F5 0%,
+                    #FFFFFF 72%
+                );
+
+            border-bottom:1px solid rgba(4,103,56,.08);
+        }
+
+        .trace-hero .trace-brand{
+            margin:0 0 28px;
+
+            padding:0;
+        }
+
+        .trace-hero-copy{
+            max-width:580px;
+
+            margin:0 auto;
+        }
+
+        .trace-eyebrow{
+            display:block;
+
+            margin-bottom:8px;
+
+            font-size:11px;
+            font-weight:600;
+
+            letter-spacing:.16em;
+
+            color:#046738;
+        }
+
+        .trace-hero h1{
+            margin:0;
+
+            font-size:clamp(25px,4vw,34px);
+
+            line-height:1.2;
+
+            font-weight:700;
+
+            letter-spacing:-.03em;
+
+            color:#163D2C;
+        }
+
+        .trace-hero-copy p{
+            margin:10px auto 0;
+
+            max-width:520px;
+
+            font-size:13px;
+
+            line-height:1.7;
+
+            color:#718278;
+        }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
         .trace-status{
             display:inline-flex;
+
             align-items:center;
-            gap:7px;
-            padding:7px 12px;
+            justify-content:center;
+
+            gap:8px;
+
+            margin-top:18px;
+
+            padding:7px 13px;
+
             border-radius:999px;
-            background:#EAF7F0;
-            color:#046738;
-            font-size:12px;
+
+            font-size:11px;
+
             font-weight:600;
-            margin-bottom:16px;
         }
 
         .trace-status-dot{
             width:7px;
             height:7px;
+
+            flex:0 0 7px;
+
             border-radius:50%;
-            background:#046738;
+
+            background:currentColor;
         }
 
-        .trace-product{
-            margin:0;
-            font-size:28px;
-            line-height:1.2;
-            font-weight:700;
-            color:#17352A;
+        .trace-status.success{
+            color:#046738;
+            background:#EAF7EF;
         }
 
-        .trace-volume{
-            margin-top:8px;
-            font-size:15px;
-            color:#6B7C74;
+        .trace-status.warning{
+            color:#9A6700;
+            background:#FFF7DF;
         }
 
-        .trace-code{
-            margin-top:18px;
-            display:inline-block;
-            padding:8px 12px;
-            border-radius:10px;
-            background:#F5F8F6;
-            color:#52675D;
-            font-size:12px;
-            font-weight:500;
-            letter-spacing:.3px;
+        .trace-status.danger{
+            color:#B42318;
+            background:#FFF0EE;
         }
 
-        .trace-body{
-            padding:30px;
+        .trace-status.neutral{
+            color:#596C63;
+            background:#EEF3F0;
         }
+
+        /* =====================================================
+           SECTION
+        ===================================================== */
 
         .trace-section{
-            margin-bottom:28px;
+            padding:30px 34px;
+
+            border-bottom:1px solid rgba(4,103,56,.08);
         }
 
-        .trace-section:last-child{
-            margin-bottom:0;
-        }
-
-        .trace-section-title{
+        .trace-section-header{
             display:flex;
-            align-items:center;
-            gap:9px;
-            margin-bottom:15px;
-            font-size:14px;
-            font-weight:700;
-            color:#17352A;
+
+            align-items:flex-start;
+            justify-content:space-between;
+
+            gap:20px;
+
+            margin-bottom:22px;
         }
 
-        .trace-section-title i{
-            width:18px;
-            height:18px;
+        .trace-section-header > svg{
+            width:21px;
+            height:21px;
+
+            flex:0 0 auto;
+
             color:#046738;
         }
 
-        .trace-grid{
+        .trace-section-kicker{
+            display:block;
+
+            margin-bottom:5px;
+
+            font-size:10px;
+
+            font-weight:600;
+
+            letter-spacing:.14em;
+
+            color:#8B9B93;
+        }
+
+        .trace-section h2{
+            margin:0;
+
+            font-size:18px;
+
+            line-height:1.3;
+
+            font-weight:600;
+
+            color:#18352A;
+        }
+
+        /* =====================================================
+           PRODUCT
+        ===================================================== */
+
+        .trace-product-grid{
             display:grid;
-            grid-template-columns:repeat(2,minmax(0,1fr));
+
+            grid-template-columns:
+                minmax(0,1.5fr)
+                repeat(2,minmax(130px,1fr));
+
+            gap:12px;
+        }
+
+        .trace-product-main,
+        .trace-info-item{
+            min-width:0;
+
+            padding:17px;
+
+            border:1px solid #E4EEE8;
+
+            border-radius:16px;
+
+            background:#FBFDFC;
+        }
+
+        .trace-product-main{
+            display:flex;
+
+            flex-direction:column;
+
+            justify-content:center;
+        }
+
+        .trace-product-name{
+            font-size:17px;
+
+            font-weight:600;
+
+            color:#18352A;
+        }
+
+        .trace-product-code{
+            margin-top:4px;
+
+            font-size:11px;
+
+            color:#819087;
+        }
+
+        .trace-info-item span{
+            display:block;
+
+            margin-bottom:6px;
+
+            font-size:10px;
+
+            font-weight:500;
+
+            color:#8A9991;
+        }
+
+        .trace-info-item strong{
+            display:block;
+
+            font-size:13px;
+
+            font-weight:600;
+
+            color:#26483A;
+        }
+
+        /* =====================================================
+           TRACE ID
+        ===================================================== */
+
+        .trace-highlight{
+            background:
+                linear-gradient(
+                    145deg,
+                    #F4FAF6,
+                    #FFFFFF
+                );
+        }
+
+        .trace-code-box{
+            display:flex;
+
+            flex-direction:column;
+
+            gap:6px;
+
+            margin-bottom:14px;
+
+            padding:19px;
+
+            border-radius:18px;
+
+            background:#FFFFFF;
+
+            border:1px solid #DCEBE2;
+        }
+
+        .trace-code-box span{
+            font-size:10px;
+
+            font-weight:500;
+
+            color:#82928A;
+        }
+
+        .trace-code-box strong{
+            font-size:18px;
+
+            font-weight:700;
+
+            color:#046738;
+
+            word-break:break-word;
+        }
+
+        .trace-mini-grid{
+            display:grid;
+
+            grid-template-columns:repeat(4,1fr);
+
             gap:10px;
         }
 
-        .trace-item{
-            padding:14px;
-            background:#FAFCFB;
-            border:1px solid rgba(4,103,56,.08);
-            border-radius:14px;
-        }
-
-        .trace-label{
-            font-size:11px;
-            color:#83928B;
-            margin-bottom:4px;
-        }
-
-        .trace-value{
-            font-size:13px;
-            font-weight:600;
-            color:#28483B;
-        }
+        /* =====================================================
+           TIMELINE
+        ===================================================== */
 
         .trace-timeline{
             position:relative;
-            padding-left:28px;
+
+            margin-left:8px;
+
+            padding-left:34px;
         }
 
         .trace-timeline::before{
             content:"";
+
             position:absolute;
-            left:7px;
+
             top:7px;
             bottom:7px;
+            left:10px;
+
             width:1px;
-            background:rgba(4,103,56,.16);
+
+            background:#DCE9E1;
         }
 
         .trace-step{
             position:relative;
-            padding-bottom:20px;
+
+            display:flex;
+
+            align-items:flex-start;
+
+            min-height:76px;
         }
 
         .trace-step:last-child{
-            padding-bottom:0;
+            min-height:auto;
         }
 
-        .trace-step::before{
-            content:"";
+        .trace-step-icon{
             position:absolute;
-            left:-25px;
-            top:4px;
-            width:9px;
-            height:9px;
+
+            left:-34px;
+
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            width:22px;
+            height:22px;
+
             border-radius:50%;
-            background:#046738;
-            box-shadow:0 0 0 4px #EAF7F0;
+
+            background:#FFFFFF;
+
+            border:1px solid #D5E5DC;
+
+            color:#8CA096;
         }
 
-        .trace-step-title{
+        .trace-step-icon svg{
+            width:13px;
+            height:13px;
+        }
+
+        .trace-step.completed .trace-step-icon,
+        .trace-step.current .trace-step-icon{
+            color:#046738;
+
+            border-color:#B8DDC7;
+
+            background:#EFF9F3;
+        }
+
+        .trace-step-content{
+            display:flex;
+
+            flex-wrap:wrap;
+
+            align-items:baseline;
+
+            column-gap:7px;
+
+            row-gap:2px;
+
+            padding-bottom:20px;
+        }
+
+        .trace-step-content span{
+            width:100%;
+
+            font-size:10px;
+
+            font-weight:500;
+
+            color:#8A9991;
+        }
+
+        .trace-step-content strong{
             font-size:13px;
+
             font-weight:600;
-            color:#28483B;
+
+            color:#244A39;
         }
 
-        .trace-step-meta{
-            margin-top:3px;
+        .trace-step-content small{
             font-size:11px;
-            color:#83928B;
+
+            color:#829189;
+        }
+
+        /* =====================================================
+           COMPONENTS
+        ===================================================== */
+
+        .trace-components{
+            display:flex;
+
+            flex-direction:column;
+
+            gap:10px;
         }
 
         .trace-component{
             display:flex;
+
             align-items:center;
-            justify-content:space-between;
-            gap:15px;
-            padding:13px 14px;
-            border:1px solid rgba(4,103,56,.08);
-            border-radius:14px;
-            background:#FAFCFB;
-            margin-bottom:8px;
+
+            gap:13px;
+
+            padding:15px;
+
+            border:1px solid #E2ECE6;
+
+            border-radius:16px;
+
+            background:#FBFDFC;
         }
 
-        .trace-component:last-child{
-            margin-bottom:0;
-        }
+        .trace-component-number{
+            display:flex;
 
-        .trace-component-name{
-            font-size:13px;
+            align-items:center;
+            justify-content:center;
+
+            width:30px;
+            height:30px;
+
+            flex:0 0 30px;
+
+            border-radius:10px;
+
+            background:#EDF7F1;
+
+            color:#046738;
+
+            font-size:11px;
+
             font-weight:600;
-            color:#28483B;
+        }
+
+        .trace-component-main{
+            flex:1;
+
+            min-width:0;
+        }
+
+        .trace-component-title{
+            font-size:13px;
+
+            font-weight:600;
+
+            color:#26483A;
         }
 
         .trace-component-meta{
             margin-top:3px;
-            font-size:11px;
-            color:#83928B;
+
+            font-size:10px;
+
+            color:#8A9991;
         }
 
         .trace-component-qty{
-            white-space:nowrap;
+            flex:0 0 auto;
+
+            text-align:right;
+        }
+
+        .trace-component-qty strong{
+            display:block;
+
             font-size:13px;
-            font-weight:700;
+
             color:#046738;
         }
 
-        .trace-footer{
-            margin-top:22px;
-            text-align:center;
-            font-size:11px;
-            line-height:1.6;
-            color:#94A29C;
+        .trace-component-qty span{
+            font-size:10px;
+
+            color:#84938B;
         }
 
-        .trace-loading,
+        .trace-empty{
+            padding:20px;
+
+            text-align:center;
+
+            border-radius:16px;
+
+            background:#F8FAF9;
+
+            color:#7C8D84;
+
+            font-size:12px;
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .trace-footer{
+            display:flex;
+
+            align-items:flex-start;
+
+            gap:13px;
+
+            padding:24px 34px;
+
+            background:#FBFDFC;
+        }
+
+        .trace-footer-icon{
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            width:34px;
+            height:34px;
+
+            flex:0 0 34px;
+
+            border-radius:11px;
+
+            color:#046738;
+
+            background:#EAF7EF;
+        }
+
+        .trace-footer-icon svg{
+            width:17px;
+            height:17px;
+        }
+
+        .trace-footer strong{
+            display:block;
+
+            margin-bottom:3px;
+
+            font-size:12px;
+
+            color:#315445;
+        }
+
+        .trace-footer p{
+            margin:0;
+
+            font-size:10px;
+
+            line-height:1.6;
+
+            color:#87968E;
+        }
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+        .trace-loading{
+            padding:70px 30px;
+
+            text-align:center;
+        }
+
+        .trace-loading svg{
+            width:28px;
+            height:28px;
+
+            color:#046738;
+
+            animation:traceSpin 1s linear infinite;
+        }
+
+        .trace-loading p{
+            margin:12px 0 0;
+
+            font-size:12px;
+
+            color:#7C8D84;
+        }
+
+        @keyframes traceSpin{
+            from{
+                transform:rotate(0deg);
+            }
+
+            to{
+                transform:rotate(360deg);
+            }
+        }
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
         .trace-error{
-            padding:50px 25px;
+            padding:60px 30px;
+
             text-align:center;
         }
 
         .trace-error-icon{
-            width:48px;
-            height:48px;
-            margin:0 auto 15px;
-            border-radius:50%;
             display:flex;
+
             align-items:center;
             justify-content:center;
-            background:#FEF2F2;
+
+            width:52px;
+            height:52px;
+
+            margin:0 auto 18px;
+
+            border-radius:16px;
+
             color:#B42318;
+
+            background:#FFF0EE;
         }
 
-        .trace-error h2{
+        .trace-error-icon svg{
+            width:24px;
+            height:24px;
+        }
+
+        .trace-error h1{
             margin:0;
-            font-size:18px;
-            color:#3A403D;
+
+            font-size:21px;
+
+            font-weight:600;
+
+            color:#263B31;
         }
 
         .trace-error p{
-            margin:8px auto 0;
-            max-width:460px;
+            max-width:430px;
+
+            margin:10px auto 0;
+
             font-size:13px;
-            color:#7A8580;
+
+            line-height:1.7;
+
+            color:#7A8B82;
         }
 
-        @media(max-width:600px){
+        .trace-error-code{
+            display:inline-block;
 
-            .trace-page{
-                padding:20px 12px 40px;
+            margin-top:18px;
+
+            padding:8px 12px;
+
+            border-radius:10px;
+
+            background:#F4F7F5;
+
+            font-size:10px;
+
+            color:#75857D;
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media(max-width:700px){
+
+            .trace-card{
+                margin-top:20px;
+
+                margin-bottom:40px;
+
+                border-radius:22px;
+            }
+
+            .trace-brand{
+                margin-top:20px;
+            }
+
+            .trace-brand .trace-logo-icon{
+                width:34px !important;
+                height:34px !important;
+
+                min-width:34px !important;
+                max-width:34px !important;
+
+                min-height:34px !important;
+                max-height:34px !important;
+            }
+
+            .trace-brand .trace-logo-text{
+                width:112px !important;
+
+                max-width:112px !important;
             }
 
             .trace-hero{
-                padding:28px 20px;
+                padding:28px 20px 30px;
             }
 
-            .trace-body{
-                padding:22px 18px;
+            .trace-section{
+                padding:24px 20px;
             }
 
-            .trace-product{
-                font-size:23px;
+            .trace-footer{
+                padding:20px;
             }
 
-            .trace-grid{
+            .trace-product-grid{
+                grid-template-columns:1fr;
+            }
+
+            .trace-mini-grid{
+                grid-template-columns:repeat(2,1fr);
+            }
+
+            .trace-code-box strong{
+                font-size:15px;
+            }
+        }
+
+        @media(max-width:420px){
+
+            .trace-mini-grid{
                 grid-template-columns:1fr;
             }
 
@@ -340,6 +909,13 @@
                 align-items:flex-start;
             }
 
+            .trace-hero h1{
+                font-size:24px;
+            }
+
+            .trace-section h2{
+                font-size:17px;
+            }
         }
 
     </style>
@@ -347,52 +923,55 @@
 
 <body>
 
-<div class="trace-page">
+    <!-- =====================================================
+         PUBLIC TRACE APP
+    ===================================================== -->
 
-    <div class="trace-container">
+    <div id="traceApp" class="trace-card">
 
-        <div class="trace-brand">
-            <img
-                src="../assets/branding/logo-icon.png"
-                class="brand-icon"
-                alt="MERAMU"
-            >
+        <div class="trace-loading">
 
-            <img
-                src="../assets/branding/logo-text.png"
-                class="brand-text"
-                alt="MERAMU"
-            >
-        </div>
+            <i data-lucide="loader-circle"></i>
 
-        <div id="traceApp" class="trace-card">
+            <p>
+                Memuat data produk...
+            </p>
 
-            <div class="trace-loading">
-                <i data-lucide="loader-circle"></i>
-                <p>Memuat data produk...</p>
-            </div>
-
-        </div>
-
-        <div class="trace-footer">
-            Informasi traceability produk MERAMU.<br>
-            Data HPP dan informasi internal produksi tidak ditampilkan pada halaman publik.
         </div>
 
     </div>
 
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- =====================================================
+         SUPABASE
+    ===================================================== -->
 
-<script>
-    window.supabaseClient = window.supabase.createClient(
-        "https://bgllborppxhbvmzsetjh.supabase.co",
-        "sb_publishable_g0Kl_e3HewgdaavLEMDkSQ_xe1LMbNl"
-    );
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script src="../js/trace.js"></script>
+    <script>
+        window.supabaseClient = window.supabase.createClient(
+            "https://bgllborppxhbvmzsetjh.supabase.co",
+            "sb_publishable_g0Kl_e3HewgdaavLEMDkSQ_xe1LMbNl"
+        );
+    </script>
+
+
+    <!-- =====================================================
+         TRACE LOGIC
+    ===================================================== -->
+
+    <script src="../js/trace.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        });
+    </script>
 
 </body>
 </html>
