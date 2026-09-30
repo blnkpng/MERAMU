@@ -1423,98 +1423,84 @@
 
                                 <div class="form-grid-2">
 
-                                    <div class="form-field">
-
-                                        <label for="qcDecision">
-                                            Decision
-                                        </label>
-                                
-                                <select id="qcDecision" name="decision">
-                                    <option value="passed">PASS — Siap Lanjut</option>
-                                    <option value="not_ready">NOT READY — Perpanjang</option>
-                                    <option value="hold">HOLD — Tahan</option>
+                            <!-- =========================================================
+                                 DECISION
+                            ========================================================= -->
+                            
+                            <div class="form-field">
+                            
+                                <label for="qcDecision">
+                                    Keputusan QC
+                                </label>
+                            
+                                <select
+                                    id="qcDecision"
+                                    required
+                                >
+                            
+                                    <option value="">
+                                        Pilih keputusan
+                                    </option>
+                            
+                                    <option value="passed">
+                                        PASS — Siap Lanjut
+                                    </option>
+                            
+                                    <option value="not_ready">
+                                        NOT READY — Perpanjang
+                                    </option>
+                            
+                                    <option value="hold">
+                                        HOLD — Tahan
+                                    </option>
+                            
                                 </select>
-
-                                    </div>
-
-
-                                    <div class="form-field">
-
-                                        <label for="qcOperator">
-                                            Operator
-                                        </label>
-
-                                        <input
-                                            id="qcOperator"
-                                            type="text"
-                                            value="Arif"
-                                        >
-
-                                    </div>
-
-                                </div>
-
-
+                            
+                            </div>
+                            
+                            
+                            <!-- =========================================================
+                                 EXTENSION
+                            ========================================================= -->
+                            
+                            <div
+                                id="qcExtensionSection"
+                                class="form-grid-2"
+                                hidden
+                            >
+                            
                                 <div class="form-field">
-
-                                    <label for="qcReason">
-                                        Alasan / Temuan QC
+                            
+                                    <label for="qcExtensionDays">
+                                        Tambahan Hari
                                     </label>
-
-                                    <textarea
-                                        id="qcReason"
-                                        rows="3"
-                                        placeholder="Contoh: pH masih tinggi, aroma belum matang..."
-                                    ></textarea>
-
+                            
+                                    <input
+                                        id="qcExtensionDays"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        placeholder="Contoh: 4"
+                                    >
+                            
                                 </div>
-
-
+                            
+                            
                                 <div class="form-field">
-
-                                    <label for="qcNotes">
-                                        Catatan
+                            
+                                    <label for="qcNextTargetDate">
+                                        Target Berikutnya
                                     </label>
-
-                                    <textarea
-                                        id="qcNotes"
-                                        rows="3"
-                                        placeholder="Catatan tambahan..."
-                                    ></textarea>
-
-                                </div>
-
-
-                                <div class="fermentation-log-form-actions">
-
-                                    <button
-                                        id="cancelQualityCheck"
-                                        class="page-btn secondary"
-                                        type="button"
+                            
+                                    <input
+                                        id="qcNextTargetDate"
+                                        type="date"
+                                        readonly
                                     >
-                                        Batal
-                                    </button>
-
-
-                                    <button
-                                        id="saveQualityCheck"
-                                        class="page-btn primary"
-                                        type="submit"
-                                    >
-
-                                        <i data-lucide="save"></i>
-
-                                        Simpan QC
-
-                                    </button>
-
+                            
                                 </div>
-
-                            </form>
-
-                        </div>
-
-                    </div>
+                            
+                            </div>
 
 
                     <!-- =========================================================
