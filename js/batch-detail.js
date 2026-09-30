@@ -1821,14 +1821,10 @@ if(operatorInput){
 
 /* =========================================================
    SAVE FERMENTATION LOG
-   Supabase Version
+   Supabase Safe Version
 ========================================================= */
 
 function saveFermentationLog(event){
-
-    /* =====================================================
-       PREVENT DEFAULT FORM SUBMIT
-    ===================================================== */
 
     if(event){
         event.preventDefault();
@@ -1836,7 +1832,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       GET FORM
+       FORM
     ===================================================== */
 
     const form =
@@ -1848,7 +1844,7 @@ function saveFermentationLog(event){
     if(!form){
 
         console.warn(
-            "MERAMU: Form fermentation log tidak ditemukan."
+            "MERAMU: fermentationLogForm tidak ditemukan."
         );
 
         return;
@@ -1857,7 +1853,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       VALIDATE FORM
+       VALIDATION
     ===================================================== */
 
     if(!form.checkValidity()){
@@ -1870,7 +1866,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       GET CURRENT BATCH
+       CURRENT BATCH
     ===================================================== */
 
     const batch =
@@ -1889,7 +1885,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       GET SUPABASE CLIENT
+       SUPABASE
     ===================================================== */
 
     const supabase =
@@ -1898,12 +1894,12 @@ function saveFermentationLog(event){
 
     if(!supabase){
 
-        console.error(
-            "MERAMU: Supabase client belum tersedia."
+        alert(
+            "Koneksi Supabase belum siap."
         );
 
-        alert(
-            "Koneksi database belum siap. Silakan tunggu sebentar lalu coba lagi."
+        console.error(
+            "MERAMU: supabaseClient tidak tersedia."
         );
 
         return;
@@ -1912,7 +1908,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       GET FORM VALUES
+       FORM VALUES
     ===================================================== */
 
     const stage =
@@ -1933,28 +1929,36 @@ function saveFermentationLog(event){
         )?.value || "";
 
 
-    const phInput =
-        document.getElementById(
-            "logPh"
-        )?.value;
+    const ph =
+        Number(
+            document.getElementById(
+                "logPh"
+            )?.value
+        );
 
 
-    const brixInput =
-        document.getElementById(
-            "logBrix"
-        )?.value;
+    const brix =
+        Number(
+            document.getElementById(
+                "logBrix"
+            )?.value
+        );
 
 
-    const temperatureInput =
-        document.getElementById(
-            "logTemperature"
-        )?.value;
+    const temperature =
+        Number(
+            document.getElementById(
+                "logTemperature"
+            )?.value
+        );
 
 
-    const volumeInput =
-        document.getElementById(
-            "logVolume"
-        )?.value;
+    const volume =
+        Number(
+            document.getElementById(
+                "logVolume"
+            )?.value
+        );
 
 
     const qc =
@@ -1976,27 +1980,7 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       CONVERT NUMERIC VALUES
-    ===================================================== */
-
-    const ph =
-        Number(phInput);
-
-
-    const brix =
-        Number(brixInput);
-
-
-    const temperature =
-        Number(temperatureInput);
-
-
-    const volume =
-        Number(volumeInput);
-
-
-    /* =====================================================
-       VALIDATE NUMERIC VALUES
+       VALIDATE NUMBERS
     ===================================================== */
 
     if(
@@ -2007,18 +1991,7 @@ function saveFermentationLog(event){
     ){
 
         alert(
-            "Nilai pH, Brix, suhu, dan volume harus berupa angka yang valid."
-        );
-
-        return;
-
-    }
-
-
-    if(volume <= 0){
-
-        alert(
-            "Volume harus lebih besar dari 0."
+            "pH, Brix, suhu, dan volume harus berupa angka."
         );
 
         return;
@@ -2027,41 +2000,13 @@ function saveFermentationLog(event){
 
 
     /* =====================================================
-       VALIDATE DATE & TIME
+       DATE / TIME
     ===================================================== */
 
-    if(
-        !date ||
-        !time
-    ){
+    if(!date || !time){
 
         alert(
-            "Tanggal dan waktu pengukuran wajib diisi."
-        );
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       BUILD MEASURED AT
-    ===================================================== */
-
-    const measuredDate =
-        new Date(
-            `${date}T${time}:00`
-        );
-
-
-    if(
-        Number.isNaN(
-            measuredDate.getTime()
-        )
-    ){
-
-        alert(
-            "Tanggal atau waktu pengukuran tidak valid."
+            "Tanggal dan waktu wajib diisi."
         );
 
         return;
@@ -2070,119 +2015,11 @@ function saveFermentationLog(event){
 
 
     const measuredAt =
-        measuredDate.toISOString();
+        `${date}T${time}:00`;
 
 
     /* =====================================================
-       GET REAL BATCH UUID
-       
-       batch.code = KB-022
-       batches.id = UUID
-
-       fermentation_logs.batch_id
-       membutuhkan UUID.
-    ===================================================== */
-
-    let batchUuid =
-        batch?.id ||
-        batch?.batch_id ||
-        null;
-
-
-    /* =====================================================
-       UUID VALIDATION
-    ===================================================== */
-
-    const uuidPattern =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-
-    if(
-        !uuidPattern.test(
-            String(
-                batchUuid || ""
-            )
-        )
-    ){
-
-        batchUuid =
-            null;
-
-    }
-
-
-    /* =====================================================
-       LOOKUP BATCH UUID FROM SUPABASE
-    ===================================================== */
-
-    if(!batchUuid){
-
-        console.log(
-            "MERAMU: Mencari UUID batch:",
-            batch.code
-        );
-
-
-        const {
-            data: batchRow,
-            error: batchError
-        } =
-            await supabase
-                .from("batches")
-                .select(
-                    "id,batch_code"
-                )
-                .eq(
-                    "batch_code",
-                    batch.code
-                )
-                .maybeSingle();
-
-
-        if(batchError){
-
-            console.error(
-                "MERAMU: Gagal mencari UUID batch.",
-                batchError
-            );
-
-
-            alert(
-                `Gagal mencari batch ${batch.code} di database.\n\n${batchError.message || "Unknown error"}`
-            );
-
-
-            return;
-
-        }
-
-
-        if(!batchRow?.id){
-
-            alert(
-                `Batch ${batch.code} tidak ditemukan di database.`
-            );
-
-
-            return;
-
-        }
-
-
-        batchUuid =
-            batchRow.id;
-
-
-        console.log(
-            "MERAMU: UUID batch ditemukan:",
-            batchUuid
-        );
-
-    }
-
-
-    /* =====================================================
-       GET SUBMIT BUTTON
+       BUTTON
     ===================================================== */
 
     const submitButton =
@@ -2191,101 +2028,122 @@ function saveFermentationLog(event){
         );
 
 
-    const originalSubmitText =
-        submitButton?.innerHTML ||
-        "Simpan Log";
+    const originalButtonHTML =
+        submitButton
+            ? submitButton.innerHTML
+            : "";
 
-
-    /* =====================================================
-       PREVENT DOUBLE SUBMIT
-    ===================================================== */
 
     if(submitButton){
 
         submitButton.disabled =
             true;
 
-
         submitButton.innerHTML =
-            `
-                <span
-                    style="
-                        display:inline-flex;
-                        align-items:center;
-                        gap:8px;
-                    "
-                >
-                    <span
-                        style="
-                            width:14px;
-                            height:14px;
-                            border:2px solid currentColor;
-                            border-right-color:transparent;
-                            border-radius:50%;
-                            display:inline-block;
-                            animation:meramuSpin .7s linear infinite;
-                        "
-                    ></span>
-
-                    Menyimpan...
-                </span>
-            `;
+            "Menyimpan...";
 
     }
 
 
     /* =====================================================
-       INSERT TO SUPABASE
+       FIND BATCH UUID
     ===================================================== */
 
-    try{
-
-        const payload = {
-
-            batch_id:
-                batchUuid,
-
-            stage:
-                stage,
-
-            measured_at:
-                measuredAt,
-
-            ph:
-                ph,
-
-            brix:
-                brix,
-
-            temperature:
-                temperature,
-
-            volume:
-                volume,
-
-            operator:
-                operator,
-
-            qc:
-                qc,
-
-            note:
-                note || null
-
-        };
+    console.log(
+        "MERAMU: Mencari batch:",
+        batch.code
+    );
 
 
-        console.log(
-            "MERAMU: INSERT fermentation_logs...",
-            payload
-        );
+    supabase
+        .from("batches")
+        .select(
+            "id,batch_code"
+        )
+        .eq(
+            "batch_code",
+            batch.code
+        )
+        .maybeSingle()
+
+        .then(function(batchResult){
+
+            if(batchResult.error){
+
+                throw batchResult.error;
+
+            }
 
 
-        const {
-            data: insertedLog,
-            error: insertError
-        } =
-            await supabase
+            if(!batchResult.data){
+
+                throw new Error(
+                    `Batch ${batch.code} tidak ditemukan di Supabase.`
+                );
+
+            }
+
+
+            const batchUuid =
+                batchResult.data.id;
+
+
+            console.log(
+                "MERAMU: Batch UUID:",
+                batchUuid
+            );
+
+
+            /* =================================================
+               PAYLOAD
+            ================================================= */
+
+            const payload = {
+
+                batch_id:
+                    batchUuid,
+
+                stage:
+                    stage,
+
+                measured_at:
+                    measuredAt,
+
+                ph:
+                    ph,
+
+                brix:
+                    brix,
+
+                temperature:
+                    temperature,
+
+                volume:
+                    volume,
+
+                operator:
+                    operator,
+
+                qc:
+                    qc,
+
+                note:
+                    note || null
+
+            };
+
+
+            console.log(
+                "MERAMU: Menyimpan fermentation log:",
+                payload
+            );
+
+
+            /* =================================================
+               INSERT
+            ================================================= */
+
+            return supabase
                 .from(
                     "fermentation_logs"
                 )
@@ -2295,198 +2153,101 @@ function saveFermentationLog(event){
                 .select("*")
                 .single();
 
+        })
 
-        /* =================================================
-           HANDLE INSERT ERROR
-        ================================================= */
+        .then(function(logResult){
 
-        if(insertError){
+            if(logResult.error){
 
-            console.error(
-                "MERAMU: Gagal INSERT fermentation log.",
-                insertError
-            );
-
-
-            alert(
-                `Fermentation Log gagal disimpan.\n\n${insertError.message || "Unknown error"}`
-            );
-
-
-            return;
-
-        }
-
-
-        /* =================================================
-           INSERT SUCCESS
-        ================================================= */
-
-        console.log(
-            "MERAMU: Fermentation Log berhasil disimpan.",
-            insertedLog
-        );
-
-
-        /* =================================================
-           CLOSE MODAL
-        ================================================= */
-
-        closeFermentationLogModal();
-
-
-        /* =================================================
-           RESET FORM
-        ================================================= */
-
-        resetFermentationLogForm();
-
-
-        /* =================================================
-           RELOAD FROM SUPABASE
-           
-           Jangan hanya menggunakan data lokal.
-           Database menjadi sumber data utama.
-        ================================================= */
-
-        if(
-            typeof window.initBatchFermentationLogs ===
-            "function"
-        ){
-
-            await
-                window.initBatchFermentationLogs();
-
-        }
-        else{
-
-            /* =================================================
-               FALLBACK
-            ================================================= */
-
-            const newLog = {
-
-                id:
-                    insertedLog?.id ||
-                    Date.now(),
-
-                stage:
-                    insertedLog?.stage ||
-                    stage,
-
-                date:
-                    formatFermentationDate(
-                        date
-                    ),
-
-                time:
-                    time,
-
-                ph:
-                    Number(ph)
-                        .toFixed(2),
-
-                brix:
-                    `${Number(brix).toFixed(1)}°`,
-
-                temperature:
-                    `${Number(temperature).toFixed(1)}°C`,
-
-                volume:
-                    `${Number(volume).toFixed(1)} L`,
-
-                operator:
-                    operator,
-
-                qc:
-                    qc,
-
-                note:
-                    note
-
-            };
-
-
-            if(
-                !Array.isArray(
-                    batch.fermentationLogs
-                )
-            ){
-
-                batch.fermentationLogs = [];
+                throw logResult.error;
 
             }
 
 
-            batch.fermentationLogs.unshift(
-                newLog
+            console.log(
+                "MERAMU: Fermentation Log berhasil disimpan.",
+                logResult.data
             );
 
 
-            batch.ph =
-                newLog.ph;
+            /* =================================================
+               CLOSE MODAL
+            ================================================= */
+
+            closeFermentationLogModal();
 
 
-            batch.brix =
-                newLog.brix;
+            /* =================================================
+               RESET FORM
+            ================================================= */
+
+            resetFermentationLogForm();
 
 
-            batch.temperature =
-                newLog.temperature;
+            /* =================================================
+               RELOAD LOG DARI SUPABASE
+            ================================================= */
+
+            if(
+                typeof window.initBatchFermentationLogs ===
+                "function"
+            ){
+
+                return window
+                    .initBatchFermentationLogs();
+
+            }
 
 
-            batch.volume =
-                newLog.volume;
+            return null;
+
+        })
+
+        .then(function(){
+
+            console.log(
+                "MERAMU: Fermentation Log selesai."
+            );
+
+        })
+
+        .catch(function(error){
+
+            console.error(
+                "MERAMU: Gagal menyimpan fermentation log.",
+                error
+            );
 
 
-            renderBatchDetail();
+            alert(
+                "Fermentation Log gagal disimpan.\n\n" +
+                (
+                    error?.message ||
+                    "Terjadi kesalahan."
+                )
+            );
 
-        }
+        })
 
+        .finally(function(){
 
-        /* =================================================
-           SUCCESS MESSAGE
-        ================================================= */
+            /* =================================================
+               RESTORE BUTTON
+            ================================================= */
 
-        console.log(
-            "MERAMU: Fermentation Log selesai diproses."
-        );
+            if(submitButton){
 
-    }
-    catch(error){
+                submitButton.disabled =
+                    false;
 
-        console.error(
-            "MERAMU: Exception saat menyimpan fermentation log.",
-            error
-        );
+                submitButton.innerHTML =
+                    originalButtonHTML;
 
+            }
 
-        alert(
-            `Terjadi error saat menyimpan Fermentation Log.\n\n${error?.message || error}`
-        );
-
-    }
-    finally{
-
-        /* =================================================
-           RESTORE SUBMIT BUTTON
-        ================================================= */
-
-        if(submitButton){
-
-            submitButton.disabled =
-                false;
-
-
-            submitButton.innerHTML =
-                originalSubmitText;
-
-        }
-
-    }
+        });
 
 }
-
 /* =========================================================
 EDIT BATCH
 ========================================================= */
