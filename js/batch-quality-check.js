@@ -597,7 +597,7 @@
 
             if(decision){
 
-                decision.value = "pass";
+                decision.value = "passed";
 
             }
 
