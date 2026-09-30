@@ -580,32 +580,48 @@
                             </div>
 
 
-                            <div class="fermentation-log-header-actions">
-
+                            <div
+                                class="fermentation-log-header-actions"
+                            >
+                            
                                 <div class="fermentation-log-count">
-
+                            
                                     <span id="fermentationLogCount">
                                         0
                                     </span>
-
+                            
                                     Logs
-
+                            
                                 </div>
-
-
+                            
+                            
                                 <button
                                     id="addFermentationLog"
                                     class="page-btn primary"
                                     type="button"
                                 >
+                            
                                     <i data-lucide="plus"></i>
+                            
                                     Add Log
+                            
                                 </button>
-
+                            
+                            
+                                <button
+                                    id="addQualityCheck"
+                                    class="page-btn secondary"
+                                    type="button"
+                                >
+                            
+                                    <i data-lucide="clipboard-check"></i>
+                            
+                                    QC Check
+                            
+                                </button>
+                            
+                            
                             </div>
-
-                        </div>
-
 
                         <div
                             id="fermentationLogList"
@@ -943,7 +959,452 @@
                         </div>
 
                     </div>
+<!-- =========================================================
+     QUALITY CHECK MODAL
+========================================================= -->
 
+<div
+    id="qualityCheckModal"
+    class="fermentation-log-modal"
+    hidden
+    aria-hidden="true"
+>
+
+    <div
+        class="fermentation-log-modal-backdrop"
+        data-close-quality-check
+    ></div>
+
+
+    <div
+        class="fermentation-log-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="qualityCheckModalTitle"
+    >
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="fermentation-log-modal-header">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    QUALITY CONTROL
+                </span>
+
+                <h2 id="qualityCheckModalTitle">
+                    QC Check
+                </h2>
+
+                <p>
+                    Catat hasil pemeriksaan kualitas batch.
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeQualityCheck"
+                class="icon-detail-btn"
+                type="button"
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <form
+            id="qualityCheckForm"
+            class="fermentation-log-form"
+        >
+
+            <!-- TANGGAL + STAGE -->
+
+            <div class="form-grid-2">
+
+                <div class="form-field">
+
+                    <label for="qcCheckedAt">
+                        Tanggal & Waktu
+                    </label>
+
+                    <input
+                        id="qcCheckedAt"
+                        type="datetime-local"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcStage">
+                        Stage
+                    </label>
+
+                    <select
+                        id="qcStage"
+                        required
+                    >
+
+                        <option value="production">
+                            Production
+                        </option>
+
+                        <option value="f1">
+                            F1 Fermentasi
+                        </option>
+
+                        <option
+                            value="f2"
+                            selected
+                        >
+                            F2 Fermentasi
+                        </option>
+
+                        <option value="harvest">
+                            Harvest
+                        </option>
+
+                        <option value="bottling">
+                            Bottling
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- MEASUREMENT -->
+
+            <div class="form-grid-2">
+
+                <div class="form-field">
+
+                    <label for="qcPh">
+                        pH
+                    </label>
+
+                    <input
+                        id="qcPh"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="14"
+                        placeholder="Contoh: 3.42"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcBrix">
+                        Brix
+                    </label>
+
+                    <input
+                        id="qcBrix"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        placeholder="Contoh: 7.8"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcTemperature">
+                        Suhu (°C)
+                    </label>
+
+                    <input
+                        id="qcTemperature"
+                        type="number"
+                        step="0.1"
+                        placeholder="Contoh: 25.4"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcVolume">
+                        Volume (L)
+                    </label>
+
+                    <input
+                        id="qcVolume"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        placeholder="Contoh: 20"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SENSORI -->
+
+            <div class="form-grid-2">
+
+                <div class="form-field">
+
+                    <label for="qcAroma">
+                        Aroma
+                    </label>
+
+                    <input
+                        id="qcAroma"
+                        type="text"
+                        placeholder="Contoh: Fresh, acidic"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcTaste">
+                        Taste
+                    </label>
+
+                    <input
+                        id="qcTaste"
+                        type="text"
+                        placeholder="Contoh: Balanced"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcColor">
+                        Color
+                    </label>
+
+                    <input
+                        id="qcColor"
+                        type="text"
+                        placeholder="Contoh: Amber clear"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcCarbonation">
+                        Carbonation
+                    </label>
+
+                    <input
+                        id="qcCarbonation"
+                        type="text"
+                        placeholder="Contoh: Medium"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SCOBY -->
+
+            <div class="form-field">
+
+                <label for="qcScoby">
+                    Kondisi SCOBY
+                </label>
+
+                <input
+                    id="qcScoby"
+                    type="text"
+                    placeholder="Contoh: Normal, sehat"
+                >
+
+            </div>
+
+
+            <!-- DECISION -->
+
+            <div class="form-field">
+
+                <label for="qcDecision">
+                    Keputusan QC
+                </label>
+
+                <select
+                    id="qcDecision"
+                    required
+                >
+
+                    <option value="">
+                        Pilih keputusan
+                    </option>
+
+                    <option value="PASS">
+                        PASS — Lanjut
+                    </option>
+
+                    <option value="HOLD">
+                        HOLD — Tahan
+                    </option>
+
+                    <option value="EXTEND">
+                        EXTEND — Perpanjang Fermentasi
+                    </option>
+
+                    <option value="REJECT">
+                        REJECT — Tidak Lolos
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PERPANJANGAN -->
+
+            <div class="form-grid-2">
+
+                <div class="form-field">
+
+                    <label for="qcExtensionDays">
+                        Tambahan Hari
+                    </label>
+
+                    <input
+                        id="qcExtensionDays"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 4"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label for="qcNextTargetDate">
+                        Target Berikutnya
+                    </label>
+
+                    <input
+                        id="qcNextTargetDate"
+                        type="date"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- OPERATOR -->
+
+            <div class="form-field">
+
+                <label for="qcOperator">
+                    Operator
+                </label>
+
+                <input
+                    id="qcOperator"
+                    type="text"
+                    placeholder="Nama operator"
+                >
+
+            </div>
+
+
+            <!-- ALASAN -->
+
+            <div class="form-field">
+
+                <label for="qcReason">
+                    Alasan / Temuan QC
+                </label>
+
+                <textarea
+                    id="qcReason"
+                    rows="3"
+                    placeholder="Contoh: pH masih tinggi, aroma belum matang..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- CATATAN -->
+
+            <div class="form-field">
+
+                <label for="qcNotes">
+                    Catatan
+                </label>
+
+                <textarea
+                    id="qcNotes"
+                    rows="3"
+                    placeholder="Catatan tambahan..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- ACTION -->
+
+            <div class="fermentation-log-form-actions">
+
+                <button
+                    id="cancelQualityCheck"
+                    class="page-btn secondary"
+                    type="button"
+                >
+                    Batal
+                </button>
+
+
+                <button
+                    id="saveQualityCheck"
+                    class="page-btn primary"
+                    type="submit"
+                >
+
+                    <i data-lucide="save"></i>
+
+                    Simpan QC
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
 
                     <!-- =================================================
                          EDIT BATCH MODAL
@@ -1346,6 +1807,8 @@
     <script src="../js/batch-detail-fermentation-supabase.js"></script>
 
     <script src="../js/batch-cancel.js"></script>
+
+    <script src="../js/batch-quality-check.js"></script>
 
     <script src="../js/supabase-realtime.js"></script>
 
