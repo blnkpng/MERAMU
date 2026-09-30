@@ -2,7 +2,6 @@
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -56,12 +55,9 @@
     >
 
     <script src="https://unpkg.com/lucide@latest"></script>
-
 </head>
 
-
 <body>
-
 
     <!-- =====================================================
          SIDEBAR OVERLAY
@@ -79,28 +75,18 @@
 
     <div class="app-shell">
 
-
-        <!-- SIDEBAR -->
-
         <div id="sidebar-container"></div>
 
-
-        <!-- CONTENT -->
-
         <main class="content">
-
-
-            <!-- TOPBAR -->
 
             <div id="topbar-container"></div>
 
 
             <!-- =================================================
-                 PAGE
+                 BATCH DETAIL PAGE
             ================================================== -->
 
             <section class="page-wrapper batch-detail-page">
-
 
                 <div class="batch-detail-content">
 
@@ -114,13 +100,9 @@
                         class="detail-back-btn"
                         type="button"
                     >
-
                         <i data-lucide="arrow-left"></i>
-
                         Kembali ke Kalender
-
                     </button>
-
 
 
                     <!-- =================================================
@@ -129,18 +111,12 @@
 
                     <div class="batch-detail-header">
 
-
                         <div class="batch-detail-title">
 
-
                             <div class="section-eyebrow">
-
                                 <span class="live-dot"></span>
-
                                 BATCH DETAIL
-
                             </div>
-
 
                             <div class="batch-title-row">
 
@@ -157,7 +133,6 @@
 
                             </div>
 
-
                             <p id="batchCode">
                                 KB-022
                             </p>
@@ -165,12 +140,10 @@
                         </div>
 
 
-                        <!-- =================================================
-                             HEADER ACTIONS
-                        ================================================== -->
+                        <!-- HEADER ACTIONS -->
 
                         <div class="batch-header-actions">
-                        
+
                             <button
                                 id="printBatch"
                                 class="page-btn secondary"
@@ -179,8 +152,7 @@
                                 <i data-lucide="printer"></i>
                                 <span>Print</span>
                             </button>
-                        
-                        
+
                             <button
                                 id="printThermalLabel"
                                 class="page-btn secondary"
@@ -189,8 +161,7 @@
                                 <i data-lucide="tag"></i>
                                 <span>Thermal Label</span>
                             </button>
-                        
-                        
+
                             <button
                                 id="editBatch"
                                 class="page-btn primary"
@@ -201,8 +172,7 @@
                                 <i data-lucide="pencil"></i>
                                 <span>Edit Batch</span>
                             </button>
-                        
-                        
+
                             <button
                                 id="cancelBatch"
                                 class="page-btn danger"
@@ -213,16 +183,17 @@
                                 <i data-lucide="ban"></i>
                                 <span>Batalkan Batch</span>
                             </button>
-                        
+
                         </div>
+
                     </div>
+
 
                     <!-- =================================================
                          PROGRESS
                     ================================================== -->
 
                     <section class="batch-progress-card">
-
 
                         <div class="batch-progress-top">
 
@@ -237,7 +208,6 @@
                                 </h3>
 
                             </div>
-
 
                             <div class="batch-progress-value">
 
@@ -277,9 +247,7 @@
 
                         </div>
 
-
                     </section>
-
 
 
                     <!-- =================================================
@@ -287,7 +255,6 @@
                     ================================================== -->
 
                     <div class="batch-kpi-grid">
-
 
                         <div class="batch-kpi-card">
 
@@ -356,9 +323,7 @@
 
                         </div>
 
-
                     </div>
-
 
 
                     <!-- =================================================
@@ -368,12 +333,9 @@
                     <div class="batch-detail-grid">
 
 
-                        <!-- =============================================
-                             FERMENTATION INFO
-                        ============================================== -->
+                        <!-- FERMENTATION -->
 
                         <section class="detail-card">
-
 
                             <div class="detail-card-header">
 
@@ -389,7 +351,6 @@
 
                                 </div>
 
-
                                 <span class="detail-live-badge">
 
                                     <span></span>
@@ -402,7 +363,6 @@
 
 
                             <div class="fermentation-metrics">
-
 
                                 <div class="fermentation-metric">
 
@@ -455,7 +415,6 @@
 
                                 </div>
 
-
                             </div>
 
 
@@ -470,17 +429,12 @@
 
                             </div>
 
-
                         </section>
 
 
-
-                        <!-- =============================================
-                             RECIPE
-                        ============================================== -->
+                        <!-- RECIPE -->
 
                         <section class="detail-card">
-
 
                             <div class="detail-card-header">
 
@@ -496,21 +450,17 @@
 
                                 </div>
 
-
                                 <button
                                     class="icon-detail-btn"
                                     type="button"
                                 >
-
                                     <i data-lucide="external-link"></i>
-
                                 </button>
 
                             </div>
 
 
                             <div class="recipe-list">
-
 
                                 <div class="recipe-row">
 
@@ -563,23 +513,18 @@
 
                                 </div>
 
-
                             </div>
 
-
                         </section>
-
 
                     </div>
 
 
-
-                    <!-- =========================================================
+                    <!-- =================================================
                          BATCH TIMELINE
-                    ========================================================= -->
+                    ================================================== -->
 
                     <section class="detail-card batch-history-card">
-
 
                         <div class="detail-card-header">
 
@@ -594,7 +539,6 @@
                                 </p>
 
                             </div>
-
 
                             <div class="detail-live-badge">
 
@@ -612,17 +556,14 @@
                             class="batch-history"
                         ></div>
 
-
                     </section>
 
 
-
-                    <!-- =========================================================
+                    <!-- =================================================
                          FERMENTATION LOG
-                    ========================================================= -->
+                    ================================================== -->
 
                     <section class="detail-card fermentation-log-card">
-
 
                         <div class="detail-card-header">
 
@@ -639,10 +580,7 @@
                             </div>
 
 
-                            <div
-                                class="fermentation-log-header-actions"
-                            >
-
+                            <div class="fermentation-log-header-actions">
 
                                 <div class="fermentation-log-count">
 
@@ -660,16 +598,11 @@
                                     class="page-btn primary"
                                     type="button"
                                 >
-
                                     <i data-lucide="plus"></i>
-
                                     Add Log
-
                                 </button>
 
-
                             </div>
-
 
                         </div>
 
@@ -679,14 +612,12 @@
                             class="fermentation-log-list"
                         ></div>
 
-
                     </section>
 
 
-
-                    <!-- =========================================================
+                    <!-- =================================================
                          ADD FERMENTATION LOG MODAL
-                    ========================================================= -->
+                    ================================================== -->
 
                     <div
                         id="fermentationLogModal"
@@ -694,7 +625,6 @@
                         hidden
                         aria-hidden="true"
                     >
-
 
                         <div
                             class="fermentation-log-modal-backdrop"
@@ -709,26 +639,15 @@
                             aria-labelledby="fermentationLogModalTitle"
                         >
 
-
-                            <!-- =============================================
-                                 MODAL HEADER
-                            ============================================== -->
-
-                            <div
-                                class="fermentation-log-modal-header"
-                            >
+                            <div class="fermentation-log-modal-header">
 
                                 <div>
 
-                                    <span
-                                        class="section-eyebrow"
-                                    >
+                                    <span class="section-eyebrow">
                                         FERMENTATION
                                     </span>
 
-                                    <h2
-                                        id="fermentationLogModalTitle"
-                                    >
+                                    <h2 id="fermentationLogModalTitle">
                                         Add Fermentation Log
                                     </h2>
 
@@ -745,28 +664,18 @@
                                     type="button"
                                     aria-label="Tutup"
                                 >
-
                                     <i data-lucide="x"></i>
-
                                 </button>
 
                             </div>
 
-
-
-                            <!-- =============================================
-                                 FORM
-                            ============================================== -->
 
                             <form
                                 id="fermentationLogForm"
                                 class="fermentation-log-form"
                             >
 
-
-                                <!-- =========================================
-                                     STAGE
-                                ========================================== -->
+                                <!-- STAGE -->
 
                                 <div class="form-field">
 
@@ -796,15 +705,9 @@
                                 </div>
 
 
+                                <!-- DATE + TIME -->
 
-                                <!-- =========================================
-                                     DATE + TIME
-                                ========================================== -->
-
-                                <div
-                                    class="form-grid-2"
-                                >
-
+                                <div class="form-grid-2">
 
                                     <div class="form-field">
 
@@ -839,19 +742,12 @@
 
                                     </div>
 
-
                                 </div>
 
 
+                                <!-- MEASUREMENT -->
 
-                                <!-- =========================================
-                                     MEASUREMENT
-                                ========================================== -->
-
-                                <div
-                                    class="form-grid-2"
-                                >
-
+                                <div class="form-grid-2">
 
                                     <div class="form-field">
 
@@ -944,19 +840,12 @@
 
                                     </div>
 
-
                                 </div>
 
 
+                                <!-- QC + OPERATOR -->
 
-                                <!-- =========================================
-                                     QC + OPERATOR
-                                ========================================== -->
-
-                                <div
-                                    class="form-grid-2"
-                                >
-
+                                <div class="form-grid-2">
 
                                     <div class="form-field">
 
@@ -1006,14 +895,10 @@
 
                                     </div>
 
-
                                 </div>
 
 
-
-                                <!-- =========================================
-                                     NOTE
-                                ========================================== -->
+                                <!-- NOTE -->
 
                                 <div class="form-field">
 
@@ -1031,54 +916,38 @@
                                 </div>
 
 
+                                <!-- ACTIONS -->
 
-                                <!-- =========================================
-                                     ACTIONS
-                                ========================================== -->
-
-                                <div
-                                    class="fermentation-log-form-actions"
-                                >
-
+                                <div class="fermentation-log-form-actions">
 
                                     <button
                                         id="cancelFermentationLog"
                                         class="page-btn secondary"
                                         type="button"
                                     >
-
                                         Batal
-
                                     </button>
-
 
                                     <button
                                         class="page-btn primary"
                                         type="submit"
                                     >
-
                                         <i data-lucide="save"></i>
-
                                         Simpan Log
-
                                     </button>
-
 
                                 </div>
 
-
                             </form>
-
 
                         </div>
 
                     </div>
 
 
-
-                    <!-- =========================================================
+                    <!-- =================================================
                          EDIT BATCH MODAL
-                    ========================================================= -->
+                    ================================================== -->
 
                     <div
                         id="editBatchModal"
@@ -1086,7 +955,6 @@
                         hidden
                         aria-hidden="true"
                     >
-
 
                         <div
                             class="fermentation-log-modal-backdrop"
@@ -1101,26 +969,15 @@
                             aria-labelledby="editBatchModalTitle"
                         >
 
-
-                            <!-- =============================================
-                                 MODAL HEADER
-                            ============================================== -->
-
-                            <div
-                                class="fermentation-log-modal-header"
-                            >
+                            <div class="fermentation-log-modal-header">
 
                                 <div>
 
-                                    <span
-                                        class="section-eyebrow"
-                                    >
+                                    <span class="section-eyebrow">
                                         BATCH
                                     </span>
 
-                                    <h2
-                                        id="editBatchModalTitle"
-                                    >
+                                    <h2 id="editBatchModalTitle">
                                         Edit Batch
                                     </h2>
 
@@ -1137,38 +994,27 @@
                                     type="button"
                                     aria-label="Tutup"
                                 >
-
                                     <i data-lucide="x"></i>
-
                                 </button>
-
 
                             </div>
 
-
-
-                            <!-- =============================================
-                                 FORM
-                            ============================================== -->
 
                             <form
                                 id="editBatchForm"
                                 class="fermentation-log-form"
                             >
 
-
-                                <!-- =========================================
-                                     PRODUCT
-                                ========================================== -->
+                                <!-- PRODUCT -->
 
                                 <div class="form-field">
 
-                                    <label for="editBatchProduct">
+                                    <label for="editProduct">
                                         Product
                                     </label>
 
                                     <input
-                                        id="editBatchProduct"
+                                        id="editProduct"
                                         name="product"
                                         type="text"
                                         placeholder="Contoh: Lemon Kombucha"
@@ -1178,26 +1024,20 @@
                                 </div>
 
 
+                                <!-- VOLUME + TARGET DATE -->
 
-                                <!-- =========================================
-                                     VOLUME + TARGET DATE
-                                ========================================== -->
-
-                                <div
-                                    class="form-grid-2"
-                                >
-
+                                <div class="form-grid-2">
 
                                     <div class="form-field">
 
-                                        <label for="editBatchVolume">
+                                        <label for="editVolume">
                                             Volume
                                         </label>
 
                                         <div class="form-input-with-unit">
 
                                             <input
-                                                id="editBatchVolume"
+                                                id="editVolume"
                                                 name="volume"
                                                 type="number"
                                                 step="0.1"
@@ -1217,12 +1057,12 @@
 
                                     <div class="form-field">
 
-                                        <label for="editBatchTargetDate">
+                                        <label for="editTargetDate">
                                             Target Date
                                         </label>
 
                                         <input
-                                            id="editBatchTargetDate"
+                                            id="editTargetDate"
                                             name="targetDate"
                                             type="date"
                                             required
@@ -1230,23 +1070,19 @@
 
                                     </div>
 
-
                                 </div>
 
 
-
-                                <!-- =========================================
-                                     STAGE
-                                ========================================== -->
+                                <!-- CURRENT STAGE -->
 
                                 <div class="form-field">
 
-                                    <label for="editBatchStage">
+                                    <label for="editStage">
                                         Current Stage
                                     </label>
 
                                     <select
-                                        id="editBatchStage"
+                                        id="editStage"
                                         name="stage"
                                         required
                                     >
@@ -1284,19 +1120,16 @@
                                 </div>
 
 
-
-                                <!-- =========================================
-                                     NOTE
-                                ========================================== -->
+                                <!-- BATCH NOTE -->
 
                                 <div class="form-field">
 
-                                    <label for="editBatchNote">
+                                    <label for="editNote">
                                         Catatan Batch
                                     </label>
 
                                     <textarea
-                                        id="editBatchNote"
+                                        id="editNote"
                                         name="note"
                                         rows="4"
                                         placeholder="Contoh: Target fermentasi disesuaikan setelah pengecekan QC."
@@ -1305,57 +1138,40 @@
                                 </div>
 
 
+                                <!-- ACTIONS -->
 
-                                <!-- =========================================
-                                     ACTIONS
-                                ========================================== -->
-
-                                <div
-                                    class="fermentation-log-form-actions"
-                                >
-
+                                <div class="fermentation-log-form-actions">
 
                                     <button
                                         id="cancelEditBatch"
                                         class="page-btn secondary"
                                         type="button"
                                     >
-
                                         Batal
-
                                     </button>
-
 
                                     <button
                                         class="page-btn primary"
                                         type="submit"
                                     >
-
                                         <i data-lucide="save"></i>
-
                                         Simpan Perubahan
-
                                     </button>
-
 
                                 </div>
 
-
                             </form>
-
 
                         </div>
 
                     </div>
 
 
-
                     <!-- =================================================
-                         NOTES
+                         PRODUCTION NOTES
                     ================================================== -->
 
                     <section class="detail-card">
-
 
                         <div class="detail-card-header">
 
@@ -1387,210 +1203,183 @@
 
                         </div>
 
-
                     </section>
 
-
                 </div>
-
 
             </section>
 
-
         </main>
-
 
     </div>
 
+
     <!-- =====================================================
-     CANCEL BATCH MODAL
-====================================================== -->
-
-<div
-    id="cancelBatchModal"
-    class="batch-modal"
-    aria-hidden="true"
->
+         CANCEL BATCH MODAL
+    ====================================================== -->
 
     <div
-        class="batch-modal-backdrop"
-        data-close-cancel-modal
-    ></div>
-
-
-    <div
-        class="batch-modal-card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cancelBatchTitle"
+        id="cancelBatchModal"
+        class="batch-modal"
+        aria-hidden="true"
     >
 
-        <div class="batch-modal-header">
-
-            <div>
-
-                <span class="section-eyebrow">
-                    BATCH ACTION
-                </span>
-
-                <h2 id="cancelBatchTitle">
-                    Batalkan Batch
-                </h2>
-
-                <p>
-                    Batch tidak akan dihapus.
-                    Status akan berubah menjadi
-                    <strong>Cancelled</strong>.
-                </p>
-
-            </div>
+        <div
+            class="batch-modal-backdrop"
+            data-close-cancel-modal
+        ></div>
 
 
-            <button
-                type="button"
-                class="batch-modal-close"
-                data-close-cancel-modal
-                aria-label="Tutup"
-            >
+        <div
+            class="batch-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cancelBatchTitle"
+        >
 
-                <i data-lucide="x"></i>
+            <div class="batch-modal-header">
 
-            </button>
+                <div>
 
-        </div>
+                    <span class="section-eyebrow">
+                        BATCH ACTION
+                    </span>
 
+                    <h2 id="cancelBatchTitle">
+                        Batalkan Batch
+                    </h2>
 
-        <form id="cancelBatchForm">
+                    <p>
+                        Batch tidak akan dihapus.
+                        Status akan berubah menjadi
+                        <strong>Cancelled</strong>.
+                    </p>
 
-            <div class="form-group">
-
-                <label>
-                    Batch
-                </label>
-
-                <div
-                    id="cancelBatchCode"
-                    class="form-static-value"
-                >
-                    —
                 </div>
 
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="cancelBatchReason">
-                    Alasan Pembatalan
-                </label>
-
-                <textarea
-                    id="cancelBatchReason"
-                    rows="4"
-                    placeholder="Contoh: Salah pilih resep, batch gagal QC, atau produksi dihentikan."
-                ></textarea>
-
-            </div>
-
-
-            <div class="batch-modal-actions">
 
                 <button
                     type="button"
-                    class="page-btn secondary"
+                    class="batch-modal-close"
                     data-close-cancel-modal
+                    aria-label="Tutup"
                 >
-                    Kembali
-                </button>
-
-
-                <button
-                    type="submit"
-                    class="page-btn danger"
-                >
-
-                    <i data-lucide="ban"></i>
-
-                    Batalkan Batch
-
+                    <i data-lucide="x"></i>
                 </button>
 
             </div>
 
-        </form>
+
+            <form id="cancelBatchForm">
+
+                <div class="form-group">
+
+                    <label>
+                        Batch
+                    </label>
+
+                    <div
+                        id="cancelBatchCode"
+                        class="form-static-value"
+                    >
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="cancelBatchReason">
+                        Alasan Pembatalan
+                    </label>
+
+                    <textarea
+                        id="cancelBatchReason"
+                        rows="4"
+                        placeholder="Contoh: Salah pilih resep, batch gagal QC, atau produksi dihentikan."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="batch-modal-actions">
+
+                    <button
+                        type="button"
+                        class="page-btn secondary"
+                        data-close-cancel-modal
+                    >
+                        Kembali
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="page-btn danger"
+                    >
+                        <i data-lucide="ban"></i>
+                        Batalkan Batch
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
-
-</div>
-
 
 
     <!-- =====================================================
          SCRIPTS
     ====================================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- =====================================================
-     MERAMU JAVASCRIPT
-====================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- 1. SUPABASE CLIENT
-     WAJIB sebelum adapter Supabase lainnya -->
-<script src="../js/supabase.js"></script>
+    <script src="../js/supabase.js"></script>
 
+    <script src="../js/batch-detail.js"></script>
 
-<!-- 2. BATCH DETAIL CORE -->
-<script src="../js/batch-detail.js"></script>
+    <script src="../js/batch-detail-supabase.js"></script>
 
+    <script src="../js/batch-detail-fermentation-supabase.js"></script>
 
-<!-- 3. BATCH DETAIL → SUPABASE -->
-<script src="../js/batch-detail-supabase.js"></script>
+    <script src="../js/batch-cancel.js"></script>
 
+    <script src="../js/supabase-realtime.js"></script>
 
-<!-- 4. FERMENTATION LOG → SUPABASE -->
-<script src="../js/batch-detail-fermentation-supabase.js"></script>
-<script src="../js/batch-cancel.js"></script>
+    <script src="../js/component-loader.js"></script>
 
-<!-- 5. SUPABASE REALTIME -->
-<script src="../js/supabase-realtime.js"></script>
+    <script src="../js/app.js"></script>
 
 
-<!-- 6. SHARED COMPONENT LOADER -->
-<script src="../js/component-loader.js"></script>
+    <script>
 
+        document.addEventListener(
+            "DOMContentLoaded",
+            function(){
 
-<!-- 7. GLOBAL APP CONTROLLER -->
-<script src="../js/app.js"></script>
+                if(
+                    window.initBatchDetail
+                ){
 
+                    window.initBatchDetail();
 
-<script>
+                }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+                if(
+                    window.lucide
+                ){
 
-        if(
-            window.initBatchDetail
-        ){
+                    lucide.createIcons();
 
-            window.initBatchDetail();
+                }
 
-        }
+            }
+        );
 
-
-        if(
-            window.lucide
-        ){
-
-            lucide.createIcons();
-
-        }
-
-    }
-);
-
-</script>
-
+    </script>
 
 </body>
 
