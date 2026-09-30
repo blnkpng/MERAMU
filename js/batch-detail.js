@@ -3283,25 +3283,28 @@ function saveEditBatch(event){
                     ===================================== */
 
                     const payload = {
-
+                    
                         product_id:
                             productId,
-
+                    
                         target_date:
                             targetDate,
-
+                    
                         planned_volume:
                             Number(volume),
-
+                    
+                        actual_volume:
+                            Number(volume),
+                    
                         current_stage:
                             normalizedStage,
-
+                    
                         status:
                             status,
-
+                    
                         notes:
                             note || null
-
+                    
                     };
 
 
