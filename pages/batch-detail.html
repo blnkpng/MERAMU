@@ -1392,29 +1392,12 @@
                                         <label for="qcDecision">
                                             Decision
                                         </label>
-
-                                        <select
-                                            id="qcDecision"
-                                            required
-                                        >
-
-                                            <option value="pass">
-                                                Pass
-                                            </option>
-
-                                            <option value="hold">
-                                                Hold
-                                            </option>
-
-                                            <option value="fail">
-                                                Fail
-                                            </option>
-
-                                            <option value="release">
-                                                Release
-                                            </option>
-
-                                        </select>
+                                
+                                <select id="qcDecision" name="decision">
+                                    <option value="passed">PASS — Siap Lanjut</option>
+                                    <option value="not_ready">NOT READY — Perpanjang</option>
+                                    <option value="hold">HOLD — Tahan</option>
+                                </select>
 
                                     </div>
 
