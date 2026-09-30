@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MERAMU • Finished Products</title>
+
+    <link
+        rel="icon"
+        href="../assets/branding/favicon-32.png"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/variables.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+
+        /* =====================================================
+           MERAMU FINISHED PRODUCTS
+        ===================================================== */
+
+        .finished-page{
+            width:100%;
+            padding:28px;
+        }
+
+        .finished-header{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:20px;
+
+            margin-bottom:24px;
+        }
+
+        .finished-eyebrow{
+            display:block;
+
+            margin-bottom:5px;
+
+            font-size:10px;
+            font-weight:600;
+
+            letter-spacing:.14em;
+
+            color:#8B9B93;
+        }
+
+        .finished-title{
+            margin:0;
+
+            font-size:26px;
+            line-height:1.2;
+
+            font-weight:700;
+
+            color:#17352A;
+        }
+
+        .finished-subtitle{
+            margin:7px 0 0;
+
+            font-size:13px;
+
+            color:#7B8A83;
+        }
+
+        .finished-actions{
+            display:flex;
+            gap:8px;
+        }
+
+        .finished-btn{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+
+            gap:7px;
+
+            min-height:40px;
+
+            padding:0 14px;
+
+            border-radius:12px;
+
+            border:1px solid #DDE9E2;
+
+            background:#FFFFFF;
+
+            color:#315445;
+
+            font-family:"Poppins",sans-serif;
+
+            font-size:12px;
+            font-weight:600;
+
+            cursor:pointer;
+        }
+
+        .finished-btn:hover{
+            background:#F5FAF7;
+        }
+
+        .finished-btn.primary{
+            border-color:#046738;
+
+            background:#046738;
+
+            color:#FFFFFF;
+        }
+
+        .finished-btn svg{
+            width:16px;
+            height:16px;
+        }
+
+        /* =====================================================
+           BATCH SELECTOR
+        ===================================================== */
+
+        .finished-filter{
+            display:grid;
+
+            grid-template-columns:
+                minmax(0,1fr)
+                auto;
+
+            gap:12px;
+
+            margin-bottom:20px;
+
+            padding:18px;
+
+            border:1px solid #E1ECE6;
+
+            border-radius:18px;
+
+            background:#FFFFFF;
+
+            box-shadow:
+                0 8px 30px rgba(4,103,56,.05);
+        }
+
+        .finished-field{
+            min-width:0;
+        }
+
+        .finished-field label{
+            display:block;
+
+            margin-bottom:6px;
+
+            font-size:10px;
+            font-weight:600;
+
+            color:#83928B;
+        }
+
+        .finished-select{
+            width:100%;
+
+            height:42px;
+
+            padding:0 12px;
+
+            border:1px solid #DCE8E1;
+
+            border-radius:11px;
+
+            background:#FBFDFC;
+
+            color:#29483B;
+
+            font-family:"Poppins",sans-serif;
+
+            font-size:12px;
+
+            outline:none;
+        }
+
+        .finished-select:focus{
+            border-color:#8BC6A5;
+
+            box-shadow:
+                0 0 0 3px rgba(4,103,56,.07);
+        }
+
+        /* =====================================================
+           BATCH INFO
+        ===================================================== */
+
+        .finished-batch{
+            margin-bottom:20px;
+
+            padding:20px;
+
+            border:1px solid #DDEAE2;
+
+            border-radius:20px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #F3FAF6,
+                    #FFFFFF
+                );
+        }
+
+        .finished-batch-top{
+            display:flex;
+
+            align-items:flex-start;
+            justify-content:space-between;
+
+            gap:20px;
+
+            margin-bottom:16px;
+        }
+
+        .finished-batch-name{
+            margin:0;
+
+            font-size:18px;
+            font-weight:600;
+
+            color:#17352A;
+        }
+
+        .finished-batch-code{
+            margin-top:4px;
+
+            font-size:11px;
+
+            color:#819087;
+        }
+
+        .finished-status{
+            display:inline-flex;
+
+            align-items:center;
+
+            gap:7px;
+
+            padding:6px 10px;
+
+            border-radius:999px;
+
+            background:#EAF7EF;
+
+            color:#046738;
+
+            font-size:10px;
+            font-weight:600;
+        }
+
+        .finished-status-dot{
+            width:6px;
+            height:6px;
+
+            border-radius:50%;
+
+            background:#046738;
+        }
+
+        .finished-batch-grid{
+            display:grid;
+
+            grid-template-columns:
+                repeat(4,minmax(0,1fr));
+
+            gap:10px;
+        }
+
+        .finished-stat{
+            padding:12px;
+
+            border:1px solid #E1ECE6;
+
+            border-radius:13px;
+
+            background:rgba(255,255,255,.72);
+        }
+
+        .finished-stat span{
+            display:block;
+
+            margin-bottom:4px;
+
+            font-size:9px;
+
+            color:#8A9991;
+        }
+
+        .finished-stat strong{
+            display:block;
+
+            font-size:13px;
+
+            color:#29483B;
+        }
+
+        /* =====================================================
+           UNIT GRID
+        ===================================================== */
+
+        .finished-section-header{
+            display:flex;
+
+            align-items:center;
+            justify-content:space-between;
+
+            gap:15px;
+
+            margin-bottom:14px;
+        }
+
+        .finished-section-title{
+            margin:0;
+
+            font-size:16px;
+            font-weight:600;
+
+            color:#17352A;
+        }
+
+        .finished-count{
+            font-size:11px;
+
+            color:#8A9991;
+        }
+
+        .finished-units{
+            display:grid;
+
+            grid-template-columns:
+                repeat(4,minmax(0,1fr));
+
+            gap:12px;
+        }
+
+        .finished-unit{
+            position:relative;
+
+            padding:15px;
+
+            border:1px solid #E1ECE6;
+
+            border-radius:17px;
+
+            background:#FFFFFF;
+
+            transition:
+                transform .15s ease,
+                box-shadow .15s ease,
+                border-color .15s ease;
+        }
+
+        .finished-unit:hover{
+            transform:translateY(-2px);
+
+            border-color:#C5DED0;
+
+            box-shadow:
+                0 10px 28px rgba(4,103,56,.08);
+        }
+
+        .finished-unit-top{
+            display:flex;
+
+            align-items:center;
+            justify-content:space-between;
+
+            gap:8px;
+
+            margin-bottom:12px;
+        }
+
+        .finished-unit-number{
+            font-size:12px;
+            font-weight:600;
+
+            color:#315445;
+        }
+
+        .finished-unit-status{
+            padding:4px 7px;
+
+            border-radius:999px;
+
+            background:#EDF7F1;
+
+            color:#046738;
+
+            font-size:8px;
+            font-weight:600;
+        }
+
+        .finished-qr{
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            min-height:150px;
+
+            margin-bottom:12px;
+
+            border-radius:13px;
+
+            background:#FFFFFF;
+
+            border:1px solid #EDF2EF;
+        }
+
+        .finished-qr canvas,
+        .finished-qr img{
+            display:block;
+
+            width:135px !important;
+            height:135px !important;
+
+            max-width:135px !important;
+            max-height:135px !important;
+        }
+
+        .finished-trace-code{
+            padding:9px;
+
+            border-radius:10px;
+
+            background:#F7FAF8;
+
+            text-align:center;
+
+            font-size:9px;
+            font-weight:600;
+
+            color:#426052;
+
+            word-break:break-all;
+        }
+
+        .finished-unit-actions{
+            display:grid;
+
+            grid-template-columns:1fr 1fr;
+
+            gap:7px;
+
+            margin-top:9px;
+        }
+
+        .finished-unit-btn{
+            display:flex;
+
+            align-items:center;
+            justify-content:center;
+
+            gap:5px;
+
+            height:34px;
+
+            border:1px solid #DDE9E2;
+
+            border-radius:9px;
+
+            background:#FFFFFF;
+
+            color:#426052;
+
+            font-family:"Poppins",sans-serif;
+
+            font-size:9px;
+            font-weight:600;
+
+            cursor:pointer;
+        }
+
+        .finished-unit-btn:hover{
+            background:#F5FAF7;
+        }
+
+        .finished-unit-btn.primary{
+            background:#046738;
+
+            border-color:#046738;
+
+            color:#FFFFFF;
+        }
+
+        .finished-unit-btn svg{
+            width:13px;
+            height:13px;
+        }
+
+        /* =====================================================
+           EMPTY / LOADING
+        ===================================================== */
+
+        .finished-empty{
+            padding:60px 20px;
+
+            text-align:center;
+
+            border:1px dashed #D5E4DB;
+
+            border-radius:18px;
+
+            color:#829189;
+        }
+
+        .finished-empty svg{
+            width:30px;
+            height:30px;
+
+            margin-bottom:10px;
+
+            color:#8EA198;
+        }
+
+        .finished-empty strong{
+            display:block;
+
+            margin-bottom:4px;
+
+            font-size:13px;
+
+            color:#52675D;
+        }
+
+        .finished-empty span{
+            font-size:11px;
+        }
+
+        /* =====================================================
+           THERMAL PRINT
+        ===================================================== */
+
+        .thermal-print-area{
+            display:none;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width:1000px){
+
+            .finished-units{
+                grid-template-columns:
+                    repeat(3,minmax(0,1fr));
+            }
+
+        }
+
+        @media(max-width:760px){
+
+            .finished-page{
+                padding:20px 16px;
+            }
+
+            .finished-header{
+                flex-direction:column;
+            }
+
+            .finished-actions{
+                width:100%;
+            }
+
+            .finished-actions .finished-btn{
+                flex:1;
+            }
+
+            .finished-filter{
+                grid-template-columns:1fr;
+            }
+
+            .finished-batch-grid{
+                grid-template-columns:
+                    repeat(2,minmax(0,1fr));
+            }
+
+            .finished-units{
+                grid-template-columns:
+                    repeat(2,minmax(0,1fr));
+            }
+
+        }
+
+        @media(max-width:480px){
+
+            .finished-title{
+                font-size:22px;
+            }
+
+            .finished-batch-top{
+                flex-direction:column;
+            }
+
+            .finished-units{
+                grid-template-columns:1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <div id="appShell" class="app-shell">
+
+        <div id="sidebar-container"></div>
+
+        <main class="content">
+
+            <div id="topbar-container"></div>
+
+
+            <div class="finished-page">
+
+                <header class="finished-header">
+
+                    <div>
+
+                        <span class="finished-eyebrow">
+                            FINISHED PRODUCTS
+                        </span>
+
+                        <h1 class="finished-title">
+                            Produk Jadi
+                        </h1>
+
+                        <p class="finished-subtitle">
+                            Kelola finished batch, QR code,
+                            dan label setiap botol.
+                        </p>
+
+                    </div>
+
+
+                    <div class="finished-actions">
+
+                        <button
+                            id="refreshFinished"
+                            class="finished-btn"
+                            type="button"
+                        >
+
+                            <i data-lucide="refresh-cw"></i>
+
+                            Refresh
+
+                        </button>
+
+
+                        <button
+                            id="printAllLabels"
+                            class="finished-btn primary"
+                            type="button"
+                        >
+
+                            <i data-lucide="printer"></i>
+
+                            Print Semua
+
+                        </button>
+
+                    </div>
+
+                </header>
+
+
+                <!-- BATCH SELECT -->
+
+                <section class="finished-filter">
+
+                    <div class="finished-field">
+
+                        <label>
+                            Finished Batch
+                        </label>
+
+                        <select
+                            id="finishedBatchSelect"
+                            class="finished-select"
+                        >
+
+                            <option value="">
+                                Memuat finished batch...
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="finished-field">
+
+                        <label>
+                            QR / Label
+                        </label>
+
+                        <button
+                            id="generateAllQr"
+                            class="finished-btn primary"
+                            type="button"
+                            style="height:42px;width:100%;"
+                        >
+
+                            <i data-lucide="qr-code"></i>
+
+                            Generate QR
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- BATCH INFO -->
+
+                <section
+                    id="finishedBatchInfo"
+                    class="finished-batch"
+                    style="display:none;"
+                >
+                </section>
+
+
+                <!-- UNITS -->
+
+                <section>
+
+                    <div class="finished-section-header">
+
+                        <h2 class="finished-section-title">
+                            Individual Bottles
+                        </h2>
+
+                        <span
+                            id="finishedUnitCount"
+                            class="finished-count"
+                        >
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="finishedUnits"
+                        class="finished-units"
+                    >
+
+                        <div class="finished-empty">
+
+                            <i data-lucide="package"></i>
+
+                            <strong>
+                                Belum ada finished batch
+                            </strong>
+
+                            <span>
+                                Pilih finished batch untuk melihat
+                                QR setiap botol.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUPABASE
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+
+        window.supabaseClient =
+            window.supabase.createClient(
+                "https://bgllborppxhbvmzsetjh.supabase.co",
+                "sb_publishable_g0Kl_e3HewgdaavLEMDkSQ_xe1LMbNl"
+            );
+
+    </script>
+
+
+    <!-- QR GENERATOR -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+    ></script>
+
+
+    <script src="../js/component-loader.js"></script>
+
+    <script src="../js/finished.js"></script>
+
+</body>
+
+</html>
