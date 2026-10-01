@@ -6,39 +6,93 @@
        QR / Trace Code
        ========================================================= */
 
-    function getTraceCode() {
-        const path = window.location.pathname
-            .replaceAll("\\", "/")
-            .replace(/\/+$/, "");
+    function getTraceCode(){
 
-        const parts = path.split("/").filter(Boolean);
-
-        /*
-         * Support:
-         * /trace/FG-20260930-0001-001
-         * /pages/trace.html?code=FG-20260930-0001-001
-         */
-
-        const queryCode = new URLSearchParams(
+    const params =
+        new URLSearchParams(
             window.location.search
-        ).get("code");
-
-        if (queryCode) {
-            return decodeURIComponent(queryCode).trim();
-        }
-
-        const traceIndex = parts.findIndex(
-            part => part.toLowerCase() === "trace"
         );
 
-        if (traceIndex !== -1 && parts[traceIndex + 1]) {
-            return decodeURIComponent(
-                parts[traceIndex + 1]
-            ).trim();
-        }
 
-        return "";
+    /*
+     * =====================================================
+     * BATCH TRACE
+     * Contoh:
+     * /pages/trace.html?batch=KB-027
+     * =====================================================
+     */
+
+    const queryBatch =
+        params.get("batch");
+
+    if(queryBatch){
+
+        return {
+            type: "batch",
+            value: queryBatch.trim()
+        };
+
     }
+
+
+    /*
+     * =====================================================
+     * BOTTLE TRACE
+     * Contoh:
+     * /pages/trace.html?code=FG-20260930-0001-001
+     * =====================================================
+     */
+
+    const queryCode =
+        params.get("code");
+
+    if(queryCode){
+
+        return {
+            type: "code",
+            value: queryCode.trim()
+        };
+
+    }
+
+
+    /*
+     * =====================================================
+     * LEGACY /TRACE/...
+     *
+     * Dipertahankan supaya URL lama
+     * tidak langsung rusak.
+     * =====================================================
+     */
+
+    const parts =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    const traceIndex =
+        parts.indexOf("trace");
+
+
+    if(
+        traceIndex !== -1 &&
+        parts[traceIndex + 1]
+    ){
+
+        return {
+            type: "code",
+            value: decodeURIComponent(
+                parts[traceIndex + 1]
+            ).trim()
+        };
+
+    }
+
+
+    return null;
+
+}
 
 
     /* =========================================================
@@ -865,89 +919,204 @@
 
 
     /* =========================================================
-       LOAD TRACE
-       ========================================================= */
+   LOAD TRACE
+   ========================================================= */
 
-    async function loadTrace() {
+async function loadTrace() {
 
-        const traceCode = getTraceCode();
-
-        if (!traceCode) {
-
-            renderError(
-                "Trace Code Tidak Ada",
-                "Halaman ini membutuhkan trace code produk."
-            );
-
-            return;
-        }
+    const traceRequest =
+        getTraceCode();
 
 
-        try {
+    /*
+     * Tidak ada parameter trace
+     */
+    if (!traceRequest) {
 
-            const supabase =
-                await waitForSupabaseClient();
+        renderError(
+            "Trace Code Tidak Ada",
+            "Halaman ini membutuhkan trace code atau batch code."
+        );
 
-
-            const {
-                data,
-                error
-            } = await supabase.rpc(
-                "get_meramu_public_trace",
-                {
-                    p_trace_code: traceCode
-                }
-            );
-
-
-            if (error) {
-
-                console.error(
-                    "MERAMU Trace RPC Error:",
-                    error
-                );
-
-                throw error;
-            }
-
-
-            if (!data) {
-
-                renderError(
-                    "Produk Tidak Ditemukan",
-                    "Trace code tersebut tidak ditemukan."
-                );
-
-                return;
-            }
-
-
-            console.log(
-                "MERAMU Trace Loaded:",
-                traceCode,
-                data
-            );
-
-
-            renderTrace(data);
-
-
-        } catch (error) {
-
-            console.error(
-                "MERAMU Trace Error:",
-                error
-            );
-
-
-            renderError(
-                "Trace Tidak Dapat Dibuka",
-                "Terjadi masalah saat mengambil informasi produk."
-            );
-        }
+        return;
     }
 
 
+    try {
+
+        const supabase =
+            await waitForSupabaseClient();
+
+
+        let data = null;
+        let error = null;
+
+
+        /* =====================================================
+           BATCH TRACE
+           ?batch=KB-027
+        ===================================================== */
+
+        if (
+            traceRequest.type ===
+            "batch"
+        ) {
+
+            console.log(
+                "MERAMU Batch Trace:",
+                traceRequest.value
+            );
+
+
+            const response =
+                await supabase.rpc(
+                    "get_meramu_public_batch_trace",
+                    {
+                        p_batch_code:
+                            traceRequest.value
+                    }
+                );
+
+
+            data =
+                response.data;
+
+            error =
+                response.error;
+
+        }
+
+
+        /* =====================================================
+           BOTTLE TRACE
+           ?code=FG-20260930-0001-001
+        ===================================================== */
+
+        else if (
+            traceRequest.type ===
+            "code"
+        ) {
+
+            console.log(
+                "MERAMU Bottle Trace:",
+                traceRequest.value
+            );
+
+
+            const response =
+                await supabase.rpc(
+                    "get_meramu_public_trace",
+                    {
+                        p_trace_code:
+                            traceRequest.value
+                    }
+                );
+
+
+            data =
+                response.data;
+
+            error =
+                response.error;
+
+        }
+
+
+        /* =====================================================
+           UNKNOWN TRACE TYPE
+        ===================================================== */
+
+        else {
+
+            renderError(
+                "Trace Tidak Valid",
+                "Jenis trace tidak dikenali."
+            );
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           RPC ERROR
+        ===================================================== */
+
+        if (error) {
+
+            console.error(
+                "MERAMU Trace RPC Error:",
+                error
+            );
+
+            throw error;
+
+        }
+
+
+        /* =====================================================
+           DATA TIDAK DITEMUKAN
+        ===================================================== */
+
+        if (!data) {
+
+            if (
+                traceRequest.type ===
+                "batch"
+            ) {
+
+                renderError(
+                    "Batch Tidak Ditemukan",
+                    `Batch ${traceRequest.value} tidak ditemukan.`
+                );
+
+            } else {
+
+                renderError(
+                    "Produk Tidak Ditemukan",
+                    `Trace code ${traceRequest.value} tidak ditemukan.`
+                );
+
+            }
+
+            return;
+
+        }
+
+
+        /* =====================================================
+           LOG
+        ===================================================== */
+
+        console.log(
+            "MERAMU Trace Loaded:",
+            traceRequest,
+            data
+        );
+
+
+        /* =====================================================
+           RENDER
+        ===================================================== */
+
+        renderTrace(data);
+
+    } catch (error) {
+
+        console.error(
+            "MERAMU Trace Error:",
+            error
+        );
+
+
+        renderError(
+            "Trace Tidak Dapat Dibuka",
+            "Terjadi masalah saat mengambil informasi trace."
+        );
+
+    }
+
+}
     /* =========================================================
        INIT
        ========================================================= */
