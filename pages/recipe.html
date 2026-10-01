@@ -933,6 +933,427 @@
     </div>
 
 </div>
+                    <!-- =====================================================
+     RECIPE DETAIL MODAL
+===================================================== -->
+
+<div
+    id="recipeDetailModal"
+    class="recipe-modal"
+    hidden
+>
+
+    <div class="recipe-modal-backdrop"></div>
+
+    <div
+        class="recipe-modal-dialog recipe-detail-dialog"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <!-- HEADER -->
+
+        <div class="recipe-modal-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+
+                    <span class="live-dot"></span>
+
+                    RECIPE DETAIL
+
+                </div>
+
+                <h2 id="recipeDetailTitle">
+                    Recipe
+                </h2>
+
+                <p id="recipeDetailSubtitle">
+                    Detail master formula MERAMU.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="recipe-modal-close"
+                id="closeRecipeDetail"
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="recipeDetailLoading"
+            class="recipe-detail-loading"
+        >
+
+            <div class="recipe-spinner"></div>
+
+            <strong>
+                Memuat detail recipe...
+            </strong>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <div
+            id="recipeDetailContent"
+            class="recipe-detail-content"
+            hidden
+        >
+
+            <!-- IDENTITY -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-head">
+
+                    <div>
+
+                        <span>
+                            RECIPE
+                        </span>
+
+                        <h3 id="detailRecipeName">
+                            —
+                        </h3>
+
+                    </div>
+
+                    <span
+                        id="detailRecipeStatus"
+                        class="recipe-status active"
+                    >
+                        Active
+                    </span>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Recipe Code
+                        </span>
+
+                        <strong id="detailRecipeCode">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Product
+                        </span>
+
+                        <strong id="detailRecipeProduct">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Recipe Type
+                        </span>
+
+                        <strong id="detailRecipeType">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Current Version
+                        </span>
+
+                        <strong id="detailRecipeVersion">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="detailRecipeDescriptionBox"
+                    class="recipe-detail-description"
+                    hidden
+                >
+
+                    <span>
+                        Deskripsi
+                    </span>
+
+                    <p id="detailRecipeDescription"></p>
+
+                </div>
+
+            </section>
+
+
+            <!-- VERSION -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="git-branch"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Formula Version
+                        </strong>
+
+                        <span>
+                            Formula yang digunakan recipe saat ini
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Version
+                        </span>
+
+                        <strong id="detailVersionNumber">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Yield
+                        </span>
+
+                        <strong id="detailVersionYield">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Fermentation
+                        </span>
+
+                        <strong id="detailVersionFermentation">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Shelf Life
+                        </span>
+
+                        <strong id="detailVersionShelfLife">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INGREDIENTS -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="layers-3"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Ingredients
+                        </strong>
+
+                        <span>
+                            Formula untuk basis yield
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="recipeDetailIngredients"
+                    class="recipe-detail-ingredients"
+                ></div>
+
+            </section>
+
+
+            <!-- FERMENTATION -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="timer"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Fermentation Setting
+                        </strong>
+
+                        <span>
+                            Target proses fermentasi
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            F1 Target
+                        </span>
+
+                        <strong id="detailF1">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            F2 Target
+                        </span>
+
+                        <strong id="detailF2">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="recipeDetailError"
+            class="recipe-form-error"
+            hidden
+        >
+
+            <i data-lucide="triangle-alert"></i>
+
+            <span></span>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="recipe-modal-footer">
+
+            <button
+                type="button"
+                class="page-btn secondary"
+                id="closeRecipeDetailBottom"
+            >
+                Tutup
+            </button>
+
+
+            <button
+                type="button"
+                class="page-btn secondary"
+                id="editRecipeFromDetail"
+            >
+
+                <i data-lucide="pencil"></i>
+
+                Edit Recipe
+
+            </button>
+
+
+            <button
+                type="button"
+                class="page-btn primary"
+                id="newRecipeVersionFromDetail"
+            >
+
+                <i data-lucide="git-branch"></i>
+
+                Buat Versi Baru
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
                 </div>
 
