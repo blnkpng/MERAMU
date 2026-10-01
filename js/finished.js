@@ -2107,9 +2107,9 @@ function renderUnits() {
     }
 
 
-    /* =========================================================
-   THERMAL LABEL 58MM x 60MM
-   COMPACT VERSION
+/* =========================================================
+   THERMAL LABEL 55MM x 25MM
+   MINI BOTTLE VERSION
    ========================================================= */
 
 function printThermalLabel(units) {
@@ -2118,7 +2118,6 @@ function printThermalLabel(units) {
         Array.isArray(units)
             ? units
             : [units];
-
 
     if (!items.length) {
 
@@ -2138,12 +2137,6 @@ function printThermalLabel(units) {
         selectedBatch?.product_name ||
         selectedBatch?.products?.name ||
         "MERAMU";
-
-
-    const category =
-        selectedBatch?.product_category ||
-        selectedBatch?.products?.category ||
-        "";
 
 
     const bottleSize =
@@ -2170,12 +2163,12 @@ function printThermalLabel(units) {
     /* =====================================================
        BUILD MINI BOTTLE LABELS
 
-       Target physical size:
+       Target:
        55mm wide x 25mm high
 
        Layout:
        LEFT  = QR + SCAN INFORMATION
-       RIGHT = Product + Category + Size + BB
+       RIGHT = Product + Size + BB
        ===================================================== */
 
     const labels =
@@ -2186,15 +2179,13 @@ function printThermalLabel(units) {
                     unit.trace_code || "";
 
 
-                const safeCategory =
-                    category
-                        ? escapeHtml(category)
-                        : "";
-
-
                 return `
 
                     <div class="thermal-label">
+
+                        <!-- ==============================
+                             LEFT : QR
+                             ============================== -->
 
                         <div class="thermal-qr-panel">
 
@@ -2212,24 +2203,20 @@ function printThermalLabel(units) {
                         </div>
 
 
+                        <!-- ==============================
+                             RIGHT : PRODUCT INFO
+                             ============================== -->
+
                         <div class="thermal-info-panel">
 
                             <div class="thermal-product">
                                 ${escapeHtml(product)}
                             </div>
 
-                            ${
-                                safeCategory
-                                    ? `
-                                        <div class="thermal-category">
-                                            ${safeCategory}
-                                        </div>
-                                    `
-                                    : ""
-                            }
-
 
                             <div class="thermal-meta">
+
+                                <!-- BOTTLE SIZE -->
 
                                 <div class="thermal-meta-row">
 
@@ -2250,6 +2237,7 @@ function printThermalLabel(units) {
 
                                     </div>
 
+
                                     <strong>
                                         ${formatNumber(
                                             bottleSize,
@@ -2259,6 +2247,8 @@ function printThermalLabel(units) {
 
                                 </div>
 
+
+                                <!-- BEST BEFORE -->
 
                                 <div class="thermal-meta-row">
 
@@ -2287,9 +2277,11 @@ function printThermalLabel(units) {
 
                                     </div>
 
+
                                     <span>
                                         BB:
                                     </span>
+
 
                                     <strong>
                                         ${escapeHtml(bestBefore)}
@@ -2395,8 +2387,8 @@ function printThermalLabel(units) {
 
 
                 /* =================================================
-                   EXACT PRINT SIZE
-                   MINI BOTTLE LABEL = 55MM x 25MM
+                   PRINT SIZE
+                   55MM x 25MM
                    ================================================= */
 
                 @page {
@@ -2438,7 +2430,8 @@ function printThermalLabel(units) {
 
                     display: grid;
 
-                    grid-template-columns: 21mm 1fr;
+                    grid-template-columns:
+                        21mm 1fr;
 
                     column-gap: 2mm;
 
@@ -2555,15 +2548,24 @@ function printThermalLabel(units) {
                 }
 
 
+                /* =================================================
+                   PRODUCT NAME
+                   =================================================
+
+                   DIPERKECIL AGAR:
+                   TELANG KOMBUCHA
+                   TIDAK TERPOTONG
+                   ================================================= */
+
                 .thermal-product {
 
                     width: 100%;
 
-                    margin: 0;
+                    margin: 0 0 2mm 0;
 
-                    font-size: 10.2px;
+                    font-size: 7.2px;
 
-                    line-height: 1.05;
+                    line-height: 1;
 
                     font-weight: 800;
 
@@ -2580,32 +2582,9 @@ function printThermalLabel(units) {
                 }
 
 
-                .thermal-category {
-
-                    width: 100%;
-
-                    margin-top: 0.8mm;
-
-                    margin-bottom: 2.2mm;
-
-                    font-size: 9.2px;
-
-                    line-height: 1;
-
-                    font-weight: 400;
-
-                    letter-spacing: -0.1px;
-
-                    text-transform: uppercase;
-
-                    white-space: nowrap;
-
-                    overflow: hidden;
-
-                    text-overflow: ellipsis;
-
-                }
-
+                /* =================================================
+                   META INFORMATION
+                   ================================================= */
 
                 .thermal-meta {
 
@@ -2658,6 +2637,10 @@ function printThermalLabel(units) {
 
                 }
 
+
+                /* =================================================
+                   ICONS
+                   ================================================= */
 
                 .thermal-bottle-icon,
                 .thermal-calendar-icon {
@@ -2853,7 +2836,6 @@ function printThermalLabel(units) {
     );
 
 }
-
 
     /* =====================================================
        EMPTY STATE
