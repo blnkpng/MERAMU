@@ -1605,7 +1605,7 @@
 
                         margin-bottom:3.4mm;
 
-                        font-size:10px;
+                        font-size:9px;
 
                         line-height:1.05;
 
