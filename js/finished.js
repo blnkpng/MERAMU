@@ -1559,9 +1559,9 @@
 
                         display:block;
 
-                        width:7mm;
+                        width:5mm;
 
-                        height:7mm;
+                        height:5mm;
 
                         object-fit:contain;
 
@@ -1579,7 +1579,7 @@
 
                         display:block;
 
-                        width:27mm;
+                        width:22mm;
 
                         height:auto;
 
