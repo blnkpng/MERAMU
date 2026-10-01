@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recipe Studio • MERAMU</title>
+
+    <link
+        rel="icon"
+        href="../assets/branding/favicon-32.png"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/variables.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR OVERLAY -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+    ></div>
+
+
+    <!-- APP SHELL -->
+
+    <div class="app-shell">
+
+
+        <!-- SIDEBAR -->
+
+        <div id="sidebar-container"></div>
+
+
+        <!-- CONTENT -->
+
+        <main class="content">
+
+
+            <!-- TOPBAR -->
+
+            <div id="topbar-container"></div>
+
+
+            <!-- PAGE -->
+
+            <section class="page-wrapper recipe-page">
+
+
+                <div class="recipe-page-content">
+
+
+                    <!-- PAGE HEADER -->
+
+                    <div class="page-header recipe-page-header">
+
+                        <div>
+
+                            <div class="section-eyebrow">
+
+                                <span class="live-dot"></span>
+
+                                MASTER DATA
+
+                            </div>
+
+
+                            <h1>
+                                Recipe Studio
+                            </h1>
+
+
+                            <p>
+                                Kelola formula, versi, yield,
+                                dan dasar perhitungan resep MERAMU.
+                            </p>
+
+                        </div>
+
+
+                        <div class="page-header-actions">
+
+                            <button
+                                type="button"
+                                class="page-btn primary"
+                                id="createRecipeButton"
+                            >
+
+                                <i data-lucide="plus"></i>
+
+                                Buat Resep
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECIPE NOTE -->
+
+                    <div class="recipe-info-banner">
+
+                        <div class="recipe-info-icon">
+
+                            <i data-lucide="book-open"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                Recipe adalah master formula
+                            </strong>
+
+                            <span>
+                                Resep digunakan sebagai template
+                                oleh Production. Membuat resep
+                                tidak otomatis membuat batch produksi.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOOLBAR -->
+
+                    <div class="recipe-toolbar">
+
+                        <div class="recipe-search">
+
+                            <i data-lucide="search"></i>
+
+                            <input
+                                type="search"
+                                id="recipeSearch"
+                                placeholder="Cari nama atau kode resep..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="recipeStatusFilter"
+                            class="recipe-filter"
+                        >
+
+                            <option value="all">
+                                Semua Status
+                            </option>
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="archived">
+                                Archived
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SUMMARY -->
+
+                    <div class="recipe-summary">
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Total Recipe
+                            </span>
+
+                            <strong id="recipeTotal">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Active
+                            </span>
+
+                            <strong id="recipeActive">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Versions
+                            </span>
+
+                            <strong id="recipeVersions">
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOADING -->
+
+                    <div
+                        id="recipeLoading"
+                        class="recipe-state"
+                    >
+
+                        <div class="recipe-spinner"></div>
+
+                        <strong>
+                            Memuat resep...
+                        </strong>
+
+                        <span>
+                            Mengambil data dari Supabase.
+                        </span>
+
+                    </div>
+
+
+                    <!-- ERROR -->
+
+                    <div
+                        id="recipeError"
+                        class="recipe-state error"
+                        hidden
+                    >
+
+                        <div class="recipe-state-icon">
+
+                            <i data-lucide="triangle-alert"></i>
+
+                        </div>
+
+                        <strong>
+                            Gagal memuat resep
+                        </strong>
+
+                        <span id="recipeErrorMessage">
+                            Terjadi kesalahan saat mengambil data.
+                        </span>
+
+                        <button
+                            type="button"
+                            class="page-btn secondary"
+                            id="recipeRetryButton"
+                        >
+
+                            <i data-lucide="refresh-cw"></i>
+
+                            Coba Lagi
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- EMPTY -->
+
+                    <div
+                        id="recipeEmpty"
+                        class="recipe-state"
+                        hidden
+                    >
+
+                        <div class="recipe-state-icon">
+
+                            <i data-lucide="book-open"></i>
+
+                        </div>
+
+                        <strong>
+                            Belum ada resep
+                        </strong>
+
+                        <span>
+                            Belum ada recipe yang tersimpan
+                            di database MERAMU.
+                        </span>
+
+                    </div>
+
+
+                    <!-- LIST -->
+
+                    <section
+                        id="recipeList"
+                        class="recipe-list-page"
+                        hidden
+                    ></section>
+
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
+
+    <!-- PAGE -->
+
+    <script src="../js/recipe.js"></script>
+
+    <!-- SHARED -->
+
+    <script src="../js/component-loader.js"></script>
+
+    <script src="../js/app.js"></script>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                if(window.initRecipePage){
+
+                    window.initRecipePage();
+
+                }
+
+                if(window.lucide){
+
+                    lucide.createIcons();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
