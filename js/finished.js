@@ -2439,421 +2439,206 @@ function printThermalLabel(units) {
                 }
 
 
-                /* =================================================
-   LABEL — 58MM × 60MM
-   ================================================= */
+                /* =========================================================
+   MERAMU THERMAL LABEL
+   TARGET: 58mm × 60mm
+   CSS SIZE: 219px × 227px
+========================================================= */
 
-.thermal-label {
+.thermal-label{
+    position:relative;
 
-    position: relative;
+    width:219px;
+    height:227px;
+    min-height:227px;
+    max-height:227px;
 
-    width: 58mm;
+    box-sizing:border-box;
 
-    height: 60mm;
+    padding:10px 10px 8px 10px;
 
-    min-width: 58mm;
-    max-width: 58mm;
+    background:#FFFFFF;
+    color:#000000;
 
-    min-height: 60mm;
-    max-height: 60mm;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
 
-    box-sizing: border-box;
+    overflow:hidden;
 
-    padding:
-        1.2mm
-        2.5mm
-        1.2mm
-        2.5mm;
-
-    margin: 0;
-
-    background: #FFFFFF;
-
-    color: #000000;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: flex-start;
-
-    text-align: center;
-
-    overflow: hidden;
-
-    page-break-after: always;
-
-    break-after: page;
+    page-break-after:always;
 }
 
 
-/* =================================================
+/* =========================================================
    BRAND
-   ================================================= */
+========================================================= */
 
-.thermal-brand {
+.thermal-brand{
+    width:100%;
 
-    width: 100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    margin-bottom: 0.6mm;
-
+    margin-bottom:7px;
 }
 
 
-.thermal-logo-icon {
+.thermal-logo-icon{
+    display:block;
 
-    display: block;
+    width:19px;
+    height:19px;
 
-    width: 3.8mm;
+    object-fit:contain;
 
-    height: 3.8mm;
-
-    object-fit: contain;
-
-    margin-bottom: 0.1mm;
+    margin-bottom:2px;
 
     filter:
         grayscale(1)
         brightness(0);
-
 }
 
 
-.thermal-logo-text {
+.thermal-logo-text{
+    display:block;
 
-    display: block;
+    width:80px;
+    height:auto;
 
-    width: 16mm;
+    max-height:19px;
 
-    height: auto;
-
-    max-height: 3.4mm;
-
-    object-fit: contain;
+    object-fit:contain;
 
     filter:
         grayscale(1)
         brightness(0);
-
 }
 
 
-/* =================================================
-   PRODUCT
-   ================================================= */
+/* =========================================================
+   PRODUCT NAME
+========================================================= */
 
-.thermal-product {
+.thermal-product{
+    width:100%;
 
-    width: 100%;
+    margin-bottom:7px;
 
-    margin-bottom: 0.8mm;
+    font-size:11px;
+    line-height:1.05;
 
-    font-size: 7.2px;
+    font-weight:800;
 
-    line-height: 1.05;
+    letter-spacing:-0.2px;
 
-    font-weight: 800;
+    text-transform:uppercase;
 
-    letter-spacing: -0.1px;
+    color:#000000;
 
-    text-transform: uppercase;
-
-    color: #000000;
-
+    overflow:hidden;
 }
 
 
-/* =================================================
+/* =========================================================
    SIZE
-   ================================================= */
+========================================================= */
 
-.thermal-size-row {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 1.2mm;
-
-    margin-bottom: 1mm;
-
-    color: #000000;
-
+.thermal-size-row strong{
+    font-size:14px;
 }
 
 
-.thermal-size-row strong {
-
-    font-size: 9.5px;
-
-    line-height: 1;
-
-    font-weight: 700;
-
-}
-
-
-.thermal-bottle-icon {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-
-.thermal-bottle-icon svg {
-
-    width: 3.6mm;
-
-    height: 3.6mm;
-
-    fill: none;
-
-    stroke: #000000;
-
-    stroke-width: 1.6;
-
-    stroke-linecap: round;
-
-    stroke-linejoin: round;
-
-}
-
-
-/* =================================================
-   BEST BEFORE
-   ================================================= */
-
-.thermal-best-before {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 0.8mm;
-
-    margin-bottom: 1mm;
-
-    color: #000000;
-
-}
-
-
-.thermal-calendar-icon {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-
-.thermal-calendar-icon svg {
-
-    width: 3.6mm;
-
-    height: 3.6mm;
-
-    fill: none;
-
-    stroke: #000000;
-
-    stroke-width: 1.6;
-
-    stroke-linecap: round;
-
-    stroke-linejoin: round;
-
-}
-
-
-.thermal-best-before span {
-
-    font-size: 7.5px;
-
-    line-height: 1;
-
-    font-weight: 700;
-
-}
-
-
-.thermal-best-before strong {
-
-    font-size: 7.5px;
-
-    line-height: 1;
-
-    font-weight: 500;
-
-}
-
-
-/* =================================================
+/* =========================================================
    QR
-   ================================================= */
+========================================================= */
 
-.thermal-qr {
+.thermal-qr{
+    display:flex;
 
-    display: flex;
+    align-items:center;
+    justify-content:center;
 
-    align-items: center;
+    width:113px;
+    height:113px;
 
-    justify-content: center;
+    margin:0 auto 7px;
 
-    width: 23mm;
-
-    height: 23mm;
-
-    margin:
-        0 auto
-        0.7mm;
-
-    flex-shrink: 0;
-
+    flex-shrink:0;
 }
 
 
 .thermal-qr img,
-.thermal-qr canvas {
+.thermal-qr canvas{
+    display:block;
 
-    display: block;
+    width:113px !important;
+    height:113px !important;
 
-    width: 23mm !important;
-
-    height: 23mm !important;
-
-    max-width: 23mm !important;
-
-    max-height: 23mm !important;
-
+    max-width:113px !important;
+    max-height:113px !important;
 }
 
 
-/* =================================================
+/* =========================================================
    TRACE CODE
-   ================================================= */
+========================================================= */
 
-.thermal-code {
+.thermal-code{
+    width:100%;
 
-    width: 100%;
+    font-size:8px;
+    line-height:1.1;
 
-    font-size: 5.8px;
+    font-weight:500;
 
-    line-height: 1;
+    letter-spacing:0.1px;
 
-    font-weight: 500;
+    color:#000000;
 
-    letter-spacing: 0;
+    white-space:nowrap;
 
-    color: #000000;
+    text-align:center;
 
-    white-space: nowrap;
-
-    text-align: center;
-
-    overflow: hidden;
-
+    overflow:hidden;
 }
 
 
-/* =================================================
-   PRINT PAGE
-   PENTING:
-   Browser dipaksa membuat halaman 58mm × 60mm
-   ================================================= */
+/* =========================================================
+   PRINT SIZE
+========================================================= */
 
-@page {
-
-    size: 58mm 60mm;
-
-    margin: 0;
-
+@page{
+    size:219px 227px;
+    margin:0;
 }
 
 
-/* =================================================
-   PRINT MODE
-   ================================================= */
-
-@media print {
+@media print{
 
     html,
-    body {
-
-        width: 58mm;
-
-        height: 60mm;
-
-        min-width: 58mm;
-        max-width: 58mm;
-
-        min-height: 60mm;
-        max-height: 60mm;
-
-        margin: 0;
-
-        padding: 0;
-
-        background: #FFFFFF;
-
+    body{
+        width:219px !important;
+        margin:0 !important;
+        padding:0 !important;
     }
 
 
-    body {
+    .thermal-label{
+        width:219px !important;
+        height:227px !important;
+        min-height:227px !important;
+        max-height:227px !important;
 
-        overflow: hidden;
+        margin:0 !important;
+        padding:10px 10px 8px 10px !important;
 
-    }
+        page-break-after:always;
 
-
-    .thermal-label {
-
-        width: 58mm;
-
-        height: 60mm;
-
-        min-width: 58mm;
-        max-width: 58mm;
-
-        min-height: 60mm;
-        max-height: 60mm;
-
-        box-sizing: border-box;
-
-        margin: 0;
-
-        padding:
-            1.2mm
-            2.5mm
-            1.2mm
-            2.5mm;
-
-        page-break-after: always;
-
-        break-after: page;
-
-        overflow: hidden;
-
+        overflow:hidden !important;
     }
 
 }
