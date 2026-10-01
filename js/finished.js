@@ -3644,35 +3644,37 @@ if (unitStatusButton) {
         String(newStatus)
             .toUpperCase();
 
-    const confirmed =
-        window.confirm(
-            `Ubah Bottle #${unit.unit_number} menjadi ${label}?`
-        );
+const confirmed =
+    window.confirm(
+        `Ubah Bottle #${unit.unit_number} menjadi ${label}?`
+    );
 
-    if (!confirmed) {
 
-        return;
+if (!confirmed) {
 
-    }
+    return;
 
-    if (
-        newStatus !==
-        "done"
-    ) {
+}
 
-        showToast(
-            "Untuk test pertama, gunakan tombol DONE."
-        );
 
-        return;
+let reason = "";
 
-    }
 
-    const reason =
+/*
+ * DONE
+ */
+
+if (
+    newStatus ===
+    "done"
+) {
+
+    reason =
         window.prompt(
             "Keterangan distribusi / pengiriman:",
             "Dikirim ke toko"
         );
+
 
     if (
         reason === null
@@ -3682,11 +3684,68 @@ if (unitStatusButton) {
 
     }
 
-    await updateFinishedUnitStatus(
-        unitId,
-        newStatus,
-        reason.trim()
-    );
+}
+
+
+/*
+ * DAMAGED
+ */
+
+if (
+    newStatus ===
+    "damaged"
+) {
+
+    reason =
+        window.prompt(
+            "Alasan bottle damaged:",
+            "Bottle rusak"
+        );
+
+
+    if (
+        reason === null
+    ) {
+
+        return;
+
+    }
+
+}
+
+
+/*
+ * EXPIRED
+ */
+
+if (
+    newStatus ===
+    "expired"
+) {
+
+    reason =
+        window.prompt(
+            "Keterangan expired:",
+            "Produk melewati tanggal expiry"
+        );
+
+
+    if (
+        reason === null
+    ) {
+
+        return;
+
+    }
+
+}
+
+
+await updateFinishedUnitStatus(
+    unitId,
+    newStatus,
+    String(reason || "").trim()
+);
 
     return;
 
