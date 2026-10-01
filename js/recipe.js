@@ -1,10 +1,19 @@
 /* =========================================================
-   MERAMU RECIPE STUDIO
-   H1 — RECIPE LIST
-   H2 — CREATE RECIPE
+   MERAMU — RECIPE STUDIO
+   ---------------------------------------------------------
+   H1  Recipe List
+   H2  Create Recipe
+   H3  Recipe Detail
+   ---------------------------------------------------------
+   IMPORTANT:
+   Recipe = MASTER FORMULA
+   Production = EXECUTION / BATCH
+
+   H3 tidak mengubah Recipe Version / Ingredients lama.
+   Perubahan formula akan dilakukan melalui H4 Version.
 ========================================================= */
 
-(function(){
+(function () {
 
     "use strict";
 
@@ -25,17 +34,16 @@
 
     let ingredientRows = 0;
 
+    let activeDetailRecipeId = null;
+
 
     /* =====================================================
        SUPABASE
     ===================================================== */
 
-    function waitForSupabase(
-        callback,
-        attempt = 0
-    ){
+    function waitForSupabase(callback, attempt = 0) {
 
-        if(window.supabaseClient){
+        if (window.supabaseClient) {
 
             callback(
                 window.supabaseClient
@@ -46,7 +54,7 @@
         }
 
 
-        if(attempt >= 50){
+        if (attempt >= 50) {
 
             showError(
                 "Supabase client tidak tersedia."
@@ -73,15 +81,15 @@
 
 
     /* =====================================================
-       HELPERS
+       GENERAL HELPERS
     ===================================================== */
 
-    function escapeHtml(value){
+    function escapeHtml(value) {
 
-        if(
+        if (
             value === null ||
             value === undefined
-        ){
+        ) {
 
             return "";
 
@@ -89,22 +97,22 @@
 
 
         return String(value)
-            .replaceAll("&","&amp;")
-            .replaceAll("<","&lt;")
-            .replaceAll(">","&gt;")
-            .replaceAll('"',"&quot;")
-            .replaceAll("'","&#039;");
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
 
     }
 
 
-    function formatNumber(value){
+    function formatNumber(value) {
 
-        if(
+        if (
             value === null ||
             value === undefined ||
             value === ""
-        ){
+        ) {
 
             return "—";
 
@@ -115,7 +123,7 @@
             Number(value);
 
 
-        if(Number.isNaN(number)){
+        if (Number.isNaN(number)) {
 
             return escapeHtml(value);
 
@@ -125,20 +133,20 @@
         return new Intl.NumberFormat(
             "id-ID",
             {
-                maximumFractionDigits:2
+                maximumFractionDigits: 3
             }
         ).format(number);
 
     }
 
 
-    function formatCurrency(value){
+    function formatCurrency(value) {
 
-        if(
+        if (
             value === null ||
             value === undefined ||
             value === ""
-        ){
+        ) {
 
             return "—";
 
@@ -149,7 +157,7 @@
             Number(value);
 
 
-        if(Number.isNaN(number)){
+        if (Number.isNaN(number)) {
 
             return "—";
 
@@ -159,26 +167,26 @@
         return new Intl.NumberFormat(
             "id-ID",
             {
-                style:"currency",
-                currency:"IDR",
-                maximumFractionDigits:0
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0
             }
         ).format(number);
 
     }
 
 
-    function getCurrentVersion(recipe){
+    function getCurrentVersion(recipe) {
 
         const versions =
             Array.isArray(
-                recipe.recipe_versions
+                recipe?.recipe_versions
             )
                 ? recipe.recipe_versions
                 : [];
 
 
-        if(!versions.length){
+        if (!versions.length) {
 
             return null;
 
@@ -187,7 +195,7 @@
 
         return [...versions]
             .sort(
-                (a,b) =>
+                (a, b) =>
                     Number(
                         b.version_number || 0
                     )
@@ -200,50 +208,76 @@
     }
 
 
-    function getRecipeStatus(recipe){
+    function getRecipeStatus(recipe) {
 
         return String(
-            recipe.status || "active"
+            recipe?.status || "active"
         ).toLowerCase();
 
     }
 
 
+    function refreshIcons() {
+
+        if (window.lucide) {
+
+            lucide.createIcons();
+
+        }
+
+    }
+
+
     /* =====================================================
-       UI STATES
+       PAGE ERROR / LOADING
     ===================================================== */
 
-    function showLoading(){
+    function showLoading() {
 
-        document.getElementById(
-            "recipeLoading"
-        )?.removeAttribute("hidden");
+        document
+            .getElementById("recipeLoading")
+            ?.removeAttribute("hidden");
 
-        document.getElementById(
-            "recipeError"
-        )?.setAttribute("hidden","");
 
-        document.getElementById(
-            "recipeEmpty"
-        )?.setAttribute("hidden","");
+        document
+            .getElementById("recipeError")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
-        document.getElementById(
-            "recipeList"
-        )?.setAttribute("hidden","");
+
+        document
+            .getElementById("recipeEmpty")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
+
+
+        document
+            .getElementById("recipeList")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
     }
 
 
-    function hideLoading(){
+    function hideLoading() {
 
-        document.getElementById(
-            "recipeLoading"
-        )?.setAttribute("hidden","");
+        document
+            .getElementById("recipeLoading")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
     }
 
 
-    function showError(message){
+    function showError(message) {
 
         hideLoading();
 
@@ -253,13 +287,14 @@
                 "recipeError"
             );
 
+
         const errorText =
             document.getElementById(
                 "recipeErrorMessage"
             );
 
 
-        if(errorText){
+        if (errorText) {
 
             errorText.textContent =
                 message ||
@@ -268,52 +303,67 @@
         }
 
 
-        error?.removeAttribute("hidden");
+        error?.removeAttribute(
+            "hidden"
+        );
 
 
-        document.getElementById(
-            "recipeEmpty"
-        )?.setAttribute("hidden","");
+        document
+            .getElementById("recipeEmpty")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
-        document.getElementById(
-            "recipeList"
-        )?.setAttribute("hidden","");
+
+        document
+            .getElementById("recipeList")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
 
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
+        refreshIcons();
 
     }
 
 
-    function showEmpty(){
+    function showEmpty() {
 
         hideLoading();
 
 
-        document.getElementById(
-            "recipeEmpty"
-        )?.removeAttribute("hidden");
+        document
+            .getElementById("recipeEmpty")
+            ?.removeAttribute(
+                "hidden"
+            );
 
-        document.getElementById(
-            "recipeError"
-        )?.setAttribute("hidden","");
 
-        document.getElementById(
-            "recipeList"
-        )?.setAttribute("hidden","");
+        document
+            .getElementById("recipeError")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
+
+
+        document
+            .getElementById("recipeList")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
     }
 
 
     /* =====================================================
-       LOAD RECIPE LIST
+       H1 — LOAD RECIPE LIST
     ===================================================== */
 
-    async function loadRecipes(){
+    async function loadRecipes() {
 
         showLoading();
 
@@ -321,7 +371,7 @@
         waitForSupabase(
             async supabase => {
 
-                try{
+                try {
 
                     const {
                         data,
@@ -334,13 +384,16 @@
                             id,
                             code,
                             name,
+                            description,
                             recipe_type,
                             status,
                             product_id,
+                            current_version_number,
                             recipe_versions (
                                 id,
                                 version_number,
                                 yield_quantity,
+                                yield_unit_id,
                                 fermentation_required,
                                 f1_target_days,
                                 f2_target_days,
@@ -351,12 +404,12 @@
                         .order(
                             "name",
                             {
-                                ascending:true
+                                ascending: true
                             }
                         );
 
 
-                    if(error){
+                    if (error) {
 
                         console.error(
                             "Recipe load error:",
@@ -388,15 +441,17 @@
 
                     renderRecipes();
 
-
-                }catch(error){
+                }
+                catch (error) {
 
                     console.error(
+                        "RECIPE LIST ERROR:",
                         error
                     );
 
                     showError(
-                        error.message
+                        error?.message ||
+                        "Gagal memuat recipe."
                     );
 
                 }
@@ -411,7 +466,7 @@
        SUMMARY
     ===================================================== */
 
-    function updateSummary(){
+    function updateSummary() {
 
         const total =
             recipes.length;
@@ -427,15 +482,22 @@
 
         const versions =
             recipes.reduce(
-                (sum,recipe) =>
-                    sum +
-                    (
+                (sum, recipe) => {
+
+                    const recipeVersions =
                         Array.isArray(
                             recipe.recipe_versions
                         )
-                            ? recipe.recipe_versions.length
-                            : 0
-                    ),
+                            ? recipe.recipe_versions
+                            : [];
+
+
+                    return (
+                        sum +
+                        recipeVersions.length
+                    );
+
+                },
                 0
             );
 
@@ -445,10 +507,12 @@
                 "recipeTotal"
             );
 
+
         const activeEl =
             document.getElementById(
                 "recipeActive"
             );
+
 
         const versionsEl =
             document.getElementById(
@@ -456,26 +520,37 @@
             );
 
 
-        if(totalEl)
+        if (totalEl) {
+
             totalEl.textContent =
                 formatNumber(total);
 
-        if(activeEl)
+        }
+
+
+        if (activeEl) {
+
             activeEl.textContent =
                 formatNumber(active);
 
-        if(versionsEl)
+        }
+
+
+        if (versionsEl) {
+
             versionsEl.textContent =
                 formatNumber(versions);
+
+        }
 
     }
 
 
     /* =====================================================
-       RENDER LIST
+       RENDER RECIPE LIST
     ===================================================== */
 
-    function renderRecipes(){
+    function renderRecipes() {
 
         const list =
             document.getElementById(
@@ -483,11 +558,14 @@
             );
 
 
-        if(!list)
+        if (!list) {
+
             return;
 
+        }
 
-        if(!filteredRecipes.length){
+
+        if (!filteredRecipes.length) {
 
             showEmpty();
 
@@ -496,16 +574,25 @@
         }
 
 
-        document.getElementById(
-            "recipeEmpty"
-        )?.setAttribute("hidden","");
+        document
+            .getElementById("recipeEmpty")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
-        document.getElementById(
-            "recipeError"
-        )?.setAttribute("hidden","");
+
+        document
+            .getElementById("recipeError")
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
 
-        list.removeAttribute("hidden");
+        list.removeAttribute(
+            "hidden"
+        );
 
 
         list.innerHTML =
@@ -516,16 +603,12 @@
                 .join("");
 
 
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
+        refreshIcons();
 
     }
 
 
-    function renderRecipeCard(recipe){
+    function renderRecipeCard(recipe) {
 
         const version =
             getCurrentVersion(
@@ -539,6 +622,21 @@
             );
 
 
+        const statusLabel =
+            status === "archived"
+                ? "Archived"
+                : "Active";
+
+
+        const type =
+            recipe.recipe_type ||
+            "";
+
+
+        const yieldValue =
+            version?.yield_quantity;
+
+
         return `
 
             <article
@@ -550,7 +648,9 @@
 
                     <div class="recipe-card-icon">
 
-                        <i data-lucide="flask-conical"></i>
+                        <i
+                            data-lucide="flask-conical"
+                        ></i>
 
                     </div>
 
@@ -566,15 +666,14 @@
                                 )}
                             </h3>
 
-                            <span class="
-                                recipe-status
-                                ${status}
-                            ">
-                                ${
-                                    status === "archived"
-                                        ? "Archived"
-                                        : "Active"
-                                }
+
+                            <span
+                                class="
+                                    recipe-status
+                                    ${escapeHtml(status)}
+                                "
+                            >
+                                ${statusLabel}
                             </span>
 
                         </div>
@@ -594,7 +693,9 @@
 
                             <span>
 
-                                <i data-lucide="layers"></i>
+                                <i
+                                    data-lucide="layers"
+                                ></i>
 
                                 ${
                                     version
@@ -609,28 +710,33 @@
 
                             <span>
 
-                                <i data-lucide="flask-conical"></i>
+                                <i
+                                    data-lucide="flask-conical"
+                                ></i>
 
                                 Yield ${
-                                    version
+                                    yieldValue !== undefined &&
+                                    yieldValue !== null
                                         ? formatNumber(
-                                            version.yield_quantity
+                                            yieldValue
                                           )
                                         : "—"
-                                } L
+                                }
 
                             </span>
 
 
                             ${
-                                recipe.recipe_type
+                                type
                                     ? `
                                         <span>
 
-                                            <i data-lucide="tag"></i>
+                                            <i
+                                                data-lucide="tag"
+                                            ></i>
 
                                             ${escapeHtml(
-                                                recipe.recipe_type
+                                                type
                                             )}
 
                                         </span>
@@ -667,10 +773,12 @@
                             class="icon-detail-btn"
                             data-action="view"
                             data-id="${escapeHtml(recipe.id)}"
-                            title="Lihat resep"
+                            title="Lihat recipe"
                         >
 
-                            <i data-lucide="eye"></i>
+                            <i
+                                data-lucide="eye"
+                            ></i>
 
                         </button>
 
@@ -680,10 +788,12 @@
                             class="icon-detail-btn"
                             data-action="edit"
                             data-id="${escapeHtml(recipe.id)}"
-                            title="Edit resep"
+                            title="Edit recipe"
                         >
 
-                            <i data-lucide="pencil"></i>
+                            <i
+                                data-lucide="pencil"
+                            ></i>
 
                         </button>
 
@@ -696,7 +806,9 @@
                             title="Buat versi baru"
                         >
 
-                            <i data-lucide="git-branch"></i>
+                            <i
+                                data-lucide="git-branch"
+                            ></i>
 
                         </button>
 
@@ -715,7 +827,7 @@
        FILTER
     ===================================================== */
 
-    function applyFilters(){
+    function applyFilters() {
 
         const search =
             (
@@ -723,8 +835,8 @@
                     "recipeSearch"
                 )?.value || ""
             )
-            .trim()
-            .toLowerCase();
+                .trim()
+                .toLowerCase();
 
 
         const status =
@@ -742,14 +854,14 @@
                         String(
                             recipe.name || ""
                         )
-                        .toLowerCase();
+                            .toLowerCase();
 
 
                     const code =
                         String(
                             recipe.code || ""
                         )
-                        .toLowerCase();
+                            .toLowerCase();
 
 
                     const matchesSearch =
@@ -784,15 +896,15 @@
 
 
     /* =====================================================
-       LOAD FORM MASTER DATA
+       H2 — LOAD MASTER DATA
     ===================================================== */
 
-    async function loadFormData(){
+    async function loadFormData() {
 
         waitForSupabase(
             async supabase => {
 
-                try{
+                try {
 
                     const [
                         productResult,
@@ -815,7 +927,7 @@
                             .order(
                                 "name",
                                 {
-                                    ascending:true
+                                    ascending: true
                                 }
                             ),
 
@@ -836,7 +948,7 @@
                             .order(
                                 "name",
                                 {
-                                    ascending:true
+                                    ascending: true
                                 }
                             ),
 
@@ -851,28 +963,41 @@
                             .order(
                                 "name",
                                 {
-                                    ascending:true
+                                    ascending: true
                                 }
                             )
 
                     ]);
 
 
-                    if(productResult.error)
+                    if (productResult.error) {
+
                         throw productResult.error;
 
-                    if(ingredientResult.error)
+                    }
+
+
+                    if (ingredientResult.error) {
+
                         throw ingredientResult.error;
 
-                    if(unitResult.error)
+                    }
+
+
+                    if (unitResult.error) {
+
                         throw unitResult.error;
+
+                    }
 
 
                     products =
                         productResult.data || [];
 
+
                     ingredients =
                         ingredientResult.data || [];
+
 
                     units =
                         unitResult.data || [];
@@ -884,7 +1009,8 @@
 
                     resetIngredientRows();
 
-                }catch(error){
+                }
+                catch (error) {
 
                     console.error(
                         "Recipe master data error:",
@@ -892,7 +1018,7 @@
                     );
 
                     showFormError(
-                        error.message ||
+                        error?.message ||
                         "Gagal mengambil master data."
                     );
 
@@ -904,7 +1030,7 @@
     }
 
 
-    function populateProductSelect(){
+    function populateProductSelect() {
 
         const select =
             document.getElementById(
@@ -912,8 +1038,11 @@
             );
 
 
-        if(!select)
+        if (!select) {
+
             return;
+
+        }
 
 
         select.innerHTML = `
@@ -923,24 +1052,33 @@
             </option>
 
             ${
-                products.map(
-                    product => `
+                products
+                    .map(
+                        product => `
 
-                        <option
-                            value="${escapeHtml(product.id)}"
-                        >
-                            ${escapeHtml(
-                                product.name
-                            )}
-                            ${
-                                product.code
-                                    ? ` (${escapeHtml(product.code)})`
-                                    : ""
-                            }
-                        </option>
+                            <option
+                                value="${escapeHtml(
+                                    product.id
+                                )}"
+                            >
 
-                    `
-                ).join("")
+                                ${escapeHtml(
+                                    product.name
+                                )}
+
+                                ${
+                                    product.code
+                                        ? ` (${escapeHtml(
+                                            product.code
+                                          )})`
+                                        : ""
+                                }
+
+                            </option>
+
+                        `
+                    )
+                    .join("")
             }
 
         `;
@@ -948,7 +1086,7 @@
     }
 
 
-    function populateUnitSelect(){
+    function populateUnitSelect() {
 
         const select =
             document.getElementById(
@@ -956,8 +1094,11 @@
             );
 
 
-        if(!select)
+        if (!select) {
+
             return;
+
+        }
 
 
         select.innerHTML = `
@@ -967,25 +1108,34 @@
             </option>
 
             ${
-                units.map(
-                    unit => `
+                units
+                    .map(
+                        unit => `
 
-                        <option
-                            value="${escapeHtml(unit.id)}"
-                        >
-                            ${escapeHtml(
-                                unit.name ||
-                                unit.code
-                            )}
-                            ${
-                                unit.code
-                                    ? ` (${escapeHtml(unit.code)})`
-                                    : ""
-                            }
-                        </option>
+                            <option
+                                value="${escapeHtml(
+                                    unit.id
+                                )}"
+                            >
 
-                    `
-                ).join("")
+                                ${escapeHtml(
+                                    unit.name ||
+                                    unit.code
+                                )}
+
+                                ${
+                                    unit.code
+                                        ? ` (${escapeHtml(
+                                            unit.code
+                                          )})`
+                                        : ""
+                                }
+
+                            </option>
+
+                        `
+                    )
+                    .join("")
             }
 
         `;
@@ -993,26 +1143,33 @@
 
         const liter =
             units.find(
-                unit =>
-                    String(
-                        unit.code || ""
-                    ).toLowerCase() === "l"
-                    ||
-                    String(
-                        unit.code || ""
-                    ).toLowerCase() === "liter"
-                    ||
-                    String(
-                        unit.name || ""
-                    ).toLowerCase() === "liter"
-                    ||
-                    String(
-                        unit.name || ""
-                    ).toLowerCase() === "liter"
+                unit => {
+
+                    const code =
+                        String(
+                            unit.code || ""
+                        )
+                            .toLowerCase();
+
+
+                    const name =
+                        String(
+                            unit.name || ""
+                        )
+                            .toLowerCase();
+
+
+                    return (
+                        code === "l" ||
+                        code === "liter" ||
+                        name === "liter"
+                    );
+
+                }
             );
 
 
-        if(liter){
+        if (liter) {
 
             select.value =
                 liter.id;
@@ -1023,10 +1180,10 @@
 
 
     /* =====================================================
-       INGREDIENT ROWS
+       H2 — INGREDIENT ROWS
     ===================================================== */
 
-    function resetIngredientRows(){
+    function resetIngredientRows() {
 
         ingredientRows = 0;
 
@@ -1037,8 +1194,11 @@
             );
 
 
-        if(!container)
+        if (!container) {
+
             return;
+
+        }
 
 
         container.innerHTML = "";
@@ -1046,13 +1206,12 @@
 
         updateIngredientEmpty();
 
-
         addIngredientRow();
 
     }
 
 
-    function addIngredientRow(){
+    function addIngredientRow() {
 
         ingredientRows++;
 
@@ -1067,8 +1226,11 @@
             );
 
 
-        if(!container)
+        if (!container) {
+
             return;
+
+        }
 
 
         const row =
@@ -1087,10 +1249,10 @@
 
         row.innerHTML = `
 
-            <div class="recipe-ingredient-number">
-
+            <div
+                class="recipe-ingredient-number"
+            >
                 ${rowId}
-
             </div>
 
 
@@ -1111,31 +1273,36 @@
                     </option>
 
                     ${
-                        ingredients.map(
-                            ingredient => `
+                        ingredients
+                            .map(
+                                ingredient => `
 
-                                <option
-                                    value="${escapeHtml(
-                                        ingredient.id
-                                    )}"
-                                    data-default-unit="${escapeHtml(
-                                        ingredient.default_unit_id || ""
-                                    )}"
-                                >
-                                    ${escapeHtml(
-                                        ingredient.name
-                                    )}
-                                    ${
-                                        ingredient.code
-                                            ? ` (${escapeHtml(
-                                                ingredient.code
-                                              )})`
-                                            : ""
-                                    }
-                                </option>
+                                    <option
+                                        value="${escapeHtml(
+                                            ingredient.id
+                                        )}"
+                                        data-default-unit="${escapeHtml(
+                                            ingredient.default_unit_id || ""
+                                        )}"
+                                    >
 
-                            `
-                        ).join("")
+                                        ${escapeHtml(
+                                            ingredient.name
+                                        )}
+
+                                        ${
+                                            ingredient.code
+                                                ? ` (${escapeHtml(
+                                                    ingredient.code
+                                                  )})`
+                                                : ""
+                                        }
+
+                                    </option>
+
+                                `
+                            )
+                            .join("")
                     }
 
                 </select>
@@ -1179,29 +1346,34 @@
                     </option>
 
                     ${
-                        units.map(
-                            unit => `
+                        units
+                            .map(
+                                unit => `
 
-                                <option
-                                    value="${escapeHtml(
-                                        unit.id
-                                    )}"
-                                >
-                                    ${escapeHtml(
-                                        unit.name ||
-                                        unit.code
-                                    )}
-                                    ${
-                                        unit.code
-                                            ? ` (${escapeHtml(
-                                                unit.code
-                                              )})`
-                                            : ""
-                                    }
-                                </option>
+                                    <option
+                                        value="${escapeHtml(
+                                            unit.id
+                                        )}"
+                                    >
 
-                            `
-                        ).join("")
+                                        ${escapeHtml(
+                                            unit.name ||
+                                            unit.code
+                                        )}
+
+                                        ${
+                                            unit.code
+                                                ? ` (${escapeHtml(
+                                                    unit.code
+                                                  )})`
+                                                : ""
+                                        }
+
+                                    </option>
+
+                                `
+                            )
+                            .join("")
                     }
 
                 </select>
@@ -1215,7 +1387,9 @@
                 title="Hapus bahan"
             >
 
-                <i data-lucide="trash-2"></i>
+                <i
+                    data-lucide="trash-2"
+                ></i>
 
             </button>
 
@@ -1253,10 +1427,10 @@
                     );
 
 
-                if(
+                if (
                     defaultUnit &&
                     unitSelect
-                ){
+                ) {
 
                     unitSelect.value =
                         defaultUnit;
@@ -1285,17 +1459,12 @@
 
         updateIngredientEmpty();
 
-
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
+        refreshIcons();
 
     }
 
 
-    function renumberIngredientRows(){
+    function renumberIngredientRows() {
 
         const rows =
             document.querySelectorAll(
@@ -1304,7 +1473,7 @@
 
 
         rows.forEach(
-            (row,index) => {
+            (row, index) => {
 
                 const number =
                     row.querySelector(
@@ -1312,7 +1481,7 @@
                     );
 
 
-                if(number){
+                if (number) {
 
                     number.textContent =
                         index + 1;
@@ -1325,12 +1494,13 @@
     }
 
 
-    function updateIngredientEmpty(){
+    function updateIngredientEmpty() {
 
         const container =
             document.getElementById(
                 "recipeIngredients"
             );
+
 
         const empty =
             document.getElementById(
@@ -1346,7 +1516,7 @@
                 .length || 0;
 
 
-        if(empty){
+        if (empty) {
 
             empty.hidden =
                 count > 0;
@@ -1357,10 +1527,10 @@
 
 
     /* =====================================================
-       AUTO RECIPE CODE
+       H2 — AUTO RECIPE CODE
     ===================================================== */
 
-    function generateRecipeCode(name){
+    function generateRecipeCode(name) {
 
         const clean =
             String(name || "")
@@ -1380,23 +1550,23 @@
                 );
 
 
-        if(!clean){
+        if (!clean) {
 
             return "";
 
         }
 
 
-        return `REC-${clean.substring(0,24)}`;
+        return `REC-${clean.substring(0, 24)}`;
 
     }
 
 
     /* =====================================================
-       MODAL
+       H2 — OPEN CREATE RECIPE
     ===================================================== */
 
-    function openRecipeModal(){
+    function openRecipeModal() {
 
         const modal =
             document.getElementById(
@@ -1404,8 +1574,11 @@
             );
 
 
-        if(!modal)
+        if (!modal) {
+
             return;
+
+        }
 
 
         modal.removeAttribute(
@@ -1430,20 +1603,46 @@
         form?.reset();
 
 
-        document.getElementById(
-            "recipeYield"
-        ).value = "1";
+        const yieldInput =
+            document.getElementById(
+                "recipeYield"
+            );
 
 
-        document.getElementById(
-            "recipeType"
-        ).value =
-            "fermentation";
+        if (yieldInput) {
+
+            yieldInput.value =
+                "1";
+
+        }
 
 
-        document.getElementById(
-            "fermentationRequired"
-        ).checked = true;
+        const typeSelect =
+            document.getElementById(
+                "recipeType"
+            );
+
+
+        if (typeSelect) {
+
+            typeSelect.value =
+                "fermentation";
+
+        }
+
+
+        const fermentation =
+            document.getElementById(
+                "fermentationRequired"
+            );
+
+
+        if (fermentation) {
+
+            fermentation.checked =
+                true;
+
+        }
 
 
         document.getElementById(
@@ -1473,16 +1672,25 @@
             );
 
 
-        if(code)
-            code.value = "";
+        if (code) {
+
+            code.value =
+                "";
+
+            delete code.dataset.manual;
+
+        }
 
 
-        if(name)
-            name.value = "";
+        if (name) {
+
+            name.value =
+                "";
+
+        }
 
 
         updateFermentationVisibility();
-
 
         loadFormData();
 
@@ -1499,7 +1707,7 @@
     }
 
 
-    function closeRecipeModal(){
+    function closeRecipeModal() {
 
         const modal =
             document.getElementById(
@@ -1507,8 +1715,11 @@
             );
 
 
-        if(!modal)
+        if (!modal) {
+
             return;
+
+        }
 
 
         modal.setAttribute(
@@ -1525,10 +1736,10 @@
 
 
     /* =====================================================
-       FORM ERROR
+       H2 — FORM ERROR
     ===================================================== */
 
-    function showFormError(message){
+    function showFormError(message) {
 
         const box =
             document.getElementById(
@@ -1536,14 +1747,25 @@
             );
 
 
-        if(!box)
+        if (!box) {
+
             return;
 
+        }
 
-        box.querySelector(
-            "span"
-        ).textContent =
-            message;
+
+        const text =
+            box.querySelector(
+                "span"
+            );
+
+
+        if (text) {
+
+            text.textContent =
+                message;
+
+        }
 
 
         box.removeAttribute(
@@ -1551,32 +1773,30 @@
         );
 
 
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
+        refreshIcons();
 
     }
 
 
-    function clearFormError(){
+    function clearFormError() {
 
-        document.getElementById(
-            "recipeFormError"
-        )?.setAttribute(
-            "hidden",
-            ""
-        );
+        document
+            .getElementById(
+                "recipeFormError"
+            )
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
 
     }
 
 
     /* =====================================================
-       FERMENTATION TOGGLE
+       H2 — FERMENTATION TOGGLE
     ===================================================== */
 
-    function updateFermentationVisibility(){
+    function updateFermentationVisibility() {
 
         const checkbox =
             document.getElementById(
@@ -1590,15 +1810,16 @@
             );
 
 
-        if(
+        if (
             checkbox?.checked
-        ){
+        ) {
 
             fields?.removeAttribute(
                 "hidden"
             );
 
-        }else{
+        }
+        else {
 
             fields?.setAttribute(
                 "hidden",
@@ -1611,10 +1832,10 @@
 
 
     /* =====================================================
-       SAVE RECIPE
+       H2 — SAVE RECIPE
     ===================================================== */
 
-    async function saveRecipe(){
+    async function saveRecipe() {
 
         clearFormError();
 
@@ -1625,10 +1846,14 @@
             );
 
 
-        const originalText =
+        const buttonText =
             button?.querySelector(
                 "span"
-            )?.textContent ||
+            );
+
+
+        const originalText =
+            buttonText?.textContent ||
             "Simpan Recipe";
 
 
@@ -1641,8 +1866,7 @@
         const code =
             document.getElementById(
                 "recipeCode"
-            ).value.trim()
-            .toUpperCase();
+            ).value.trim().toUpperCase();
 
 
         const productId =
@@ -1721,7 +1945,7 @@
            VALIDATION
         ------------------------------------------------- */
 
-        if(!name){
+        if (!name) {
 
             showFormError(
                 "Nama recipe wajib diisi."
@@ -1732,7 +1956,7 @@
         }
 
 
-        if(!code){
+        if (!code) {
 
             showFormError(
                 "Recipe code wajib diisi."
@@ -1743,7 +1967,7 @@
         }
 
 
-        if(!productId){
+        if (!productId) {
 
             showFormError(
                 "Product wajib dipilih."
@@ -1754,10 +1978,10 @@
         }
 
 
-        if(
+        if (
             !yieldQuantity ||
             yieldQuantity <= 0
-        ){
+        ) {
 
             showFormError(
                 "Yield harus lebih besar dari 0."
@@ -1768,7 +1992,7 @@
         }
 
 
-        if(!yieldUnitId){
+        if (!yieldUnitId) {
 
             showFormError(
                 "Unit yield wajib dipilih."
@@ -1779,13 +2003,13 @@
         }
 
 
-        if(
+        if (
             fermentationRequired &&
             (
                 f1Target < 0 ||
                 f2Target < 0
             )
-        ){
+        ) {
 
             showFormError(
                 "Target fermentasi tidak valid."
@@ -1804,7 +2028,7 @@
             ];
 
 
-        if(!rows.length){
+        if (!rows.length) {
 
             showFormError(
                 "Tambahkan minimal satu ingredient."
@@ -1819,11 +2043,11 @@
             [];
 
 
-        for(
+        for (
             let index = 0;
             index < rows.length;
             index++
-        ){
+        ) {
 
             const row =
                 rows[index];
@@ -1849,10 +2073,12 @@
                 )?.value;
 
 
-            if(!ingredientId){
+            if (!ingredientId) {
 
                 showFormError(
-                    `Ingredient nomor ${index + 1} belum dipilih.`
+                    `Ingredient nomor ${
+                        index + 1
+                    } belum dipilih.`
                 );
 
                 return;
@@ -1860,13 +2086,15 @@
             }
 
 
-            if(
+            if (
                 !quantity ||
                 quantity <= 0
-            ){
+            ) {
 
                 showFormError(
-                    `Quantity ingredient nomor ${index + 1} tidak valid.`
+                    `Quantity ingredient nomor ${
+                        index + 1
+                    } tidak valid.`
                 );
 
                 return;
@@ -1874,10 +2102,12 @@
             }
 
 
-            if(!unitId){
+            if (!unitId) {
 
                 showFormError(
-                    `Unit ingredient nomor ${index + 1} belum dipilih.`
+                    `Unit ingredient nomor ${
+                        index + 1
+                    } belum dipilih.`
                 );
 
                 return;
@@ -1901,30 +2131,25 @@
 
 
         /* -------------------------------------------------
-           BUTTON STATE
+           BUTTON LOADING
         ------------------------------------------------- */
 
-        if(button){
+        if (button) {
 
-            button.disabled = true;
+            button.disabled =
+                true;
 
             button.classList.add(
                 "is-loading"
             );
 
-
-            const span =
-                button.querySelector(
-                    "span"
-                );
+        }
 
 
-            if(span){
+        if (buttonText) {
 
-                span.textContent =
-                    "Menyimpan...";
-
-            }
+            buttonText.textContent =
+                "Menyimpan...";
 
         }
 
@@ -1936,10 +2161,11 @@
                     null;
 
 
-                try{
+                try {
 
                     /* =====================================
-                       1. CREATE RECIPE
+                       STEP 1
+                       CREATE RECIPE
                     ===================================== */
 
                     const {
@@ -1980,7 +2206,7 @@
                         .single();
 
 
-                    if(recipeError){
+                    if (recipeError) {
 
                         throw recipeError;
 
@@ -1992,7 +2218,8 @@
 
 
                     /* =====================================
-                       2. CREATE VERSION 1
+                       STEP 2
+                       CREATE VERSION 1
                     ===================================== */
 
                     const {
@@ -2054,7 +2281,7 @@
                         .single();
 
 
-                    if(versionError){
+                    if (versionError) {
 
                         throw versionError;
 
@@ -2062,7 +2289,8 @@
 
 
                     /* =====================================
-                       3. CREATE INGREDIENTS
+                       STEP 3
+                       CREATE INGREDIENTS
                     ===================================== */
 
                     const ingredientRows =
@@ -2099,7 +2327,7 @@
                         );
 
 
-                    if(ingredientError){
+                    if (ingredientError) {
 
                         throw ingredientError;
 
@@ -2112,16 +2340,14 @@
 
                     closeRecipeModal();
 
-
                     await loadRecipes();
-
 
                     showSuccessMessage(
                         "Recipe berhasil dibuat."
                     );
 
-
-                }catch(error){
+                }
+                catch (error) {
 
                     console.error(
                         "CREATE RECIPE ERROR:",
@@ -2130,29 +2356,25 @@
 
 
                     /*
-                       Best-effort rollback.
-                       Hanya recipe yang dibuat pada proses
-                       ini yang akan dicoba dihapus.
-                    */
+                     * Best effort rollback.
+                     */
 
-                    if(createdRecipeId){
+                    if (createdRecipeId) {
 
-                        try{
+                        try {
 
                             await supabase
-
                                 .from("recipes")
-
                                 .delete()
-
                                 .eq(
                                     "id",
                                     createdRecipeId
                                 );
 
-                        }catch(
+                        }
+                        catch (
                             rollbackError
-                        ){
+                        ) {
 
                             console.error(
                                 "Rollback error:",
@@ -2169,9 +2391,10 @@
                         "Recipe gagal disimpan."
                     );
 
-                }finally{
+                }
+                finally {
 
-                    if(button){
+                    if (button) {
 
                         button.disabled =
                             false;
@@ -2180,19 +2403,13 @@
                             "is-loading"
                         );
 
-
-                        const span =
-                            button.querySelector(
-                                "span"
-                            );
+                    }
 
 
-                        if(span){
+                    if (buttonText) {
 
-                            span.textContent =
-                                originalText;
-
-                        }
+                        buttonText.textContent =
+                            originalText;
 
                     }
 
@@ -2205,10 +2422,10 @@
 
 
     /* =====================================================
-       SUCCESS TOAST
+       H2 — SUCCESS TOAST
     ===================================================== */
 
-    function showSuccessMessage(message){
+    function showSuccessMessage(message) {
 
         let toast =
             document.getElementById(
@@ -2216,7 +2433,7 @@
             );
 
 
-        if(!toast){
+        if (!toast) {
 
             toast =
                 document.createElement(
@@ -2241,7 +2458,9 @@
 
         toast.innerHTML = `
 
-            <i data-lucide="circle-check"></i>
+            <i
+                data-lucide="circle-check"
+            ></i>
 
             <span>
                 ${escapeHtml(message)}
@@ -2255,11 +2474,7 @@
         );
 
 
-        if(window.lucide){
-
-            lucide.createIcons();
-
-        }
+        refreshIcons();
 
 
         setTimeout(
@@ -2277,13 +2492,1075 @@
 
 
     /* =====================================================
-       ACTIONS
+       H3 — RECIPE DETAIL
+    ===================================================== */
+
+    async function openRecipeDetail(id) {
+
+        activeDetailRecipeId =
+            id;
+
+
+        const modal =
+            document.getElementById(
+                "recipeDetailModal"
+            );
+
+
+        if (!modal) {
+
+            console.error(
+                "recipeDetailModal tidak ditemukan."
+            );
+
+            return;
+
+        }
+
+
+        modal.removeAttribute(
+            "hidden"
+        );
+
+
+        document.body.classList.add(
+            "recipe-modal-open"
+        );
+
+
+        const loading =
+            document.getElementById(
+                "recipeDetailLoading"
+            );
+
+
+        const content =
+            document.getElementById(
+                "recipeDetailContent"
+            );
+
+
+        const error =
+            document.getElementById(
+                "recipeDetailError"
+            );
+
+
+        loading?.removeAttribute(
+            "hidden"
+        );
+
+
+        content?.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        error?.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        waitForSupabase(
+            async supabase => {
+
+                try {
+
+                    /* =====================================
+                       1. LOAD RECIPE
+                    ===================================== */
+
+                    const {
+                        data: recipe,
+                        error: recipeError
+                    } = await supabase
+
+                        .from("recipes")
+
+                        .select(`
+                            id,
+                            code,
+                            name,
+                            description,
+                            recipe_type,
+                            status,
+                            product_id,
+                            current_version_number
+                        `)
+
+                        .eq(
+                            "id",
+                            id
+                        )
+
+                        .single();
+
+
+                    if (recipeError) {
+
+                        throw recipeError;
+
+                    }
+
+
+                    /* =====================================
+                       2. LOAD PRODUCT
+                    ===================================== */
+
+                    let product = null;
+
+
+                    if (recipe.product_id) {
+
+                        const {
+                            data,
+                            error
+                        } = await supabase
+
+                            .from("products")
+
+                            .select(`
+                                id,
+                                code,
+                                name
+                            `)
+
+                            .eq(
+                                "id",
+                                recipe.product_id
+                            )
+
+                            .maybeSingle();
+
+
+                        if (error) {
+
+                            throw error;
+
+                        }
+
+
+                        product =
+                            data;
+
+                    }
+
+
+                    /* =====================================
+                       3. LOAD VERSION
+                    ===================================== */
+
+                    const {
+                        data: versions,
+                        error: versionError
+                    } = await supabase
+
+                        .from(
+                            "recipe_versions"
+                        )
+
+                        .select(`
+                            id,
+                            version_number,
+                            yield_quantity,
+                            yield_unit_id,
+                            fermentation_required,
+                            f1_target_days,
+                            f2_target_days,
+                            shelf_life_days,
+                            notes,
+                            status
+                        `)
+
+                        .eq(
+                            "recipe_id",
+                            id
+                        )
+
+                        .order(
+                            "version_number",
+                            {
+                                ascending: false
+                            }
+                        );
+
+
+                    if (versionError) {
+
+                        throw versionError;
+
+                    }
+
+
+                    const version =
+                        Array.isArray(versions) &&
+                        versions.length
+                            ? versions[0]
+                            : null;
+
+
+                    /* =====================================
+                       4. LOAD YIELD UNIT
+                    ===================================== */
+
+                    let yieldUnit = null;
+
+
+                    if (
+                        version?.yield_unit_id
+                    ) {
+
+                        const {
+                            data,
+                            error
+                        } = await supabase
+
+                            .from("units")
+
+                            .select(`
+                                id,
+                                code,
+                                name
+                            `)
+
+                            .eq(
+                                "id",
+                                version.yield_unit_id
+                            )
+
+                            .maybeSingle();
+
+
+                        if (error) {
+
+                            throw error;
+
+                        }
+
+
+                        yieldUnit =
+                            data;
+
+                    }
+
+
+                    /* =====================================
+                       5. LOAD INGREDIENT ROWS
+                    ===================================== */
+
+                    let recipeIngredients =
+                        [];
+
+
+                    if (version?.id) {
+
+                        const {
+                            data,
+                            error
+                        } = await supabase
+
+                            .from(
+                                "recipe_ingredients"
+                            )
+
+                            .select(`
+                                id,
+                                ingredient_id,
+                                quantity,
+                                unit_id
+                            `)
+
+                            .eq(
+                                "recipe_version_id",
+                                version.id
+                            );
+
+
+                        if (error) {
+
+                            throw error;
+
+                        }
+
+
+                        recipeIngredients =
+                            data || [];
+
+                    }
+
+
+                    /* =====================================
+                       6. LOAD INGREDIENT MASTER DATA
+                    ===================================== */
+
+                    if (
+                        recipeIngredients.length
+                    ) {
+
+                        const ingredientIds =
+                            [
+                                ...new Set(
+                                    recipeIngredients
+                                        .map(
+                                            item =>
+                                                item.ingredient_id
+                                        )
+                                        .filter(Boolean)
+                                )
+                            ];
+
+
+                        const unitIds =
+                            [
+                                ...new Set(
+                                    recipeIngredients
+                                        .map(
+                                            item =>
+                                                item.unit_id
+                                        )
+                                        .filter(Boolean)
+                                )
+                            ];
+
+
+                        let ingredientMap =
+                            new Map();
+
+
+                        let unitMap =
+                            new Map();
+
+
+                        if (
+                            ingredientIds.length
+                        ) {
+
+                            const {
+                                data,
+                                error
+                            } = await supabase
+
+                                .from(
+                                    "ingredients"
+                                )
+
+                                .select(`
+                                    id,
+                                    code,
+                                    name
+                                `)
+
+                                .in(
+                                    "id",
+                                    ingredientIds
+                                );
+
+
+                            if (error) {
+
+                                throw error;
+
+                            }
+
+
+                            (data || [])
+                                .forEach(
+                                    item => {
+
+                                        ingredientMap.set(
+                                            String(
+                                                item.id
+                                            ),
+                                            item
+                                        );
+
+                                    }
+                                );
+
+                        }
+
+
+                        if (
+                            unitIds.length
+                        ) {
+
+                            const {
+                                data,
+                                error
+                            } = await supabase
+
+                                .from("units")
+
+                                .select(`
+                                    id,
+                                    code,
+                                    name
+                                `)
+
+                                .in(
+                                    "id",
+                                    unitIds
+                                );
+
+
+                            if (error) {
+
+                                throw error;
+
+                            }
+
+
+                            (data || [])
+                                .forEach(
+                                    item => {
+
+                                        unitMap.set(
+                                            String(
+                                                item.id
+                                            ),
+                                            item
+                                        );
+
+                                    }
+                                );
+
+                        }
+
+
+                        recipeIngredients =
+                            recipeIngredients.map(
+                                item => ({
+
+                                    ...item,
+
+                                    ingredient:
+                                        ingredientMap.get(
+                                            String(
+                                                item.ingredient_id
+                                            )
+                                        ) || null,
+
+                                    unit:
+                                        unitMap.get(
+                                            String(
+                                                item.unit_id
+                                            )
+                                        ) || null
+
+                                })
+                            );
+
+                    }
+
+
+                    /* =====================================
+                       7. RENDER
+                    ===================================== */
+
+                    renderRecipeDetail({
+
+                        recipe,
+
+                        product,
+
+                        version,
+
+                        yieldUnit,
+
+                        ingredients:
+                            recipeIngredients
+
+                    });
+
+
+                    loading?.setAttribute(
+                        "hidden",
+                        ""
+                    );
+
+
+                    content?.removeAttribute(
+                        "hidden"
+                    );
+
+
+                    refreshIcons();
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "RECIPE DETAIL ERROR:",
+                        error
+                    );
+
+
+                    loading?.setAttribute(
+                        "hidden",
+                        ""
+                    );
+
+
+                    showRecipeDetailError(
+                        error?.message ||
+                        "Gagal memuat detail recipe."
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       H3 — RENDER DETAIL
+    ===================================================== */
+
+    function renderRecipeDetail(data) {
+
+        const {
+            recipe,
+            product,
+            version,
+            yieldUnit,
+            ingredients: recipeIngredients
+        } = data;
+
+
+        /* ---------------------------------------------
+           HEADER
+        --------------------------------------------- */
+
+        setText(
+            "recipeDetailTitle",
+            recipe.name ||
+            "Recipe"
+        );
+
+
+        setText(
+            "recipeDetailSubtitle",
+            recipe.code ||
+            "Master formula"
+        );
+
+
+        /* ---------------------------------------------
+           IDENTITY
+        --------------------------------------------- */
+
+        setText(
+            "detailRecipeName",
+            recipe.name ||
+            "—"
+        );
+
+
+        setText(
+            "detailRecipeCode",
+            recipe.code ||
+            "—"
+        );
+
+
+        setText(
+            "detailRecipeProduct",
+            product?.name ||
+            "—"
+        );
+
+
+        setText(
+            "detailRecipeType",
+            recipe.recipe_type ||
+            "—"
+        );
+
+
+        setText(
+            "detailRecipeVersion",
+            version
+                ? `v${version.version_number}`
+                : "Belum ada"
+        );
+
+
+        /* ---------------------------------------------
+           STATUS
+        --------------------------------------------- */
+
+        const status =
+            String(
+                recipe.status ||
+                "active"
+            ).toLowerCase();
+
+
+        const statusElement =
+            document.getElementById(
+                "detailRecipeStatus"
+            );
+
+
+        if (statusElement) {
+
+            statusElement.textContent =
+                status === "archived"
+                    ? "Archived"
+                    : "Active";
+
+
+            statusElement.className =
+                `recipe-status ${status}`;
+
+        }
+
+
+        /* ---------------------------------------------
+           DESCRIPTION
+        --------------------------------------------- */
+
+        const descriptionBox =
+            document.getElementById(
+                "detailRecipeDescriptionBox"
+            );
+
+
+        const description =
+            recipe.description ||
+            "";
+
+
+        if (description) {
+
+            descriptionBox?.removeAttribute(
+                "hidden"
+            );
+
+
+            setText(
+                "detailRecipeDescription",
+                description
+            );
+
+        }
+        else {
+
+            descriptionBox?.setAttribute(
+                "hidden",
+                ""
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           VERSION
+        --------------------------------------------- */
+
+        setText(
+            "detailVersionNumber",
+            version
+                ? `v${version.version_number}`
+                : "—"
+        );
+
+
+        setText(
+            "detailVersionYield",
+            version
+                ? `${formatNumber(
+                    version.yield_quantity
+                )} ${
+                    yieldUnit?.code ||
+                    yieldUnit?.name ||
+                    ""
+                }`
+                : "—"
+        );
+
+
+        setText(
+            "detailVersionFermentation",
+            version
+                ? (
+                    version.fermentation_required
+                        ? "Required"
+                        : "Tidak"
+                )
+                : "—"
+        );
+
+
+        setText(
+            "detailVersionShelfLife",
+            version
+                ? `${formatNumber(
+                    version.shelf_life_days
+                )} hari`
+                : "—"
+        );
+
+
+        /* ---------------------------------------------
+           F1 / F2
+        --------------------------------------------- */
+
+        setText(
+            "detailF1",
+            version &&
+            version.fermentation_required
+                ? `${formatNumber(
+                    version.f1_target_days
+                )} hari`
+                : "—"
+        );
+
+
+        setText(
+            "detailF2",
+            version &&
+            version.fermentation_required
+                ? `${formatNumber(
+                    version.f2_target_days
+                )} hari`
+                : "—"
+        );
+
+
+        /* ---------------------------------------------
+           INGREDIENTS
+        --------------------------------------------- */
+
+        renderRecipeDetailIngredients(
+            recipeIngredients
+        );
+
+    }
+
+
+    function setText(
+        elementId,
+        value
+    ) {
+
+        const element =
+            document.getElementById(
+                elementId
+            );
+
+
+        if (element) {
+
+            element.textContent =
+                value ??
+                "—";
+
+        }
+
+    }
+
+
+    function renderRecipeDetailIngredients(
+        recipeIngredients
+    ) {
+
+        const container =
+            document.getElementById(
+                "recipeDetailIngredients"
+            );
+
+
+        if (!container) {
+
+            return;
+
+        }
+
+
+        if (
+            !Array.isArray(
+                recipeIngredients
+            ) ||
+            !recipeIngredients.length
+        ) {
+
+            container.innerHTML = `
+
+                <div
+                    class="recipe-ingredient-empty"
+                >
+
+                    <i
+                        data-lucide="package-open"
+                    ></i>
+
+                    <span>
+                        Belum ada ingredient
+                        pada version ini.
+                    </span>
+
+                </div>
+
+            `;
+
+
+            refreshIcons();
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            recipeIngredients
+                .map(
+                    (item, index) => {
+
+                        const ingredient =
+                            item.ingredient;
+
+
+                        const unit =
+                            item.unit;
+
+
+                        const ingredientName =
+                            ingredient?.name ||
+                            "Ingredient";
+
+
+                        const ingredientCode =
+                            ingredient?.code ||
+                            "";
+
+
+                        const unitLabel =
+                            unit?.code ||
+                            unit?.name ||
+                            "";
+
+
+                        return `
+
+                            <div
+                                class="
+                                    recipe-detail-ingredient
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        recipe-detail-ingredient-number
+                                    "
+                                >
+                                    ${index + 1}
+                                </div>
+
+
+                                <div
+                                    class="
+                                        recipe-detail-ingredient-name
+                                    "
+                                >
+
+                                    <strong>
+
+                                        ${escapeHtml(
+                                            ingredientName
+                                        )}
+
+                                    </strong>
+
+
+                                    ${
+                                        ingredientCode
+                                            ? `
+                                                <span>
+
+                                                    ${escapeHtml(
+                                                        ingredientCode
+                                                    )}
+
+                                                </span>
+                                              `
+                                            : ""
+                                    }
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        recipe-detail-ingredient-qty
+                                    "
+                                >
+
+                                    ${formatNumber(
+                                        item.quantity
+                                    )}
+
+                                    ${
+                                        unitLabel
+                                            ? ` ${escapeHtml(
+                                                unitLabel
+                                              )}`
+                                            : ""
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+
+        refreshIcons();
+
+    }
+
+
+    /* =====================================================
+       H3 — DETAIL ERROR
+    ===================================================== */
+
+    function showRecipeDetailError(
+        message
+    ) {
+
+        const error =
+            document.getElementById(
+                "recipeDetailError"
+            );
+
+
+        if (!error) {
+
+            return;
+
+        }
+
+
+        const text =
+            error.querySelector(
+                "span"
+            );
+
+
+        if (text) {
+
+            text.textContent =
+                message;
+        }
+
+
+        error.removeAttribute(
+            "hidden"
+        );
+
+
+        refreshIcons();
+
+    }
+
+
+    /* =====================================================
+       H3 — CLOSE DETAIL
+    ===================================================== */
+
+    function closeRecipeDetail() {
+
+        document
+            .getElementById(
+                "recipeDetailModal"
+            )
+            ?.setAttribute(
+                "hidden",
+                ""
+            );
+
+
+        document.body.classList.remove(
+            "recipe-modal-open"
+        );
+
+
+        activeDetailRecipeId =
+            null;
+
+    }
+
+
+    /* =====================================================
+       H3 — EDIT
+       -----------------------------------------------------
+       Untuk H3 kita belum overwrite formula.
+       Edit master information akan kita sambungkan
+       ke Edit Form setelah detail sudah tervalidasi.
+    ===================================================== */
+
+    function handleEditRecipe() {
+
+        if (!activeDetailRecipeId) {
+
+            return;
+
+        }
+
+
+        closeRecipeDetail();
+
+
+        alert(
+            "Edit Recipe akan kita sambungkan pada form Edit H3."
+        );
+
+    }
+
+
+    /* =====================================================
+       H4 PLACEHOLDER
+    ===================================================== */
+
+    function handleNewRecipeVersion() {
+
+        if (!activeDetailRecipeId) {
+
+            return;
+
+        }
+
+
+        alert(
+            "Recipe Version akan kita kerjakan pada H4."
+        );
+
+    }
+
+
+    /* =====================================================
+       RECIPE ACTIONS
     ===================================================== */
 
     function handleRecipeAction(
         action,
         id
-    ){
+    ) {
+
+        if (!id) {
+
+            return;
+
+        }
+
 
         const recipe =
             recipes.find(
@@ -2293,42 +3570,50 @@
             );
 
 
-        if(!recipe)
-            return;
-
-
-        if(action === "view"){
-
-            console.log(
-                "Recipe View:",
-                recipe
-            );
-
-            alert(
-                "Recipe Detail kita lanjutkan setelah H2."
-            );
+        if (!recipe) {
 
             return;
 
         }
 
 
-        if(action === "edit"){
+        switch (action) {
 
-            alert(
-                "Edit Recipe akan kita kerjakan di H3."
-            );
+            case "view":
 
-            return;
+                openRecipeDetail(
+                    id
+                );
 
-        }
+                break;
 
 
-        if(action === "version"){
+            case "edit":
 
-            alert(
-                "Recipe Version akan kita kerjakan di H4."
-            );
+                /*
+                 * H3 Edit akan menggunakan
+                 * master recipe information.
+                 */
+
+                openRecipeDetail(
+                    id
+                );
+
+                break;
+
+
+            case "version":
+
+                openRecipeDetail(
+                    id
+                );
+
+                break;
+
+
+            default:
+
+                break;
 
         }
 
@@ -2339,167 +3624,264 @@
        EVENTS
     ===================================================== */
 
-    function bindEvents(){
+    function bindEvents() {
 
-        document.getElementById(
-            "recipeSearch"
-        )?.addEventListener(
-            "input",
-            applyFilters
-        );
+        /* ---------------------------------------------
+           SEARCH
+        --------------------------------------------- */
 
-
-        document.getElementById(
-            "recipeStatusFilter"
-        )?.addEventListener(
-            "change",
-            applyFilters
-        );
+        document
+            .getElementById(
+                "recipeSearch"
+            )
+            ?.addEventListener(
+                "input",
+                applyFilters
+            );
 
 
-        document.getElementById(
-            "recipeRetryButton"
-        )?.addEventListener(
-            "click",
-            loadRecipes
-        );
+        /* ---------------------------------------------
+           STATUS FILTER
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "recipeStatusFilter"
+            )
+            ?.addEventListener(
+                "change",
+                applyFilters
+            );
 
 
-        document.getElementById(
-            "createRecipeButton"
-        )?.addEventListener(
-            "click",
-            openRecipeModal
-        );
+        /* ---------------------------------------------
+           RETRY
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "recipeRetryButton"
+            )
+            ?.addEventListener(
+                "click",
+                loadRecipes
+            );
 
 
-        document.getElementById(
-            "closeRecipeModal"
-        )?.addEventListener(
-            "click",
-            closeRecipeModal
-        );
+        /* ---------------------------------------------
+           CREATE RECIPE
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "createRecipeButton"
+            )
+            ?.addEventListener(
+                "click",
+                openRecipeModal
+            );
 
 
-        document.getElementById(
-            "cancelRecipeButton"
-        )?.addEventListener(
-            "click",
-            closeRecipeModal
-        );
+        /* ---------------------------------------------
+           CLOSE CREATE MODAL
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "closeRecipeModal"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeModal
+            );
 
 
-        document.querySelector(
-            ".recipe-modal-backdrop"
-        )?.addEventListener(
-            "click",
-            closeRecipeModal
-        );
+        document
+            .getElementById(
+                "cancelRecipeButton"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeModal
+            );
 
 
-        document.getElementById(
-            "addIngredientButton"
-        )?.addEventListener(
-            "click",
-            addIngredientRow
-        );
+        document
+            .querySelector(
+                "#recipeModal .recipe-modal-backdrop"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeModal
+            );
 
 
-        document.getElementById(
-            "fermentationRequired"
-        )?.addEventListener(
-            "change",
-            updateFermentationVisibility
-        );
+        /* ---------------------------------------------
+           ADD INGREDIENT
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "addIngredientButton"
+            )
+            ?.addEventListener(
+                "click",
+                addIngredientRow
+            );
 
 
-        document.getElementById(
-            "recipeName"
-        )?.addEventListener(
-            "input",
-            event => {
+        /* ---------------------------------------------
+           FERMENTATION
+        --------------------------------------------- */
 
-                const code =
-                    document.getElementById(
-                        "recipeCode"
-                    );
-
-
-                if(
-                    code &&
-                    !code.dataset.manual
-                ){
-
-                    code.value =
-                        generateRecipeCode(
-                            event.target.value
-                        );
-
-                }
-
-            }
-        );
+        document
+            .getElementById(
+                "fermentationRequired"
+            )
+            ?.addEventListener(
+                "change",
+                updateFermentationVisibility
+            );
 
 
-        document.getElementById(
-            "recipeCode"
-        )?.addEventListener(
-            "input",
-            event => {
+        /* ---------------------------------------------
+           AUTO RECIPE CODE
+        --------------------------------------------- */
 
-                event.target.dataset.manual =
-                    event.target.value
-                        .trim()
-                        .length
-                        ? "true"
-                        : "";
+        document
+            .getElementById(
+                "recipeName"
+            )
+            ?.addEventListener(
+                "input",
+                event => {
 
-            }
-        );
-
-
-        document.getElementById(
-            "createRecipeForm"
-        )?.addEventListener(
-            "submit",
-            event => {
-
-                event.preventDefault();
-
-                saveRecipe();
-
-            }
-        );
-
-
-        document.addEventListener(
-            "keydown",
-            event => {
-
-                if(
-                    event.key === "Escape"
-                ){
-
-                    const modal =
+                    const code =
                         document.getElementById(
-                            "recipeModal"
+                            "recipeCode"
                         );
 
 
-                    if(
-                        modal &&
-                        !modal.hidden
-                    ){
+                    if (
+                        code &&
+                        !code.dataset.manual
+                    ) {
 
-                        closeRecipeModal();
+                        code.value =
+                            generateRecipeCode(
+                                event.target.value
+                            );
 
                     }
 
                 }
+            );
 
-            }
-        );
 
+        document
+            .getElementById(
+                "recipeCode"
+            )
+            ?.addEventListener(
+                "input",
+                event => {
+
+                    event.target.dataset.manual =
+                        event.target.value
+                            .trim()
+                            .length
+                            ? "true"
+                            : "";
+
+                }
+            );
+
+
+        /* ---------------------------------------------
+           CREATE FORM SUBMIT
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "createRecipeForm"
+            )
+            ?.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+                    saveRecipe();
+
+                }
+            );
+
+
+        /* ---------------------------------------------
+           DETAIL MODAL CLOSE
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "closeRecipeDetail"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeDetail
+            );
+
+
+        document
+            .getElementById(
+                "closeRecipeDetailBottom"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeDetail
+            );
+
+
+        document
+            .querySelector(
+                "#recipeDetailModal .recipe-modal-backdrop"
+            )
+            ?.addEventListener(
+                "click",
+                closeRecipeDetail
+            );
+
+
+        /* ---------------------------------------------
+           DETAIL → EDIT
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "editRecipeFromDetail"
+            )
+            ?.addEventListener(
+                "click",
+                handleEditRecipe
+            );
+
+
+        /* ---------------------------------------------
+           DETAIL → NEW VERSION
+        --------------------------------------------- */
+
+        document
+            .getElementById(
+                "newRecipeVersionFromDetail"
+            )
+            ?.addEventListener(
+                "click",
+                handleNewRecipeVersion
+            );
+
+
+        /* ---------------------------------------------
+           GLOBAL RECIPE ACTION
+        --------------------------------------------- */
 
         document.addEventListener(
             "click",
@@ -2511,14 +3893,71 @@
                     );
 
 
-                if(!button)
+                if (!button) {
+
                     return;
+
+                }
 
 
                 handleRecipeAction(
                     button.dataset.action,
                     button.dataset.id
                 );
+
+            }
+        );
+
+
+        /* ---------------------------------------------
+           ESCAPE
+        --------------------------------------------- */
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key !== "Escape"
+                ) {
+
+                    return;
+
+                }
+
+
+                const createModal =
+                    document.getElementById(
+                        "recipeModal"
+                    );
+
+
+                const detailModal =
+                    document.getElementById(
+                        "recipeDetailModal"
+                    );
+
+
+                if (
+                    createModal &&
+                    !createModal.hidden
+                ) {
+
+                    closeRecipeModal();
+
+                    return;
+
+                }
+
+
+                if (
+                    detailModal &&
+                    !detailModal.hidden
+                ) {
+
+                    closeRecipeDetail();
+
+                }
 
             }
         );
@@ -2530,7 +3969,7 @@
        INIT
     ===================================================== */
 
-    function initRecipePage(){
+    function initRecipePage() {
 
         bindEvents();
 
@@ -2540,6 +3979,10 @@
 
     }
 
+
+    /* =====================================================
+       PUBLIC
+    ===================================================== */
 
     window.initRecipePage =
         initRecipePage;
