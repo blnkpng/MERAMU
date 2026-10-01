@@ -504,8 +504,184 @@
 
 
     /* =====================================================
+   UPDATE FINISHED BATCH STATUS
+===================================================== */
+
+async function updateFinishedStatus(
+    newStatus,
+    reason = null
+) {
+
+    if (!selectedBatch) {
+
+        showToast(
+            "Finished Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const supabase =
+        getSupabaseClient();
+
+
+    const statusLabel =
+        String(newStatus || "")
+            .toUpperCase();
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabase.rpc(
+            "update_meramu_finished_status",
+            {
+                p_finished_batch_id:
+                    selectedBatch.id,
+
+                p_new_status:
+                    newStatus,
+
+                p_reason:
+                    reason
+            }
+        );
+
+
+        if (error) {
+
+            console.error(
+                "MERAMU Finished Status RPC Error:",
+                error
+            );
+
+            throw new Error(
+                error.message ||
+                "Gagal mengubah status Finished Batch."
+            );
+
+        }
+
+
+        /*
+         * RPC mengembalikan row
+         * finished_batches terbaru.
+         */
+
+        const updatedBatch =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+
+        if (!updatedBatch) {
+
+            throw new Error(
+                "Status berhasil diproses, tetapi data batch terbaru tidak diterima."
+            );
+
+        }
+
+
+        /*
+         * Update data lokal
+         */
+
+        const index =
+            finishedBatches.findIndex(
+                batch =>
+                    batch.id ===
+                    selectedBatch.id
+            );
+
+
+        if (index !== -1) {
+
+            finishedBatches[index] = {
+
+                ...finishedBatches[index],
+
+                ...updatedBatch
+
+            };
+
+        }
+
+
+        selectedBatch = {
+
+            ...selectedBatch,
+
+            ...updatedBatch
+
+        };
+
+
+        /*
+         * Update dropdown
+         */
+
+        const select =
+            $("finishedBatchSelect");
+
+
+        if (select) {
+
+            select.value =
+                selectedBatch.id;
+
+        }
+
+
+        /*
+         * Render ulang kartu batch
+         */
+
+        renderBatchInfo();
+
+
+        /*
+         * Jangan reload QR/unit.
+         * Data unit tidak berubah hanya
+         * karena status finished batch berubah.
+         */
+
+        showToast(
+            `Status batch menjadi ${statusLabel}.`
+        );
+
+
+        console.log(
+            "MERAMU: Finished Batch status updated:",
+            selectedBatch.finished_code,
+            selectedBatch.status
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "MERAMU update finished status error:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Gagal mengubah status batch."
+        );
+
+    }
+
+}
+
+/* =====================================================
    RENDER BATCH INFO
-   ===================================================== */
+===================================================== */
 
 function renderBatchInfo() {
 
@@ -535,8 +711,14 @@ function renderBatchInfo() {
 
 
     const status =
-        selectedBatch.status ||
-        "finished";
+        String(
+            selectedBatch.status ||
+            "finished"
+        ).toLowerCase();
+
+
+    const statusLabel =
+        status.toUpperCase();
 
 
     const quantity =
@@ -590,6 +772,279 @@ function renderBatchInfo() {
         "—";
 
 
+    /*
+     * STATUS ACTIONS
+     */
+
+    let statusActions = "";
+
+
+    if (status === "finished") {
+
+        statusActions = `
+
+            <div
+                style="
+                    display:flex;
+                    gap:8px;
+                    flex-wrap:wrap;
+                    margin-top:16px;
+                    padding-top:14px;
+                    border-top:1px solid rgba(4,103,56,.10);
+                "
+            >
+
+                <button
+                    type="button"
+                    class="finished-status-action"
+                    data-status-action="released"
+                    style="
+                        border:0;
+                        border-radius:11px;
+                        padding:9px 14px;
+                        background:#046738;
+                        color:#FFFFFF;
+                        font-family:Poppins,sans-serif;
+                        font-size:11px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    <i
+                        data-lucide="badge-check"
+                        style="
+                            width:14px;
+                            height:14px;
+                            vertical-align:-2px;
+                            margin-right:5px;
+                        "
+                    ></i>
+
+                    Release
+                </button>
+
+
+                <button
+                    type="button"
+                    class="finished-status-action"
+                    data-status-action="hold"
+                    style="
+                        border:1px solid #E5B94E;
+                        border-radius:11px;
+                        padding:9px 14px;
+                        background:#FFF9E8;
+                        color:#8A6500;
+                        font-family:Poppins,sans-serif;
+                        font-size:11px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    <i
+                        data-lucide="pause-circle"
+                        style="
+                            width:14px;
+                            height:14px;
+                            vertical-align:-2px;
+                            margin-right:5px;
+                        "
+                    ></i>
+
+                    Hold
+                </button>
+
+
+                <button
+                    type="button"
+                    class="finished-status-action"
+                    data-status-action="cancelled"
+                    style="
+                        border:1px solid #E5B7B7;
+                        border-radius:11px;
+                        padding:9px 14px;
+                        background:#FFF5F5;
+                        color:#A33A3A;
+                        font-family:Poppins,sans-serif;
+                        font-size:11px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    <i
+                        data-lucide="x-circle"
+                        style="
+                            width:14px;
+                            height:14px;
+                            vertical-align:-2px;
+                            margin-right:5px;
+                        "
+                    ></i>
+
+                    Cancel
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    else if (status === "hold") {
+
+        statusActions = `
+
+            <div
+                style="
+                    display:flex;
+                    gap:8px;
+                    flex-wrap:wrap;
+                    margin-top:16px;
+                    padding-top:14px;
+                    border-top:1px solid rgba(4,103,56,.10);
+                "
+            >
+
+                <button
+                    type="button"
+                    class="finished-status-action"
+                    data-status-action="released"
+                    style="
+                        border:0;
+                        border-radius:11px;
+                        padding:9px 14px;
+                        background:#046738;
+                        color:#FFFFFF;
+                        font-family:Poppins,sans-serif;
+                        font-size:11px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    <i
+                        data-lucide="badge-check"
+                        style="
+                            width:14px;
+                            height:14px;
+                            vertical-align:-2px;
+                            margin-right:5px;
+                        "
+                    ></i>
+
+                    Release
+                </button>
+
+
+                <button
+                    type="button"
+                    class="finished-status-action"
+                    data-status-action="cancelled"
+                    style="
+                        border:1px solid #E5B7B7;
+                        border-radius:11px;
+                        padding:9px 14px;
+                        background:#FFF5F5;
+                        color:#A33A3A;
+                        font-family:Poppins,sans-serif;
+                        font-size:11px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    <i
+                        data-lucide="x-circle"
+                        style="
+                            width:14px;
+                            height:14px;
+                            vertical-align:-2px;
+                            margin-right:5px;
+                        "
+                    ></i>
+
+                    Cancel
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+
+    else if (
+        status === "released"
+    ) {
+
+        statusActions = `
+
+            <div
+                style="
+                    margin-top:16px;
+                    padding-top:14px;
+                    border-top:1px solid rgba(4,103,56,.10);
+                    font-family:Poppins,sans-serif;
+                    font-size:11px;
+                    color:#668078;
+                "
+            >
+
+                <i
+                    data-lucide="lock-keyhole"
+                    style="
+                        width:14px;
+                        height:14px;
+                        vertical-align:-3px;
+                        margin-right:5px;
+                    "
+                ></i>
+
+                Batch sudah released dan
+                dikunci untuk perubahan status.
+
+            </div>
+
+        `;
+
+    }
+
+
+    else if (
+        status === "cancelled"
+    ) {
+
+        statusActions = `
+
+            <div
+                style="
+                    margin-top:16px;
+                    padding-top:14px;
+                    border-top:1px solid rgba(163,58,58,.10);
+                    font-family:Poppins,sans-serif;
+                    font-size:11px;
+                    color:#9A5C5C;
+                "
+            >
+
+                <i
+                    data-lucide="ban"
+                    style="
+                        width:14px;
+                        height:14px;
+                        vertical-align:-3px;
+                        margin-right:5px;
+                    "
+                ></i>
+
+                Batch sudah cancelled dan
+                dikunci untuk perubahan status.
+
+            </div>
+
+        `;
+
+    }
+
+
     el.style.display =
         "block";
 
@@ -632,7 +1087,7 @@ function renderBatchInfo() {
                 ></span>
 
                 ${escapeHtml(
-                    status
+                    statusLabel
                 )}
 
             </div>
@@ -653,14 +1108,19 @@ function renderBatchInfo() {
                 </span>
 
                 <strong>
+
                     ${quantity}
-                    <small style="
-                        font-size:10px;
-                        font-weight:500;
-                        margin-left:3px;
-                    ">
+
+                    <small
+                        style="
+                            font-size:10px;
+                            font-weight:500;
+                            margin-left:3px;
+                        "
+                    >
                         BOTOL
                     </small>
+
                 </strong>
 
             </div>
@@ -673,14 +1133,19 @@ function renderBatchInfo() {
                 </span>
 
                 <strong>
+
                     ${bottleSize}
-                    <small style="
-                        font-size:10px;
-                        font-weight:500;
-                        margin-left:3px;
-                    ">
+
+                    <small
+                        style="
+                            font-size:10px;
+                            font-weight:500;
+                            margin-left:3px;
+                        "
+                    >
                         ML
                     </small>
+
                 </strong>
 
             </div>
@@ -693,14 +1158,19 @@ function renderBatchInfo() {
                 </span>
 
                 <strong>
+
                     ${outputVolume}
-                    <small style="
-                        font-size:10px;
-                        font-weight:500;
-                        margin-left:3px;
-                    ">
+
+                    <small
+                        style="
+                            font-size:10px;
+                            font-weight:500;
+                            margin-left:3px;
+                        "
+                    >
                         L
                     </small>
+
                 </strong>
 
             </div>
@@ -713,34 +1183,23 @@ function renderBatchInfo() {
                 </span>
 
                 <strong>
+
                     ${wasteVolume}
-                    <small style="
-                        font-size:10px;
-                        font-weight:500;
-                        margin-left:3px;
-                    ">
+
+                    <small
+                        style="
+                            font-size:10px;
+                            font-weight:500;
+                            margin-left:3px;
+                        "
+                    >
                         L
                     </small>
+
                 </strong>
 
             </div>
 
-        </div>
-
-
-        <!-- =================================================
-             PRODUCTION DETAILS
-        ================================================== -->
-
-        <div
-            style="
-                display:grid;
-                grid-template-columns:
-                    repeat(2,minmax(0,1fr));
-                gap:10px;
-                margin-top:10px;
-            "
-        >
 
             <div class="finished-stat">
 
@@ -803,7 +1262,21 @@ function renderBatchInfo() {
 
         </div>
 
+
+        <!-- =================================================
+             STATUS ACTIONS
+        ================================================== -->
+
+        ${statusActions}
+
     `;
+
+
+    /*
+     * Render Lucide icons
+     */
+
+    createIcons();
 
 }
 
@@ -2501,15 +2974,200 @@ function renderBatchInfo() {
         }
 
 
-        document.addEventListener(
+       document.addEventListener(
             "click",
-            function (event) {
+            async function (event) {
 
                 const copyButton =
                     event.target.closest(
                         "[data-copy-trace]"
                     );
+const statusButton =
+    event.target.closest(
+        "[data-status-action]"
+    );
 
+
+if (statusButton) {
+
+    const newStatus =
+        statusButton.dataset.statusAction;
+
+
+    if (!selectedBatch) {
+
+        showToast(
+            "Finished Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const productName =
+        selectedBatch.product_name ||
+        selectedBatch.products?.name ||
+        "Finished Product";
+
+
+    const batchCode =
+        selectedBatch.finished_code ||
+        "Finished Batch";
+
+
+    /*
+     * RELEASE
+     */
+
+    if (
+        newStatus ===
+        "released"
+    ) {
+
+        const confirmed =
+            window.confirm(
+                `Release ${batchCode}?\n\n` +
+                `${productName}\n\n` +
+                `Setelah RELEASED, status batch ` +
+                `tidak dapat diubah lagi.`
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        await updateFinishedStatus(
+            "released",
+            "QC selesai dan produk siap dijual"
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * HOLD
+     */
+
+    if (
+        newStatus ===
+        "hold"
+    ) {
+
+        const reason =
+            window.prompt(
+                `Alasan HOLD untuk ${batchCode}:`,
+                "Menunggu pemeriksaan QC"
+            );
+
+
+        if (
+            reason === null
+        ) {
+
+            return;
+
+        }
+
+
+        const cleanReason =
+            reason.trim();
+
+
+        if (!cleanReason) {
+
+            showToast(
+                "Alasan HOLD wajib diisi."
+            );
+
+            return;
+
+        }
+
+
+        await updateFinishedStatus(
+            "hold",
+            cleanReason
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * CANCEL
+     */
+
+    if (
+        newStatus ===
+        "cancelled"
+    ) {
+
+        const reason =
+            window.prompt(
+                `Alasan CANCEL untuk ${batchCode}:`
+            );
+
+
+        if (
+            reason === null
+        ) {
+
+            return;
+
+        }
+
+
+        const cleanReason =
+            reason.trim();
+
+
+        if (!cleanReason) {
+
+            showToast(
+                "Alasan CANCEL wajib diisi."
+            );
+
+            return;
+
+        }
+
+
+        const confirmed =
+            window.confirm(
+                `Cancel ${batchCode}?\n\n` +
+                `Batch yang sudah CANCELLED ` +
+                `tidak dapat diaktifkan kembali.`
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        await updateFinishedStatus(
+            "cancelled",
+            cleanReason
+        );
+
+
+        return;
+
+    }
+
+}
 
                 if (copyButton) {
 
