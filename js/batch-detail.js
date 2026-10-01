@@ -5098,23 +5098,28 @@ return String(value)
 }
 
 /* =========================================================
-GET LABEL TRACE URL
+   GET BATCH TRACE URL
 ========================================================= */
 
 function getBatchTraceUrl(batch){
 
-if(!batch || !batch.code){
-    return "";
-}
+    if(
+        !batch ||
+        !batch.code
+    ){
+
+        return "";
+
+    }
 
 
-const baseUrl =
-    window.location.origin;
+    const baseUrl =
+        window.location.origin;
 
 
-return `${baseUrl}/trace/${encodeURIComponent(
-    batch.code
-)}`;
+    return `${baseUrl}/pages/trace.html?batch=${encodeURIComponent(
+        batch.code
+    )}`;
 
 }
 
