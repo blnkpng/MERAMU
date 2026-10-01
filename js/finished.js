@@ -504,73 +504,120 @@
 
 
     /* =====================================================
-       RENDER BATCH INFO
-    ===================================================== */
+   RENDER BATCH INFO
+   ===================================================== */
 
-    function renderBatchInfo() {
+function renderBatchInfo() {
 
-        const el =
-            $("finishedBatchInfo");
-
-
-        if (
-            !el ||
-            !selectedBatch
-        ) {
-
-            return;
-
-        }
+    const el =
+        $("finishedBatchInfo");
 
 
-        const product =
-            selectedBatch.products ||
-            {};
+    if (
+        !el ||
+        !selectedBatch
+    ) {
+
+        return;
+
+    }
 
 
-        const productName =
-            selectedBatch.product_name ||
-            product.name ||
-            "Finished Product";
+    const product =
+        selectedBatch.products ||
+        {};
 
 
-        el.style.display =
-            "block";
+    const productName =
+        selectedBatch.product_name ||
+        product.name ||
+        "Finished Product";
 
 
-        el.innerHTML = `
-
-            <div class="finished-batch-top">
-
-                <div>
-
-                    <h2 class="finished-batch-name">
-
-                        ${escapeHtml(
-                            productName
-                        )}
-
-                    </h2>
+    const status =
+        selectedBatch.status ||
+        "finished";
 
 
-                    <div class="finished-batch-code">
-
-                        ${escapeHtml(
-                            selectedBatch.finished_code
-                        )}
-
-                    </div>
-
-                </div>
+    const quantity =
+        formatNumber(
+            selectedBatch.quantity_bottles,
+            0
+        );
 
 
-                <div class="finished-status">
+    const bottleSize =
+        formatNumber(
+            selectedBatch.bottle_size_ml,
+            0
+        );
 
-                    <span class="finished-status-dot"></span>
+
+    const outputVolume =
+        formatNumber(
+            selectedBatch.output_volume,
+            2
+        );
+
+
+    const wasteVolume =
+        formatNumber(
+            selectedBatch.waste_volume,
+            2
+        );
+
+
+    const productionDate =
+        formatDate(
+            selectedBatch.production_date
+        );
+
+
+    const bestBeforeDate =
+        formatDate(
+            selectedBatch.best_before_date
+        );
+
+
+    const expiryDate =
+        formatDate(
+            selectedBatch.expiry_date
+        );
+
+
+    const operatorName =
+        selectedBatch.operator_name ||
+        "—";
+
+
+    el.style.display =
+        "block";
+
+
+    el.innerHTML = `
+
+        <!-- =================================================
+             BATCH HEADER
+        ================================================== -->
+
+        <div class="finished-batch-top">
+
+            <div>
+
+                <h2 class="finished-batch-name">
 
                     ${escapeHtml(
-                        selectedBatch.status ||
-                        "finished"
+                        productName
+                    )}
+
+                </h2>
+
+
+                <div class="finished-batch-code">
+
+                    ${escapeHtml(
+                        selectedBatch.finished_code ||
+                        "—"
                     )}
 
                 </div>
@@ -578,76 +625,187 @@
             </div>
 
 
-            <div class="finished-batch-grid">
+            <div class="finished-status">
 
-                <div class="finished-stat">
+                <span
+                    class="finished-status-dot"
+                ></span>
 
-                    <span>
-                        Bottles
-                    </span>
-
-                    <strong>
-                        ${formatNumber(
-                            selectedBatch.quantity_bottles,
-                            0
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="finished-stat">
-
-                    <span>
-                        Bottle Size
-                    </span>
-
-                    <strong>
-                        ${formatNumber(
-                            selectedBatch.bottle_size_ml,
-                            0
-                        )}
-                        ML
-                    </strong>
-
-                </div>
-
-
-                <div class="finished-stat">
-
-                    <span>
-                        Production
-                    </span>
-
-                    <strong>
-                        ${formatDate(
-                            selectedBatch.production_date
-                        )}
-                    </strong>
-
-                </div>
-
-
-                <div class="finished-stat">
-
-                    <span>
-                        Best Before
-                    </span>
-
-                    <strong>
-                        ${formatDate(
-                            selectedBatch.best_before_date
-                        )}
-                    </strong>
-
-                </div>
+                ${escapeHtml(
+                    status
+                )}
 
             </div>
 
-        `;
+        </div>
 
-    }
 
+        <!-- =================================================
+             PRIMARY STATS
+        ================================================== -->
+
+        <div class="finished-batch-grid">
+
+            <div class="finished-stat">
+
+                <span>
+                    Quantity
+                </span>
+
+                <strong>
+                    ${quantity}
+                    <small style="
+                        font-size:10px;
+                        font-weight:500;
+                        margin-left:3px;
+                    ">
+                        BOTOL
+                    </small>
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Bottle Size
+                </span>
+
+                <strong>
+                    ${bottleSize}
+                    <small style="
+                        font-size:10px;
+                        font-weight:500;
+                        margin-left:3px;
+                    ">
+                        ML
+                    </small>
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Output
+                </span>
+
+                <strong>
+                    ${outputVolume}
+                    <small style="
+                        font-size:10px;
+                        font-weight:500;
+                        margin-left:3px;
+                    ">
+                        L
+                    </small>
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Waste
+                </span>
+
+                <strong>
+                    ${wasteVolume}
+                    <small style="
+                        font-size:10px;
+                        font-weight:500;
+                        margin-left:3px;
+                    ">
+                        L
+                    </small>
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCTION DETAILS
+        ================================================== -->
+
+        <div
+            style="
+                display:grid;
+                grid-template-columns:
+                    repeat(2,minmax(0,1fr));
+                gap:10px;
+                margin-top:10px;
+            "
+        >
+
+            <div class="finished-stat">
+
+                <span>
+                    Production
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        productionDate
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Best Before
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        bestBeforeDate
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Expiry
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        expiryDate
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="finished-stat">
+
+                <span>
+                    Operator
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        operatorName
+                    )}
+                </strong>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
 
     /* =====================================================
        RENDER UNITS
