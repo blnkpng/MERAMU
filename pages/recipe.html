@@ -349,6 +349,590 @@
                         hidden
                     ></section>
 
+                    <!-- =====================================================
+     CREATE RECIPE MODAL
+===================================================== -->
+
+<div
+    id="recipeModal"
+    class="recipe-modal"
+    hidden
+>
+
+    <div class="recipe-modal-backdrop"></div>
+
+
+    <div
+        class="recipe-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recipeModalTitle"
+    >
+
+
+        <!-- HEADER -->
+
+        <div class="recipe-modal-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+
+                    <span class="live-dot"></span>
+
+                    RECIPE STUDIO
+
+                </div>
+
+                <h2 id="recipeModalTitle">
+                    Buat Recipe
+                </h2>
+
+                <p>
+                    Buat master formula baru untuk digunakan
+                    sebagai template Production.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="recipe-modal-close"
+                id="closeRecipeModal"
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+            id="createRecipeForm"
+            class="recipe-form"
+        >
+
+
+            <!-- BASIC INFORMATION -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="book-open"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Informasi Recipe
+                        </strong>
+
+                        <span>
+                            Identitas master formula
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeName">
+
+                            Nama Recipe
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeName"
+                            name="name"
+                            type="text"
+                            placeholder="Contoh: Telang Kombucha"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeCode">
+
+                            Recipe Code
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeCode"
+                            name="code"
+                            type="text"
+                            placeholder="REC-TELANG"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeProduct">
+
+                            Product
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeProduct"
+                            name="product_id"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih Product
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeType">
+
+                            Recipe Type
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeType"
+                            name="recipe_type"
+                            required
+                        >
+
+                            <option value="fermentation">
+                                Fermentation
+                            </option>
+
+                            <option value="direct">
+                                Direct
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="recipe-field full">
+
+                        <label for="recipeDescription">
+
+                            Deskripsi
+
+                        </label>
+
+                        <textarea
+                            id="recipeDescription"
+                            name="description"
+                            rows="3"
+                            placeholder="Catatan atau deskripsi recipe..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- YIELD -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="flask-conical"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Recipe Yield
+                        </strong>
+
+                        <span>
+                            Basis formula yang digunakan untuk scaling
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeYield">
+
+                            Basis Yield
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeYield"
+                            name="yield_quantity"
+                            type="number"
+                            min="0.001"
+                            step="0.001"
+                            value="1"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeYieldUnit">
+
+                            Unit
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeYieldUnit"
+                            name="yield_unit_id"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih Unit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INGREDIENTS -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title recipe-section-with-action">
+
+                    <div class="recipe-form-section-title-left">
+
+                        <div class="recipe-form-section-icon">
+
+                            <i data-lucide="layers-3"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Ingredients
+                            </strong>
+
+                            <span>
+                                Formula bahan untuk satu basis yield
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="recipe-small-btn"
+                        id="addIngredientButton"
+                    >
+
+                        <i data-lucide="plus"></i>
+
+                        Tambah Bahan
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="recipeIngredients"
+                    class="recipe-ingredients"
+                ></div>
+
+
+                <div
+                    id="recipeIngredientEmpty"
+                    class="recipe-ingredient-empty"
+                >
+
+                    <i data-lucide="package-open"></i>
+
+                    <span>
+                        Belum ada bahan.
+                        Klik <strong>Tambah Bahan</strong>.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FERMENTATION -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="timer"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Fermentation Setting
+                        </strong>
+
+                        <span>
+                            Target proses fermentasi recipe
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <label class="recipe-toggle-row">
+
+                    <input
+                        id="fermentationRequired"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span class="recipe-toggle"></span>
+
+                    <span class="recipe-toggle-content">
+
+                        <strong>
+                            Recipe membutuhkan fermentasi
+                        </strong>
+
+                        <small>
+                            Aktifkan jika recipe memiliki F1/F2.
+                        </small>
+
+                    </span>
+
+                </label>
+
+
+                <div
+                    id="fermentationFields"
+                    class="recipe-form-grid recipe-fermentation-fields"
+                >
+
+                    <div class="recipe-field">
+
+                        <label for="f1TargetDays">
+
+                            F1 Target
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="f1TargetDays"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="7"
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="f2TargetDays">
+
+                            F2 Target
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="f2TargetDays"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="5"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SHELF LIFE -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="calendar-clock"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Shelf Life
+                        </strong>
+
+                        <span>
+                            Umur simpan default recipe
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeShelfLife">
+
+                            Shelf Life
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="recipeShelfLife"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="30"
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeNotes">
+
+                            Notes
+
+                        </label>
+
+                        <input
+                            id="recipeNotes"
+                            type="text"
+                            placeholder="Catatan internal recipe..."
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="recipeFormError"
+                class="recipe-form-error"
+                hidden
+            >
+
+                <i data-lucide="triangle-alert"></i>
+
+                <span></span>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="recipe-modal-footer">
+
+                <button
+                    type="button"
+                    class="page-btn secondary"
+                    id="cancelRecipeButton"
+                >
+
+                    Batal
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="page-btn primary"
+                    id="saveRecipeButton"
+                >
+
+                    <i data-lucide="save"></i>
+
+                    <span>
+                        Simpan Recipe
+                    </span>
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
 
                 </div>
 
