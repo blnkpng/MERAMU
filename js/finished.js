@@ -2107,810 +2107,824 @@ function renderUnits() {
     }
 
 
+    /* =========================================================
+   THERMAL LABEL 58MM x 60MM
+   COMPACT VERSION
+   ========================================================= */
+
+function printThermalLabel(units) {
+
+    const items =
+        Array.isArray(units)
+            ? units
+            : [units];
+
+
+    if (!items.length) {
+
+        showToast(
+            "Tidak ada botol yang dipilih."
+        );
+
+        return;
+    }
+
+
     /* =====================================================
-       THERMAL LABEL 58MM
-       DESAIN MINIMAL SESUAI REFERENSI
-    ===================================================== */
+       PRODUCT DATA
+       ===================================================== */
 
-    function printThermalLabel(
-        units
-    ) {
-
-        const items =
-            Array.isArray(units)
-                ? units
-                : [units];
+    const product =
+        selectedBatch?.product_name ||
+        selectedBatch?.products?.name ||
+        "MERAMU";
 
 
-        if (
-            items.length === 0
-        ) {
-
-            return;
-
-        }
+    const bottleSize =
+        selectedBatch?.bottle_size_ml ||
+        items[0]?.bottle_size_ml ||
+        250;
 
 
-        const product =
-            selectedBatch?.product_name ||
-            selectedBatch?.products?.name ||
-            "MERAMU";
+    const bestBefore =
+        formatDate(
+            selectedBatch?.best_before_date
+        );
 
 
-        const bottleSize =
-            selectedBatch?.bottle_size_ml ||
-            items[0]?.bottle_size_ml ||
-            250;
+    /* =====================================================
+       TRACE URL
+       ===================================================== */
+
+    const traceBaseUrl =
+        window.location.origin +
+        "/pages/trace.html?code=";
 
 
-        const bestBefore =
-            formatDate(
-                selectedBatch?.best_before_date
-            );
+    /* =====================================================
+       BRAND ASSETS
+       ===================================================== */
+
+    const logoIconUrl =
+        window.location.origin +
+        "/assets/branding/logo-icon.png";
 
 
-        /*
-         * TRACE URL
-         */
-
-        const traceBaseUrl =
-            window.location.origin +
-            "/pages/trace.html?code=";
+    const logoTextUrl =
+        window.location.origin +
+        "/assets/branding/logo-text.png";
 
 
-        /*
-         * BRAND ASSETS
-         */
+    /* =====================================================
+       BUILD LABELS
+       ===================================================== */
 
-        const logoIconUrl =
-            window.location.origin +
-            "/assets/branding/logo-icon.png";
+    const labels =
+        items
+            .map(unit => {
 
-
-        const logoTextUrl =
-            window.location.origin +
-            "/assets/branding/logo-text.png";
+                const traceCode =
+                    unit.trace_code || "";
 
 
-        /*
-         * LABEL
-         */
+                return `
 
-        const labels =
-            items
-                .map(
-                    unit => {
+                    <div class="thermal-label">
 
-                        const traceCode =
-                            unit.trace_code ||
-                            "";
+                        <!-- BRAND -->
 
+                        <div class="thermal-brand">
 
-                        return `
-
-                            <div
-                                class="thermal-label"
+                            <img
+                                class="thermal-logo-icon"
+                                src="${logoIconUrl}"
+                                alt="MERAMU"
                             >
 
-                                <!-- ==========================
-                                     BRAND
-                                =========================== -->
+                            <img
+                                class="thermal-logo-text"
+                                src="${logoTextUrl}"
+                                alt="MERAMU"
+                            >
 
-                                <div
-                                    class="thermal-brand"
+                        </div>
+
+
+                        <!-- PRODUCT -->
+
+                        <div class="thermal-product">
+
+                            ${escapeHtml(product)}
+
+                        </div>
+
+
+                        <!-- SIZE -->
+
+                        <div class="thermal-size-row">
+
+                            <div class="thermal-bottle-icon">
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
                                 >
 
-                                    <img
-                                        class="thermal-logo-icon"
-                                        src="${logoIconUrl}"
-                                        alt="MERAMU"
-                                    >
+                                    <path
+                                        d="M9 2h6"
+                                    />
 
+                                    <path
+                                        d="M10 2v3l-1 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7l-1-2V2"
+                                    />
 
-                                    <img
-                                        class="thermal-logo-text"
-                                        src="${logoTextUrl}"
-                                        alt="MERAMU"
-                                    >
+                                    <path
+                                        d="M9 9h6"
+                                    />
 
-                                </div>
-
-
-                                <!-- ==========================
-                                     PRODUCT
-                                =========================== -->
-
-                                <div
-                                    class="thermal-product"
-                                >
-
-                                    ${escapeHtml(
-                                        product
-                                    )}
-
-                                </div>
-
-
-                                <!-- ==========================
-                                     SIZE
-                                =========================== -->
-
-                                <div
-                                    class="thermal-size-row"
-                                >
-
-                                    <div
-                                        class="thermal-bottle-icon"
-                                    >
-
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-
-                                            <path
-                                                d="M9 2h6"
-                                            />
-
-                                            <path
-                                                d="M10 2v3l-1 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7l-1-2V2"
-                                            />
-
-                                            <path
-                                                d="M9 9h6"
-                                            />
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <strong>
-
-                                        ${formatNumber(
-                                            bottleSize,
-                                            0
-                                        )}
-                                        ML
-
-                                    </strong>
-
-                                </div>
-
-
-                                <!-- ==========================
-                                     BEST BEFORE
-                                =========================== -->
-
-                                <div
-                                    class="thermal-best-before"
-                                >
-
-                                    <div
-                                        class="thermal-calendar-icon"
-                                    >
-
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-
-                                            <rect
-                                                x="3"
-                                                y="5"
-                                                width="18"
-                                                height="16"
-                                                rx="2"
-                                            />
-
-                                            <path
-                                                d="M16 3v4"
-                                            />
-
-                                            <path
-                                                d="M8 3v4"
-                                            />
-
-                                            <path
-                                                d="M3 10h18"
-                                            />
-
-                                            <path
-                                                d="M8 14h.01"
-                                            />
-
-                                            <path
-                                                d="M12 14h.01"
-                                            />
-
-                                            <path
-                                                d="M16 14h.01"
-                                            />
-
-                                            <path
-                                                d="M8 17h.01"
-                                            />
-
-                                            <path
-                                                d="M12 17h.01"
-                                            />
-
-                                            <path
-                                                d="M16 17h.01"
-                                            />
-
-                                        </svg>
-
-                                    </div>
-
-
-                                    <span>
-                                        BB:
-                                    </span>
-
-
-                                    <strong>
-                                        ${escapeHtml(
-                                            bestBefore
-                                        )}
-                                    </strong>
-
-                                </div>
-
-
-                                <!-- ==========================
-                                     QR
-                                =========================== -->
-
-                                <div
-                                    class="thermal-qr"
-                                    data-thermal-qr="${escapeHtml(
-                                        traceCode
-                                    )}"
-                                ></div>
-
-
-                                <!-- ==========================
-                                     TRACE CODE
-                                =========================== -->
-
-                                <div
-                                    class="thermal-code"
-                                >
-
-                                    ${escapeHtml(
-                                        traceCode
-                                    )}
-
-                                </div>
+                                </svg>
 
                             </div>
 
-                        `;
 
-                    }
-                )
-                .join("");
+                            <strong>
 
+                                ${formatNumber(
+                                    bottleSize,
+                                    0
+                                )} ML
 
-        /*
-         * OPEN PRINT WINDOW
-         */
+                            </strong>
 
-        const printWindow =
-            window.open(
-                "",
-                "_blank",
-                "width=420,height=700"
-            );
+                        </div>
 
 
-        if (!printWindow) {
+                        <!-- BEST BEFORE -->
 
-            showToast(
-                "Popup diblokir browser. Izinkan popup untuk print."
-            );
+                        <div class="thermal-best-before">
 
-            return;
+                            <div class="thermal-calendar-icon">
 
-        }
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
 
+                                    <rect
+                                        x="3"
+                                        y="5"
+                                        width="18"
+                                        height="16"
+                                        rx="2"
+                                    />
 
-        /*
-         * PRINT HTML
-         */
+                                    <path
+                                        d="M16 3v4"
+                                    />
 
-        printWindow.document.open();
+                                    <path
+                                        d="M8 3v4"
+                                    />
 
+                                    <path
+                                        d="M3 10h18"
+                                    />
 
-        printWindow.document.write(`
+                                </svg>
 
-            <!DOCTYPE html>
+                            </div>
 
-            <html>
 
-            <head>
+                            <span>
+                                BB:
+                            </span>
 
-                <meta
-                    charset="UTF-8"
-                >
 
+                            <strong>
 
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0"
-                >
+                                ${escapeHtml(
+                                    bestBefore
+                                )}
 
+                            </strong>
 
-                <title>
-                    MERAMU Thermal 58mm
-                </title>
+                        </div>
 
 
-                <style>
+                        <!-- QR -->
 
-                    /* =================================================
-                       RESET
-                    ================================================== */
+                        <div
+                            class="thermal-qr"
+                            data-thermal-qr="${escapeHtml(
+                                traceCode
+                            )}"
+                        ></div>
 
-                    *{
-                        box-sizing:border-box;
-                    }
 
+                        <!-- TRACE CODE -->
 
-                    html,
-                    body{
+                        <div class="thermal-code">
 
-                        width:58mm;
+                            ${escapeHtml(
+                                traceCode
+                            )}
 
-                        margin:0;
+                        </div>
 
-                        padding:0;
+                    </div>
 
-                        background:#FFFFFF;
+                `;
 
-                    }
+            })
+            .join("");
 
 
-                    body{
+    /* =====================================================
+       OPEN PRINT WINDOW
+       ===================================================== */
 
-                        font-family:
+    const printWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=420,height=700"
+        );
 
-                            Arial,
-                            Helvetica,
-                            sans-serif;
 
-                        color:#000000;
+    if (!printWindow) {
 
-                    }
+        showToast(
+            "Popup diblokir browser. Izinkan popup untuk print."
+        );
 
+        return;
+    }
 
-                    /* =================================================
-                       PRINT PAGE
-                    ================================================== */
-
-                    @page{
-                        size:58mm 60mm;
-                        margin:0;
-                    }
-
-
-                    /* =================================================
-                       LABEL
-                    ================================================== */
-
-                    .thermal-label{
-                        position:relative;
-                        width:58mm;
-                        height:60mm;
-                        min-height:60mm;
-                        max-height:60mm;
-                    
-                        padding:2mm 3mm;
-                    
-                        box-sizing:border-box;
-                    
-                        background:#FFFFFF;
-                        color:#000000;
-                    
-                        display:flex;
-                        flex-direction:column;
-                        align-items:center;
-                        text-align:center;
-                    
-                        overflow:hidden;
-                    
-                        page-break-after:always;
-                        break-after:page;
-                    }
-
-
-                    /* =================================================
-                       BRAND
-                    ================================================== */
-                    .thermal-brand{
-                        width:100%;
-                    
-                        display:flex;
-                        flex-direction:column;
-                        align-items:center;
-                        justify-content:center;
-                    
-                        margin-bottom:1.5mm;
-                    }
-    
-    
-                      .thermal-logo-icon{
-                        display:block;
-                        width:5mm;
-                        height:5mm;
-                        object-fit:contain;
-                        margin-bottom:.3mm;
-                        filter:grayscale(1) brightness(0);
-                    }
 
+    /* =====================================================
+       PRINT DOCUMENT
+       ===================================================== */
 
-                    .thermal-logo-text{
-                        display:block;
-                        width:20mm;
-                        height:auto;
-                        max-height:4.5mm;
-                        object-fit:contain;
-                        filter:grayscale(1) brightness(0);
-                    }
+    printWindow.document.open();
 
-                    /* =================================================
-                       PRODUCT
-                    ================================================== */
 
-                    .thermal-product{
-                        width:100%;
-                    
-                        margin-bottom:1.5mm;
-                    
-                        font-size:8.5px;
-                        line-height:1.05;
-                        font-weight:800;
-                    
-                        letter-spacing:-.15px;
-                    
-                        text-transform:uppercase;
-                    
-                        color:#000000;
-                    }
+    printWindow.document.write(`
 
-                    /* =================================================
-                       SIZE
-                    ================================================== */
+        <!DOCTYPE html>
 
-                    .thermal-size-row{
+        <html lang="id">
 
-                        display:flex;
+        <head>
 
-                        align-items:center;
+            <meta charset="UTF-8">
 
-                        justify-content:center;
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            >
 
-                        gap:2mm;
+            <title>
+                MERAMU Thermal 58mm
+            </title>
 
-                        margin-bottom:2.5mm;
 
-                        color:#000000;
+            <style>
 
-                    }
+                /* =================================================
+                   RESET
+                   ================================================= */
 
+                * {
+                    box-sizing: border-box;
+                }
 
-                    .thermal-size-row strong{
 
-                        font-size:12px;
+                html,
+                body {
 
-                        line-height:1;
+                    width: 58mm;
 
-                        font-weight:700;
+                    margin: 0;
 
-                    }
+                    padding: 0;
 
-
-                    .thermal-bottle-icon{
-
-                        display:flex;
-
-                        align-items:center;
-
-                        justify-content:center;
-
-                    }
-
-
-                    .thermal-bottle-icon svg{
-
-                        width:5.5mm;
-
-                        height:5.5mm;
-
-                        fill:none;
-
-                        stroke:#000000;
-
-                        stroke-width:1.6;
-
-                        stroke-linecap:round;
-
-                        stroke-linejoin:round;
-
-                    }
-
-
-                    /* =================================================
-                       BEST BEFORE
-                    ================================================== */
-
-                    .thermal-best-before{
-
-                        display:flex;
-
-                        align-items:center;
-
-                        justify-content:center;
-
-                        gap:1.7mm;
-
-                        margin-bottom:2.8mm;
-
-                        color:#000000;
-
-                    }
-
-
-                    .thermal-calendar-icon{
-
-                        display:flex;
-
-                        align-items:center;
-
-                        justify-content:center;
-
-                    }
-
-
-                    .thermal-calendar-icon svg{
-
-                        width:5mm;
-
-                        height:5mm;
-
-                        fill:none;
-
-                        stroke:#000000;
-
-                        stroke-width:1.6;
-
-                        stroke-linecap:round;
-
-                        stroke-linejoin:round;
-
-                    }
-
-
-                    .thermal-best-before span{
-
-                        font-size:10px;
-
-                        line-height:1;
-
-                        font-weight:700;
-
-                    }
-
-
-                    .thermal-best-before strong{
-
-                        font-size:10px;
-
-                        line-height:1;
-
-                        font-weight:500;
-
-                    }
-
-
-                    /* =================================================
-                       QR
-                    ================================================== */
-
-                    .thermal-qr{
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                    
-                        width:30mm;
-                        height:30mm;
-                    
-                        margin:0 auto 1.2mm;
-                    }
-                    
-                    .thermal-qr img,
-                    .thermal-qr canvas{
-                        display:block;
-                    
-                        width:30mm !important;
-                        height:30mm !important;
-                    
-                        max-width:30mm !important;
-                        max-height:30mm !important;
-                    }
-
-
-                    /* =================================================
-                       TRACE CODE
-                    ================================================== */
-
-                    .thermal-code{
-                        width:100%;
-                    
-                        font-size:7px;
-                        line-height:1;
-                    
-                        font-weight:500;
-                    
-                        letter-spacing:.05px;
-                    
-                        color:#000000;
-                    
-                        white-space:nowrap;
-                    
-                        text-align:center;
-                    }
-
-
-                    /* =================================================
-                       PRINT
-                    ================================================== */
-
-                    @media print{
-
-                        html,
-                        body{
-
-                            width:58mm;
-
-                            margin:0;
-
-                            padding:0;
-
-                        }
-
-
-                        .thermal-label{
-
-                            width:58mm;
-
-                        }
-
-                    }
-
-                </style>
-
-            </head>
-
-
-            <body>
-
-                ${labels}
-
-            </body>
-
-            </html>
-
-        `);
-
-
-        printWindow.document.close();
-
-
-        /*
-         * GENERATE QR
-         */
-
-        setTimeout(
-            function () {
-
-                if (
-                    typeof QRCode ===
-                    "undefined"
-                ) {
-
-                    printWindow.close();
-
-                    showToast(
-                        "Library QR belum tersedia."
-                    );
-
-                    return;
+                    background: #FFFFFF;
 
                 }
 
 
-                items.forEach(
-                    unit => {
+                body {
 
-                        if (
-                            !unit.trace_code
-                        ) {
+                    font-family:
+                        Arial,
+                        Helvetica,
+                        sans-serif;
 
-                            return;
+                    color: #000000;
 
-                        }
-
-
-                        const selector =
-                            `[data-thermal-qr="${CSS.escape(
-                                unit.trace_code
-                            )}"]`;
+                }
 
 
-                        const container =
-                            printWindow.document
-                                .querySelector(
-                                    selector
-                                );
+                /* =================================================
+                   EXACT PRINT SIZE
+                   58MM x 60MM
+                   ================================================= */
+
+                @page {
+
+                    size: 58mm 60mm;
+
+                    margin: 0;
+
+                }
 
 
-                        if (!container) {
+                /* =================================================
+                   LABEL
+                   ================================================= */
 
-                            return;
+                .thermal-label {
 
-                        }
+                    position: relative;
+
+                    width: 58mm;
+
+                    height: 60mm;
+
+                    min-height: 60mm;
+
+                    max-height: 60mm;
+
+                    padding:
+                        1.5mm
+                        2.5mm
+                        1.5mm
+                        2.5mm;
+
+                    margin: 0;
+
+                    background: #FFFFFF;
+
+                    color: #000000;
+
+                    display: flex;
+
+                    flex-direction: column;
+
+                    align-items: center;
+
+                    justify-content: flex-start;
+
+                    text-align: center;
+
+                    overflow: hidden;
+
+                    page-break-after: always;
+
+                    break-after: page;
+
+                }
 
 
-                        const url =
-                            traceBaseUrl +
-                            encodeURIComponent(
-                                unit.trace_code
+                /* =================================================
+                   BRAND
+                   ================================================= */
+
+                .thermal-brand {
+
+                    width: 100%;
+
+                    display: flex;
+
+                    flex-direction: column;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                    margin-bottom: 0.8mm;
+
+                }
+
+
+                .thermal-logo-icon {
+
+                    display: block;
+
+                    width: 4mm;
+
+                    height: 4mm;
+
+                    object-fit: contain;
+
+                    margin-bottom: 0.15mm;
+
+                    filter:
+                        grayscale(1)
+                        brightness(0);
+
+                }
+
+
+                .thermal-logo-text {
+
+                    display: block;
+
+                    width: 17mm;
+
+                    height: auto;
+
+                    max-height: 3.8mm;
+
+                    object-fit: contain;
+
+                    filter:
+                        grayscale(1)
+                        brightness(0);
+
+                }
+
+
+                /* =================================================
+                   PRODUCT
+                   ================================================= */
+
+                .thermal-product {
+
+                    width: 100%;
+
+                    margin-bottom: 1mm;
+
+                    font-size: 7.5px;
+
+                    line-height: 1.05;
+
+                    font-weight: 800;
+
+                    letter-spacing: -0.1px;
+
+                    text-transform: uppercase;
+
+                    color: #000000;
+
+                }
+
+
+                /* =================================================
+                   SIZE
+                   ================================================= */
+
+                .thermal-size-row {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                    gap: 1.5mm;
+
+                    margin-bottom: 1.5mm;
+
+                    color: #000000;
+
+                }
+
+
+                .thermal-size-row strong {
+
+                    font-size: 10px;
+
+                    line-height: 1;
+
+                    font-weight: 700;
+
+                }
+
+
+                .thermal-bottle-icon {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                }
+
+
+                .thermal-bottle-icon svg {
+
+                    width: 4mm;
+
+                    height: 4mm;
+
+                    fill: none;
+
+                    stroke: #000000;
+
+                    stroke-width: 1.6;
+
+                    stroke-linecap: round;
+
+                    stroke-linejoin: round;
+
+                }
+
+
+                /* =================================================
+                   BEST BEFORE
+                   ================================================= */
+
+                .thermal-best-before {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                    gap: 1mm;
+
+                    margin-bottom: 1.5mm;
+
+                    color: #000000;
+
+                }
+
+
+                .thermal-calendar-icon {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                }
+
+
+                .thermal-calendar-icon svg {
+
+                    width: 4mm;
+
+                    height: 4mm;
+
+                    fill: none;
+
+                    stroke: #000000;
+
+                    stroke-width: 1.6;
+
+                    stroke-linecap: round;
+
+                    stroke-linejoin: round;
+
+                }
+
+
+                .thermal-best-before span {
+
+                    font-size: 8px;
+
+                    line-height: 1;
+
+                    font-weight: 700;
+
+                }
+
+
+                .thermal-best-before strong {
+
+                    font-size: 8px;
+
+                    line-height: 1;
+
+                    font-weight: 500;
+
+                }
+
+
+                /* =================================================
+                   QR
+                   ================================================= */
+
+                .thermal-qr {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                    width: 24mm;
+
+                    height: 24mm;
+
+                    margin: 0 auto 0.8mm;
+
+                    flex-shrink: 0;
+
+                }
+
+
+                .thermal-qr img,
+                .thermal-qr canvas {
+
+                    display: block;
+
+                    width: 24mm !important;
+
+                    height: 24mm !important;
+
+                    max-width: 24mm !important;
+
+                    max-height: 24mm !important;
+
+                }
+
+
+                /* =================================================
+                   TRACE CODE
+                   ================================================= */
+
+                .thermal-code {
+
+                    width: 100%;
+
+                    font-size: 6px;
+
+                    line-height: 1;
+
+                    font-weight: 500;
+
+                    letter-spacing: 0;
+
+                    color: #000000;
+
+                    white-space: nowrap;
+
+                    text-align: center;
+
+                }
+
+
+                /* =================================================
+                   PRINT MODE
+                   ================================================= */
+
+                @media print {
+
+                    html,
+                    body {
+
+                        width: 58mm;
+
+                        height: 60mm;
+
+                        margin: 0;
+
+                        padding: 0;
+
+                        background: #FFFFFF;
+
+                    }
+
+
+                    .thermal-label {
+
+                        width: 58mm;
+
+                        height: 60mm;
+
+                        min-height: 60mm;
+
+                        max-height: 60mm;
+
+                        margin: 0;
+
+                    }
+
+                }
+
+            </style>
+
+        </head>
+
+
+        <body>
+
+            ${labels}
+
+        </body>
+
+        </html>
+
+    `);
+
+
+    printWindow.document.close();
+
+
+    /* =====================================================
+       GENERATE QR
+       ===================================================== */
+
+    setTimeout(
+        function () {
+
+            if (
+                typeof QRCode ===
+                "undefined"
+            ) {
+
+                printWindow.close();
+
+                showToast(
+                    "Library QR belum tersedia."
+                );
+
+                return;
+            }
+
+
+            items.forEach(
+                unit => {
+
+                    if (
+                        !unit.trace_code
+                    ) {
+
+                        return;
+                    }
+
+
+                    const selector =
+                        `[data-thermal-qr="${CSS.escape(
+                            unit.trace_code
+                        )}"]`;
+
+
+                    const container =
+                        printWindow.document
+                            .querySelector(
+                                selector
                             );
 
 
-                        new QRCode(
-                            container,
-                            {
+                    if (!container) {
 
-                                text: url,
+                        return;
+                    }
 
-                                width: 113,
 
-                                height: 113,
-
-                                correctLevel:
-                                    QRCode.CorrectLevel.M
-
-                            }
+                    const url =
+                        traceBaseUrl +
+                        encodeURIComponent(
+                            unit.trace_code
                         );
 
-                    }
-                );
+
+                    new QRCode(
+                        container,
+                        {
+
+                            text: url,
+
+                            width: 91,
+
+                            height: 91,
+
+                            correctLevel:
+                                QRCode.CorrectLevel.M
+
+                        }
+                    );
+
+                }
+            );
 
 
-                /*
-                 * PRINT
-                 */
+            /* =================================================
+               PRINT
+               ================================================= */
 
-                setTimeout(
-                    function () {
+            setTimeout(
+                function () {
 
-                        printWindow.focus();
+                    printWindow.focus();
 
-                        printWindow.print();
+                    printWindow.print();
 
-                    },
-                    800
-                );
+                },
+                700
+            );
 
+        },
+        400
+    );
 
-            },
-            500
-        );
-
-    }
+}
 
 
     /* =====================================================
