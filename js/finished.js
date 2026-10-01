@@ -3572,6 +3572,126 @@ if (statusButton) {
 
                 }
 
+                /* =========================================
+   INDIVIDUAL BOTTLE STATUS
+========================================= */
+
+const unitStatusButton =
+    event.target.closest(
+        "[data-unit-status]"
+    );
+
+if (unitStatusButton) {
+
+    const unitId =
+        unitStatusButton.dataset.unitId;
+
+    const newStatus =
+        unitStatusButton.dataset.unitStatus;
+
+    const unit =
+        finishedUnits.find(
+            item =>
+                String(item.id) ===
+                String(unitId)
+        );
+
+    if (!unit) {
+
+        showToast(
+            "Finished unit tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+    const currentStatus =
+        String(
+            unit.status || ""
+        )
+            .toLowerCase()
+            .trim();
+
+    if (
+        currentStatus !==
+        "available"
+    ) {
+
+        showToast(
+            `Bottle ${unit.trace_code} sudah ${currentStatus.toUpperCase()} dan terkunci.`
+        );
+
+        return;
+
+    }
+
+    const labels = {
+
+        done:
+            "DONE",
+
+        damaged:
+            "DAMAGED",
+
+        expired:
+            "EXPIRED"
+
+    };
+
+    const label =
+        labels[newStatus] ||
+        String(newStatus)
+            .toUpperCase();
+
+    const confirmed =
+        window.confirm(
+            `Ubah Bottle #${unit.unit_number} menjadi ${label}?`
+        );
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+    if (
+        newStatus !==
+        "done"
+    ) {
+
+        showToast(
+            "Untuk test pertama, gunakan tombol DONE."
+        );
+
+        return;
+
+    }
+
+    const reason =
+        window.prompt(
+            "Keterangan distribusi / pengiriman:",
+            "Dikirim ke toko"
+        );
+
+    if (
+        reason === null
+    ) {
+
+        return;
+
+    }
+
+    await updateFinishedUnitStatus(
+        unitId,
+        newStatus,
+        reason.trim()
+    );
+
+    return;
+
+}
+
             }
         );
 
