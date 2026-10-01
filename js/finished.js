@@ -1284,182 +1284,332 @@ function renderBatchInfo() {
        RENDER UNITS
     ===================================================== */
 
-    function renderUnits() {
+function renderUnits() {
 
-        const container =
-            $("finishedUnits");
-
-
-        const count =
-            $("finishedUnitCount");
+    const container =
+        $("finishedUnits");
 
 
-        if (!container) {
-
-            return;
-
-        }
+    const count =
+        $("finishedUnitCount");
 
 
-        if (count) {
+    if (!container) {
 
-            count.textContent =
-                `${finishedUnits.length} bottle${
-                    finishedUnits.length === 1
-                        ? ""
-                        : "s"
-                }`;
+        return;
 
-        }
+    }
 
 
-        if (
-            finishedUnits.length === 0
-        ) {
+    if (count) {
 
-            container.innerHTML = `
+        count.textContent =
+            `${finishedUnits.length} bottle${
+                finishedUnits.length === 1
+                    ? ""
+                    : "s"
+            }`;
 
-                <div class="finished-empty">
-
-                    <i data-lucide="package-open"></i>
-
-                    <strong>
-                        Belum ada individual bottle
-                    </strong>
-
-                    <span>
-                        Finished batch belum memiliki
-                        finished unit.
-                    </span>
-
-                </div>
-
-            `;
+    }
 
 
-            createIcons();
+    if (
+        finishedUnits.length === 0
+    ) {
 
-            return;
+        container.innerHTML = `
 
-        }
+            <div class="finished-empty">
 
+                <i data-lucide="package-open"></i>
 
-        container.innerHTML =
-            finishedUnits
-                .map(
-                    unit => {
+                <strong>
+                    Belum ada individual bottle
+                </strong>
 
-                        return `
+                <span>
+                    Finished batch belum memiliki
+                    finished unit.
+                </span>
 
-                            <article
-                                class="finished-unit"
-                            >
+            </div>
 
-                                <div
-                                    class="finished-unit-top"
-                                >
-
-                                    <span
-                                        class="finished-unit-number"
-                                    >
-
-                                        Bottle #${formatNumber(
-                                            unit.unit_number,
-                                            0
-                                        )}
-
-                                    </span>
-
-
-                                    <span
-                                        class="finished-unit-status"
-                                    >
-
-                                        ${escapeHtml(
-                                            unit.status ||
-                                            "available"
-                                        )}
-
-                                    </span>
-
-                                </div>
-
-
-                                <div
-                                    class="finished-qr"
-                                    id="qr-${escapeHtml(
-                                        unit.id
-                                    )}"
-                                >
-                                </div>
-
-
-                                <div
-                                    class="finished-trace-code"
-                                >
-
-                                    ${escapeHtml(
-                                        unit.trace_code
-                                    )}
-
-                                </div>
-
-
-                                <div
-                                    class="finished-unit-actions"
-                                >
-
-                                    <button
-                                        class="finished-unit-btn"
-                                        type="button"
-                                        data-copy-trace="${escapeHtml(
-                                            unit.trace_code
-                                        )}"
-                                    >
-
-                                        <i
-                                            data-lucide="copy"
-                                        ></i>
-
-                                        Copy
-
-                                    </button>
-
-
-                                    <button
-                                        class="finished-unit-btn primary"
-                                        type="button"
-                                        data-print-unit="${escapeHtml(
-                                            unit.id
-                                        )}"
-                                    >
-
-                                        <i
-                                            data-lucide="printer"
-                                        ></i>
-
-                                        Print
-
-                                    </button>
-
-                                </div>
-
-                            </article>
-
-                        `;
-
-                    }
-                )
-                .join("");
+        `;
 
 
         createIcons();
 
-
-        generateAllQr();
+        return;
 
     }
 
+
+    container.innerHTML =
+        finishedUnits
+            .map(
+                unit => {
+
+                    const status =
+                        String(
+                            unit.status ||
+                            "available"
+                        )
+                            .toLowerCase()
+                            .trim();
+
+
+                    const isAvailable =
+                        status === "available";
+
+
+                    const isLocked =
+                        [
+                            "done",
+                            "damaged",
+                            "expired"
+                        ].includes(status);
+
+
+                    const statusLabel =
+                        status === "available"
+                            ? "Available"
+                            : status === "done"
+                                ? "Done"
+                                : status === "damaged"
+                                    ? "Damaged"
+                                    : status === "expired"
+                                        ? "Expired"
+                                        : status;
+
+
+                    return `
+
+                        <article
+                            class="finished-unit"
+                        >
+
+                            <div
+                                class="finished-unit-top"
+                            >
+
+                                <span
+                                    class="finished-unit-number"
+                                >
+
+                                    Bottle #${formatNumber(
+                                        unit.unit_number,
+                                        0
+                                    )}
+
+                                </span>
+
+
+                                <span
+                                    class="finished-unit-status"
+                                >
+
+                                    ${escapeHtml(
+                                        statusLabel
+                                    )}
+
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="finished-qr"
+                                id="qr-${escapeHtml(
+                                    unit.id
+                                )}"
+                            >
+                            </div>
+
+
+                            <div
+                                class="finished-trace-code"
+                            >
+
+                                ${escapeHtml(
+                                    unit.trace_code
+                                )}
+
+                            </div>
+
+
+                            <div
+                                class="finished-unit-actions"
+                            >
+
+                                <button
+                                    class="finished-unit-btn"
+                                    type="button"
+                                    data-copy-trace="${escapeHtml(
+                                        unit.trace_code
+                                    )}"
+                                >
+
+                                    <i
+                                        data-lucide="copy"
+                                    ></i>
+
+                                    Copy
+
+                                </button>
+
+
+                                <button
+                                    class="finished-unit-btn primary"
+                                    type="button"
+                                    data-print-unit="${escapeHtml(
+                                        unit.id
+                                    )}"
+                                >
+
+                                    <i
+                                        data-lucide="printer"
+                                    ></i>
+
+                                    Print
+
+                                </button>
+
+                            </div>
+
+
+                            ${
+                                isAvailable
+                                    ? `
+
+                                        <div
+                                            class="finished-unit-status-actions"
+                                            style="
+                                                display:grid;
+                                                grid-template-columns:repeat(3,1fr);
+                                                gap:6px;
+                                                margin-top:8px;
+                                            "
+                                        >
+
+                                            <button
+                                                class="finished-unit-btn"
+                                                type="button"
+                                                data-unit-status="done"
+                                                data-unit-id="${escapeHtml(
+                                                    unit.id
+                                                )}"
+                                                style="
+                                                    font-size:10px;
+                                                    padding:8px 6px;
+                                                "
+                                            >
+
+                                                <i
+                                                    data-lucide="check"
+                                                ></i>
+
+                                                DONE
+
+                                            </button>
+
+
+                                            <button
+                                                class="finished-unit-btn"
+                                                type="button"
+                                                data-unit-status="damaged"
+                                                data-unit-id="${escapeHtml(
+                                                    unit.id
+                                                )}"
+                                                style="
+                                                    font-size:10px;
+                                                    padding:8px 6px;
+                                                "
+                                            >
+
+                                                <i
+                                                    data-lucide="triangle-alert"
+                                                ></i>
+
+                                                DAMAGED
+
+                                            </button>
+
+
+                                            <button
+                                                class="finished-unit-btn"
+                                                type="button"
+                                                data-unit-status="expired"
+                                                data-unit-id="${escapeHtml(
+                                                    unit.id
+                                                )}"
+                                                style="
+                                                    font-size:10px;
+                                                    padding:8px 6px;
+                                                "
+                                            >
+
+                                                <i
+                                                    data-lucide="calendar-x"
+                                                ></i>
+
+                                                EXPIRED
+
+                                            </button>
+
+                                        </div>
+
+                                    `
+                                    : isLocked
+                                        ? `
+
+                                            <div
+                                                style="
+                                                    display:flex;
+                                                    align-items:center;
+                                                    justify-content:center;
+                                                    gap:5px;
+                                                    margin-top:8px;
+                                                    padding:7px 8px;
+                                                    border-radius:10px;
+                                                    background:#F6F8F6;
+                                                    color:#6B7B72;
+                                                    font-size:10px;
+                                                    font-weight:500;
+                                                "
+                                            >
+
+                                                <i
+                                                    data-lucide="lock"
+                                                    style="
+                                                        width:13px;
+                                                        height:13px;
+                                                    "
+                                                ></i>
+
+                                                Status terkunci
+
+                                            </div>
+
+                                        `
+                                        : ""
+
+                            }
+
+                        </article>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    createIcons();
+
+
+    generateAllQr();
+
+}
 
     /* =====================================================
        GENERATE ALL QR
