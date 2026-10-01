@@ -1565,7 +1565,7 @@
 
                         object-fit:contain;
 
-                        margin-bottom:.8mm;
+                        margin-bottom:.5mm;
 
                         filter:
 
@@ -1579,11 +1579,11 @@
 
                         display:block;
 
-                        width:22mm;
+                        width:21mm;
 
                         height:auto;
 
-                        max-height:8mm;
+                        max-height:5mm;
 
                         object-fit:contain;
 
