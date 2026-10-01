@@ -498,6 +498,348 @@
 }
 </style>
 
+
+<style id="recipe-version-h4-polish">
+/* =========================================================
+   H4 POLISH — FORCE CONSISTENT FORM STYLING
+   The dynamic H4 markup is intentionally normalized here so
+   global .recipe / input styles cannot break the modal.
+========================================================= */
+
+.recipe-version-dialog {
+    color: #0f172a !important;
+}
+
+.recipe-version-dialog h1,
+.recipe-version-dialog h2,
+.recipe-version-dialog h3,
+.recipe-version-dialog h4,
+.recipe-version-dialog p,
+.recipe-version-dialog label {
+    margin: 0 !important;
+}
+
+.recipe-version-dialog p {
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    color: #64748b !important;
+}
+
+.recipe-version-dialog label {
+    display: block !important;
+    color: #475569 !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+}
+
+.recipe-version-dialog input:not([type="checkbox"]):not([type="radio"]),
+.recipe-version-dialog select,
+.recipe-version-dialog textarea {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    border: 1px solid #dbe3ea !important;
+    border-radius: 11px !important;
+    outline: none !important;
+    background: #fff !important;
+    color: #172033 !important;
+    font-family: "Poppins", sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+    box-shadow: none !important;
+}
+
+.recipe-version-dialog textarea {
+    min-height: 88px !important;
+    padding: 10px 12px !important;
+    resize: vertical !important;
+}
+
+.recipe-version-dialog select {
+    padding-right: 34px !important;
+    cursor: pointer !important;
+}
+
+.recipe-version-dialog input:not([type="checkbox"]):not([type="radio"]):focus,
+.recipe-version-dialog select:focus,
+.recipe-version-dialog textarea:focus {
+    border-color: #046738 !important;
+    box-shadow: 0 0 0 3px rgba(4,103,56,.09) !important;
+}
+
+/* Never let the browser's giant checkbox styling leak into H4. */
+.recipe-version-dialog input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 5px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    position: relative !important;
+    flex: 0 0 18px !important;
+}
+
+.recipe-version-dialog input[type="checkbox"]:checked {
+    border-color: #046738 !important;
+    background: #046738 !important;
+}
+
+.recipe-version-dialog input[type="checkbox"]:checked::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 5px !important;
+    top: 2px !important;
+    width: 5px !important;
+    height: 9px !important;
+    border: solid #fff !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
+}
+
+/* Header — normalize the actual dynamic markup */
+.recipe-version-dialog > div:first-child {
+    flex: 0 0 auto !important;
+}
+
+.recipe-version-dialog .section-eyebrow,
+.recipe-version-dialog .recipe-version-eyebrow {
+    display: block !important;
+    margin: 0 0 5px !important;
+    color: #64748b !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: .08em !important;
+    line-height: 1.2 !important;
+    text-transform: uppercase !important;
+}
+
+.recipe-version-dialog h2,
+.recipe-version-dialog .recipe-version-title {
+    color: #0f172a !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+}
+
+.recipe-version-dialog .recipe-version-header p,
+.recipe-version-dialog .recipe-version-subtitle {
+    margin-top: 5px !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+/* Body spacing */
+.recipe-version-dialog .recipe-version-body {
+    padding: 22px 26px 28px !important;
+}
+
+.recipe-version-dialog .recipe-version-section {
+    margin-bottom: 22px !important;
+}
+
+.recipe-version-dialog .recipe-version-section-title {
+    margin-bottom: 12px !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+}
+
+/* Formula summary / identity block */
+.recipe-version-dialog .recipe-version-identity,
+.recipe-version-dialog .recipe-version-meta {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    gap: 5px 28px !important;
+    margin-bottom: 12px !important;
+}
+
+.recipe-version-dialog .recipe-version-identity strong,
+.recipe-version-dialog .recipe-version-meta strong {
+    font-weight: 700 !important;
+}
+
+/* Field grid */
+.recipe-version-dialog .recipe-version-grid {
+    align-items: start !important;
+    gap: 14px 18px !important;
+}
+
+.recipe-version-dialog .recipe-version-field {
+    position: relative !important;
+    min-width: 0 !important;
+    gap: 6px !important;
+}
+
+/* Any unit text accidentally rendered after an input is kept
+   small and visually attached to the field rather than becoming
+   a huge line of text. */
+.recipe-version-dialog .recipe-version-field > small,
+.recipe-version-dialog .recipe-version-field > .unit,
+.recipe-version-dialog .recipe-version-field > .field-unit,
+.recipe-version-dialog .recipe-version-field > .input-unit {
+    display: block !important;
+    margin-top: -2px !important;
+    color: #94a3b8 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+}
+
+/* Fermentation toggle */
+.recipe-version-dialog .recipe-version-toggle {
+    min-height: 46px !important;
+    padding: 12px 14px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    background: #f8fafc !important;
+}
+
+.recipe-version-dialog .recipe-version-toggle-info {
+    flex: 1 1 auto !important;
+}
+
+.recipe-version-dialog .recipe-version-toggle-title {
+    display: block !important;
+    color: #0f172a !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+}
+
+.recipe-version-dialog .recipe-version-toggle-description {
+    display: block !important;
+    margin-top: 2px !important;
+    color: #64748b !important;
+    font-size: 10px !important;
+}
+
+/* If current H4 uses a plain label around checkbox */
+.recipe-version-dialog label:has(input[type="checkbox"]) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+}
+
+/* Error: don't show a giant empty red bar */
+.recipe-version-dialog .recipe-version-error:has(span:empty),
+.recipe-version-dialog .recipe-version-error:has(.error-message:empty),
+.recipe-version-dialog .recipe-version-error[hidden] {
+    display: none !important;
+}
+
+.recipe-version-dialog .recipe-version-error {
+    align-items: flex-start !important;
+    min-height: 0 !important;
+    margin: 0 0 18px !important;
+    padding: 10px 12px !important;
+    border: 1px solid #fecaca !important;
+    border-radius: 10px !important;
+    background: #fef2f2 !important;
+    color: #b91c1c !important;
+    font-size: 11px !important;
+}
+
+/* Ingredients */
+.recipe-version-dialog .recipe-version-ingredients {
+    width: 100% !important;
+}
+
+.recipe-version-dialog .recipe-version-ingredient-row {
+    min-width: 0 !important;
+}
+
+.recipe-version-dialog .recipe-version-ingredient-row label {
+    font-size: 10px !important;
+}
+
+/* Footer — use the project's existing page-btn, but normalize it. */
+.recipe-version-dialog .recipe-version-footer,
+.recipe-version-dialog .recipe-modal-footer {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    min-height: 68px !important;
+    padding: 14px 26px !important;
+    border-top: 1px solid #e5e7eb !important;
+    background: #fff !important;
+}
+
+.recipe-version-dialog .page-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    min-height: 38px !important;
+    padding: 0 14px !important;
+    border-radius: 9px !important;
+    font-family: "Poppins", sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.recipe-version-dialog .page-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    flex: 0 0 15px !important;
+}
+
+/* Keep the modal from inheriting huge global text sizing. */
+.recipe-version-dialog,
+.recipe-version-dialog * {
+    font-family: "Poppins", sans-serif !important;
+}
+
+/* Desktop */
+@media (min-width: 701px) {
+    .recipe-version-dialog {
+        width: min(880px, calc(100vw - 48px)) !important;
+    }
+
+    .recipe-version-dialog .recipe-version-body {
+        max-height: calc(100vh - 210px) !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .recipe-version-dialog .recipe-version-body {
+        padding: 18px !important;
+        max-height: calc(100vh - 170px) !important;
+    }
+
+    .recipe-version-dialog .recipe-version-grid,
+    .recipe-version-dialog .recipe-version-identity,
+    .recipe-version-dialog .recipe-version-meta {
+        grid-template-columns: 1fr !important;
+    }
+
+    .recipe-version-dialog .recipe-version-footer,
+    .recipe-version-dialog .recipe-modal-footer {
+        padding: 12px 18px !important;
+    }
+
+    .recipe-version-dialog .page-btn {
+        flex: 1 1 0 !important;
+    }
+}
+</style>
+
 </head>
 
 
