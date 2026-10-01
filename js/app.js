@@ -319,6 +319,9 @@ function setActiveMenu(){
             "harvest":
                 "/pages/harvest.html",
 
+            "finished":
+                  "/pages/finished.html",
+
             "recipe":
                 "/pages/recipe.html",
 
