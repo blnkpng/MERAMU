@@ -196,6 +196,13 @@ function navigateToRoute(route){
 
             break;
 
+          case "finished":
+
+             window.location.href =
+                 "/pages/finished.html";
+
+          break;
+
 
         case "recipe":
 
