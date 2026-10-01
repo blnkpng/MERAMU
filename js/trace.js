@@ -372,6 +372,507 @@
             return;
         }
 
+        /* =========================================================
+   BATCH TRACE RENDERER
+   ========================================================= */
+
+if (data.type === "batch") {
+
+    const batch =
+        data.batch || {};
+
+    const product =
+        data.product || {};
+
+
+    const batchStatus =
+        batch.status || "active";
+
+
+    const currentStage =
+        batch.current_stage || "—";
+
+
+    const statusClass =
+        getStatusClass(batchStatus);
+
+
+    app.innerHTML = `
+
+        <!-- HERO -->
+
+        <section class="trace-hero">
+
+            <div class="trace-brand">
+
+                <img
+                    src="../assets/branding/logo-icon.png"
+                    alt="MERAMU"
+                    class="trace-logo-icon"
+                >
+
+                <img
+                    src="../assets/branding/logo-text.png"
+                    alt="MERAMU"
+                    class="trace-logo-text"
+                >
+
+            </div>
+
+
+            <div class="trace-hero-copy">
+
+                <span class="trace-eyebrow">
+                    BATCH TRACE
+                </span>
+
+                <h1>
+                    ${safeValue(
+                        product.name
+                    )}
+                </h1>
+
+                <p>
+                    Informasi perjalanan
+                    dan status produksi batch.
+                </p>
+
+            </div>
+
+
+            <div class="trace-status ${statusClass}">
+
+                <span class="trace-status-dot"></span>
+
+                ${escapeHtml(
+                    getStatusLabel(batchStatus)
+                )}
+
+            </div>
+
+        </section>
+
+
+        <!-- BATCH IDENTITY -->
+
+        <section class="trace-section">
+
+            <div class="trace-section-header">
+
+                <div>
+
+                    <span class="trace-section-kicker">
+                        BATCH
+                    </span>
+
+                    <h2>
+                        Identitas Batch
+                    </h2>
+
+                </div>
+
+                <i data-lucide="package"></i>
+
+            </div>
+
+
+            <div class="trace-code-box">
+
+                <span>
+                    Batch Code
+                </span>
+
+                <strong>
+                    ${safeValue(
+                        batch.batch_code
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="trace-mini-grid">
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Product
+                    </span>
+
+                    <strong>
+                        ${safeValue(
+                            product.name
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Product Code
+                    </span>
+
+                    <strong>
+                        ${safeValue(
+                            product.code
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Stage
+                    </span>
+
+                    <strong>
+                        ${safeValue(
+                            currentStage
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Status
+                    </span>
+
+                    <strong>
+                        ${escapeHtml(
+                            getStatusLabel(
+                                batchStatus
+                            )
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCTION -->
+
+        <section class="trace-section">
+
+            <div class="trace-section-header">
+
+                <div>
+
+                    <span class="trace-section-kicker">
+                        PRODUCTION
+                    </span>
+
+                    <h2>
+                        Informasi Produksi
+                    </h2>
+
+                </div>
+
+                <i data-lucide="factory"></i>
+
+            </div>
+
+
+            <div class="trace-mini-grid">
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Production
+                    </span>
+
+                    <strong>
+                        ${formatDate(
+                            batch.production_date
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Planned Volume
+                    </span>
+
+                    <strong>
+                        ${
+                            batch.planned_volume
+                                ? formatNumber(
+                                    batch.planned_volume
+                                ) + " L"
+                                : "—"
+                        }
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Actual Volume
+                    </span>
+
+                    <strong>
+                        ${
+                            batch.actual_volume
+                                ? formatNumber(
+                                    batch.actual_volume
+                                ) + " L"
+                                : "—"
+                        }
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Target
+                    </span>
+
+                    <strong>
+                        ${formatDate(
+                            batch.target_date
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Best Before
+                    </span>
+
+                    <strong>
+                        ${formatDate(
+                            batch.best_before_date
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="trace-info-item">
+
+                    <span>
+                        Expiry
+                    </span>
+
+                    <strong>
+                        ${formatDate(
+                            batch.expiry_date
+                        )}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- JOURNEY -->
+
+        <section class="trace-section">
+
+            <div class="trace-section-header">
+
+                <div>
+
+                    <span class="trace-section-kicker">
+                        JOURNEY
+                    </span>
+
+                    <h2>
+                        Batch Journey
+                    </h2>
+
+                </div>
+
+                <i data-lucide="route"></i>
+
+            </div>
+
+
+            <div class="trace-timeline">
+
+
+                <div class="trace-step completed">
+
+                    <div class="trace-step-icon">
+                        <i data-lucide="factory"></i>
+                    </div>
+
+                    <div class="trace-step-content">
+
+                        <span>
+                            Production
+                        </span>
+
+                        <strong>
+                            ${safeValue(
+                                batch.batch_code
+                            )}
+                        </strong>
+
+                        <small>
+                            ${formatDate(
+                                batch.production_date
+                            )}
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="trace-step ${
+                    String(currentStage).toLowerCase() === "f1"
+                        ? "current"
+                        : "completed"
+                }">
+
+                    <div class="trace-step-icon">
+                        <i data-lucide="beaker"></i>
+                    </div>
+
+                    <div class="trace-step-content">
+
+                        <span>
+                            F1 Fermentasi
+                        </span>
+
+                        <strong>
+                            ${
+                                String(currentStage).toLowerCase() === "f1"
+                                    ? "ACTIVE"
+                                    : "F1"
+                            }
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="trace-step ${
+                    String(currentStage).toLowerCase() === "f2"
+                        ? "current"
+                        : ""
+                }">
+
+                    <div class="trace-step-icon">
+                        <i data-lucide="wine"></i>
+                    </div>
+
+                    <div class="trace-step-content">
+
+                        <span>
+                            F2 Fermentasi
+                        </span>
+
+                        <strong>
+                            ${
+                                String(currentStage).toLowerCase() === "f2"
+                                    ? "ACTIVE"
+                                    : "F2"
+                            }
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="trace-step ${
+                    String(currentStage).toLowerCase() === "harvest"
+                        ? "current"
+                        : ""
+                }">
+
+                    <div class="trace-step-icon">
+                        <i data-lucide="leaf"></i>
+                    </div>
+
+                    <div class="trace-step-content">
+
+                        <span>
+                            Harvest
+                        </span>
+
+                        <strong>
+                            ${
+                                String(currentStage).toLowerCase() === "harvest"
+                                    ? "ACTIVE"
+                                    : "Harvest"
+                            }
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <section class="trace-footer">
+
+            <div class="trace-footer-icon">
+                <i data-lucide="shield-check"></i>
+            </div>
+
+            <div>
+
+                <strong>
+                    MERAMU Batch Trace
+                </strong>
+
+                <p>
+                    Informasi publik mengenai
+                    perjalanan batch produksi.
+                    Data internal seperti HPP,
+                    biaya bahan, dan informasi
+                    operasional tidak ditampilkan.
+                </p>
+
+            </div>
+
+        </section>
+
+    `;
+
+
+    if (window.lucide) {
+
+        lucide.createIcons();
+
+    }
+
+
+    return;
+
+}
+
         const product =
             data.product ||
             {};
