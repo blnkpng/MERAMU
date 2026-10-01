@@ -1,6 +1,7 @@
 /* =========================================================
    MERAMU RECIPE STUDIO
    H1 — RECIPE LIST
+   H2 — CREATE RECIPE
 ========================================================= */
 
 (function(){
@@ -16,9 +17,17 @@
 
     let filteredRecipes = [];
 
+    let products = [];
+
+    let ingredients = [];
+
+    let units = [];
+
+    let ingredientRows = 0;
+
 
     /* =====================================================
-       HELPERS
+       SUPABASE
     ===================================================== */
 
     function waitForSupabase(
@@ -26,9 +35,7 @@
         attempt = 0
     ){
 
-        if(
-            window.supabaseClient
-        ){
+        if(window.supabaseClient){
 
             callback(
                 window.supabaseClient
@@ -65,6 +72,10 @@
     }
 
 
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
     function escapeHtml(value){
 
         if(
@@ -78,11 +89,11 @@
 
 
         return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+            .replaceAll("&","&amp;")
+            .replaceAll("<","&lt;")
+            .replaceAll(">","&gt;")
+            .replaceAll('"',"&quot;")
+            .replaceAll("'","&#039;");
 
     }
 
@@ -104,9 +115,7 @@
             Number(value);
 
 
-        if(
-            Number.isNaN(number)
-        ){
+        if(Number.isNaN(number)){
 
             return escapeHtml(value);
 
@@ -140,9 +149,7 @@
             Number(value);
 
 
-        if(
-            Number.isNaN(number)
-        ){
+        if(Number.isNaN(number)){
 
             return "—";
 
@@ -161,60 +168,77 @@
     }
 
 
+    function getCurrentVersion(recipe){
+
+        const versions =
+            Array.isArray(
+                recipe.recipe_versions
+            )
+                ? recipe.recipe_versions
+                : [];
+
+
+        if(!versions.length){
+
+            return null;
+
+        }
+
+
+        return [...versions]
+            .sort(
+                (a,b) =>
+                    Number(
+                        b.version_number || 0
+                    )
+                    -
+                    Number(
+                        a.version_number || 0
+                    )
+            )[0];
+
+    }
+
+
+    function getRecipeStatus(recipe){
+
+        return String(
+            recipe.status || "active"
+        ).toLowerCase();
+
+    }
+
+
     /* =====================================================
-       UI STATE
+       UI STATES
     ===================================================== */
 
     function showLoading(){
 
-        const loading =
-            document.getElementById(
-                "recipeLoading"
-            );
+        document.getElementById(
+            "recipeLoading"
+        )?.removeAttribute("hidden");
 
-        const error =
-            document.getElementById(
-                "recipeError"
-            );
+        document.getElementById(
+            "recipeError"
+        )?.setAttribute("hidden","");
 
-        const empty =
-            document.getElementById(
-                "recipeEmpty"
-            );
+        document.getElementById(
+            "recipeEmpty"
+        )?.setAttribute("hidden","");
 
-        const list =
-            document.getElementById(
-                "recipeList"
-            );
-
-
-        if(loading)
-            loading.hidden = false;
-
-        if(error)
-            error.hidden = true;
-
-        if(empty)
-            empty.hidden = true;
-
-        if(list)
-            list.hidden = true;
+        document.getElementById(
+            "recipeList"
+        )?.setAttribute("hidden","");
 
     }
 
 
     function hideLoading(){
 
-        const loading =
-            document.getElementById(
-                "recipeLoading"
-            );
-
-        if(loading){
-
-            loading.hidden = true;
-
-        }
+        document.getElementById(
+            "recipeLoading"
+        )?.setAttribute("hidden","");
 
     }
 
@@ -229,44 +253,31 @@
                 "recipeError"
             );
 
-        const messageEl =
+        const errorText =
             document.getElementById(
                 "recipeErrorMessage"
             );
 
 
-        if(messageEl){
+        if(errorText){
 
-            messageEl.textContent =
+            errorText.textContent =
                 message ||
                 "Terjadi kesalahan.";
 
         }
 
 
-        if(error){
-
-            error.hidden = false;
-
-        }
+        error?.removeAttribute("hidden");
 
 
-        const empty =
-            document.getElementById(
-                "recipeEmpty"
-            );
+        document.getElementById(
+            "recipeEmpty"
+        )?.setAttribute("hidden","");
 
-        const list =
-            document.getElementById(
-                "recipeList"
-            );
-
-
-        if(empty)
-            empty.hidden = true;
-
-        if(list)
-            list.hidden = true;
+        document.getElementById(
+            "recipeList"
+        )?.setAttribute("hidden","");
 
 
         if(window.lucide){
@@ -283,39 +294,23 @@
         hideLoading();
 
 
-        const empty =
-            document.getElementById(
-                "recipeEmpty"
-            );
+        document.getElementById(
+            "recipeEmpty"
+        )?.removeAttribute("hidden");
 
-        const error =
-            document.getElementById(
-                "recipeError"
-            );
+        document.getElementById(
+            "recipeError"
+        )?.setAttribute("hidden","");
 
-        const list =
-            document.getElementById(
-                "recipeList"
-            );
-
-
-        if(empty)
-            empty.hidden = false;
-
-        if(error)
-            error.hidden = true;
-
-        if(list)
-            list.hidden = true;
-
-
-        updateSummary();
+        document.getElementById(
+            "recipeList"
+        )?.setAttribute("hidden","");
 
     }
 
 
     /* =====================================================
-       LOAD RECIPES
+       LOAD RECIPE LIST
     ===================================================== */
 
     async function loadRecipes(){
@@ -324,9 +319,7 @@
 
 
         waitForSupabase(
-            async (
-                supabase
-            ) => {
+            async supabase => {
 
                 try{
 
@@ -342,7 +335,8 @@
                             code,
                             name,
                             recipe_type,
-
+                            status,
+                            product_id,
                             recipe_versions (
                                 id,
                                 version_number,
@@ -365,13 +359,12 @@
                     if(error){
 
                         console.error(
-                            "MERAMU Recipe Error:",
+                            "Recipe load error:",
                             error
                         );
 
                         showError(
-                            error.message ||
-                            "Gagal mengambil data recipe."
+                            error.message
                         );
 
                         return;
@@ -391,7 +384,6 @@
 
                     hideLoading();
 
-
                     updateSummary();
 
                     renderRecipes();
@@ -400,13 +392,11 @@
                 }catch(error){
 
                     console.error(
-                        "MERAMU Recipe Exception:",
                         error
                     );
 
                     showError(
-                        error.message ||
-                        "Terjadi kesalahan."
+                        error.message
                     );
 
                 }
@@ -418,89 +408,37 @@
 
 
     /* =====================================================
-       CURRENT VERSION
-    ===================================================== */
-
-    function getCurrentVersion(recipe){
-
-        const versions =
-            Array.isArray(
-                recipe.recipe_versions
-            )
-                ? recipe.recipe_versions
-                : [];
-
-
-        if(!versions.length){
-
-            return null;
-
-        }
-
-
-        return [...versions]
-            .sort(
-                (
-                    a,
-                    b
-                ) =>
-                    Number(
-                        b.version_number || 0
-                    )
-                    -
-                    Number(
-                        a.version_number || 0
-                    )
-            )[0];
-
-    }
-
-
-    /* =====================================================
-       HPP
-       
-       HPP belum kita ambil di H1 karena struktur
-       cost snapshot perlu kita cocokkan lebih dalam
-       saat H2/H9.
-    ===================================================== */
-
-    function getRecipeHpp(recipe){
-
-        return null;
-
-    }
-
-
-    /* =====================================================
-       STATUS
-       
-       Untuk H1 kita gunakan Active sebagai default
-       sampai kolom status recipe dikonfirmasi.
-    ===================================================== */
-
-    function getRecipeStatus(recipe){
-
-        if(
-            recipe.status
-        ){
-
-            return String(
-                recipe.status
-            ).toLowerCase();
-
-        }
-
-
-        return "active";
-
-    }
-
-
-    /* =====================================================
        SUMMARY
     ===================================================== */
 
     function updateSummary(){
+
+        const total =
+            recipes.length;
+
+
+        const active =
+            recipes.filter(
+                recipe =>
+                    getRecipeStatus(recipe) ===
+                    "active"
+            ).length;
+
+
+        const versions =
+            recipes.reduce(
+                (sum,recipe) =>
+                    sum +
+                    (
+                        Array.isArray(
+                            recipe.recipe_versions
+                        )
+                            ? recipe.recipe_versions.length
+                            : 0
+                    ),
+                0
+            );
+
 
         const totalEl =
             document.getElementById(
@@ -518,40 +456,6 @@
             );
 
 
-        const total =
-            recipes.length;
-
-
-        const active =
-            recipes.filter(
-                recipe =>
-                    getRecipeStatus(
-                        recipe
-                    ) === "active"
-            ).length;
-
-
-        const versionCount =
-            recipes.reduce(
-                (
-                    total,
-                    recipe
-                ) => {
-
-                    return total +
-                        (
-                            Array.isArray(
-                                recipe.recipe_versions
-                            )
-                                ? recipe.recipe_versions.length
-                                : 0
-                        );
-
-                },
-                0
-            );
-
-
         if(totalEl)
             totalEl.textContent =
                 formatNumber(total);
@@ -562,15 +466,13 @@
 
         if(versionsEl)
             versionsEl.textContent =
-                formatNumber(
-                    versionCount
-                );
+                formatNumber(versions);
 
     }
 
 
     /* =====================================================
-       RENDER
+       RENDER LIST
     ===================================================== */
 
     function renderRecipes(){
@@ -581,16 +483,11 @@
             );
 
 
-        if(!list){
-
+        if(!list)
             return;
 
-        }
 
-
-        if(
-            !filteredRecipes.length
-        ){
+        if(!filteredRecipes.length){
 
             showEmpty();
 
@@ -599,25 +496,16 @@
         }
 
 
-        const error =
-            document.getElementById(
-                "recipeError"
-            );
+        document.getElementById(
+            "recipeEmpty"
+        )?.setAttribute("hidden","");
 
-        const empty =
-            document.getElementById(
-                "recipeEmpty"
-            );
+        document.getElementById(
+            "recipeError"
+        )?.setAttribute("hidden","");
 
 
-        if(error)
-            error.hidden = true;
-
-        if(empty)
-            empty.hidden = true;
-
-
-        list.hidden = false;
+        list.removeAttribute("hidden");
 
 
         list.innerHTML =
@@ -639,42 +527,14 @@
 
     function renderRecipeCard(recipe){
 
-        const currentVersion =
+        const version =
             getCurrentVersion(
                 recipe
             );
 
 
-        const version =
-            currentVersion
-                ? `v${escapeHtml(
-                    currentVersion.version_number
-                )}`
-                : "Belum ada versi";
-
-
-        const yieldQuantity =
-            currentVersion
-                ? formatNumber(
-                    currentVersion.yield_quantity
-                )
-                : "—";
-
-
         const status =
             getRecipeStatus(
-                recipe
-            );
-
-
-        const statusLabel =
-            status === "archived"
-                ? "Archived"
-                : "Active";
-
-
-        const hpp =
-            getRecipeHpp(
                 recipe
             );
 
@@ -687,7 +547,6 @@
             >
 
                 <div class="recipe-card-main">
-
 
                     <div class="recipe-card-icon">
 
@@ -711,7 +570,11 @@
                                 recipe-status
                                 ${status}
                             ">
-                                ${statusLabel}
+                                ${
+                                    status === "archived"
+                                        ? "Archived"
+                                        : "Active"
+                                }
                             </span>
 
                         </div>
@@ -733,7 +596,13 @@
 
                                 <i data-lucide="layers"></i>
 
-                                ${version}
+                                ${
+                                    version
+                                        ? `v${escapeHtml(
+                                            version.version_number
+                                          )}`
+                                        : "Belum ada versi"
+                                }
 
                             </span>
 
@@ -742,7 +611,13 @@
 
                                 <i data-lucide="flask-conical"></i>
 
-                                Yield ${yieldQuantity} L
+                                Yield ${
+                                    version
+                                        ? formatNumber(
+                                            version.yield_quantity
+                                          )
+                                        : "—"
+                                } L
 
                             </span>
 
@@ -772,7 +647,6 @@
 
                 <div class="recipe-card-right">
 
-
                     <div class="recipe-hpp">
 
                         <span>
@@ -780,18 +654,13 @@
                         </span>
 
                         <strong>
-                            ${
-                                hpp === null
-                                    ? "—"
-                                    : formatCurrency(hpp)
-                            }
+                            —
                         </strong>
 
                     </div>
 
 
                     <div class="recipe-actions">
-
 
                         <button
                             type="button"
@@ -831,7 +700,6 @@
 
                         </button>
 
-
                     </div>
 
                 </div>
@@ -849,28 +717,20 @@
 
     function applyFilters(){
 
-        const searchInput =
-            document.getElementById(
-                "recipeSearch"
-            );
-
-        const statusFilter =
-            document.getElementById(
-                "recipeStatusFilter"
-            );
-
-
         const search =
             (
-                searchInput?.value ||
-                ""
+                document.getElementById(
+                    "recipeSearch"
+                )?.value || ""
             )
             .trim()
             .toLowerCase();
 
 
         const status =
-            statusFilter?.value ||
+            document.getElementById(
+                "recipeStatusFilter"
+            )?.value ||
             "all";
 
 
@@ -880,16 +740,14 @@
 
                     const name =
                         String(
-                            recipe.name ||
-                            ""
+                            recipe.name || ""
                         )
                         .toLowerCase();
 
 
                     const code =
                         String(
-                            recipe.code ||
-                            ""
+                            recipe.code || ""
                         )
                         .toLowerCase();
 
@@ -926,6 +784,1499 @@
 
 
     /* =====================================================
+       LOAD FORM MASTER DATA
+    ===================================================== */
+
+    async function loadFormData(){
+
+        waitForSupabase(
+            async supabase => {
+
+                try{
+
+                    const [
+                        productResult,
+                        ingredientResult,
+                        unitResult
+                    ] = await Promise.all([
+
+                        supabase
+                            .from("products")
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                is_active
+                            `)
+                            .eq(
+                                "is_active",
+                                true
+                            )
+                            .order(
+                                "name",
+                                {
+                                    ascending:true
+                                }
+                            ),
+
+                        supabase
+                            .from("ingredients")
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                default_unit_id,
+                                cost_per_unit,
+                                is_active
+                            `)
+                            .eq(
+                                "is_active",
+                                true
+                            )
+                            .order(
+                                "name",
+                                {
+                                    ascending:true
+                                }
+                            ),
+
+                        supabase
+                            .from("units")
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                category
+                            `)
+                            .order(
+                                "name",
+                                {
+                                    ascending:true
+                                }
+                            )
+
+                    ]);
+
+
+                    if(productResult.error)
+                        throw productResult.error;
+
+                    if(ingredientResult.error)
+                        throw ingredientResult.error;
+
+                    if(unitResult.error)
+                        throw unitResult.error;
+
+
+                    products =
+                        productResult.data || [];
+
+                    ingredients =
+                        ingredientResult.data || [];
+
+                    units =
+                        unitResult.data || [];
+
+
+                    populateProductSelect();
+
+                    populateUnitSelect();
+
+                    resetIngredientRows();
+
+                }catch(error){
+
+                    console.error(
+                        "Recipe master data error:",
+                        error
+                    );
+
+                    showFormError(
+                        error.message ||
+                        "Gagal mengambil master data."
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    function populateProductSelect(){
+
+        const select =
+            document.getElementById(
+                "recipeProduct"
+            );
+
+
+        if(!select)
+            return;
+
+
+        select.innerHTML = `
+
+            <option value="">
+                Pilih Product
+            </option>
+
+            ${
+                products.map(
+                    product => `
+
+                        <option
+                            value="${escapeHtml(product.id)}"
+                        >
+                            ${escapeHtml(
+                                product.name
+                            )}
+                            ${
+                                product.code
+                                    ? ` (${escapeHtml(product.code)})`
+                                    : ""
+                            }
+                        </option>
+
+                    `
+                ).join("")
+            }
+
+        `;
+
+    }
+
+
+    function populateUnitSelect(){
+
+        const select =
+            document.getElementById(
+                "recipeYieldUnit"
+            );
+
+
+        if(!select)
+            return;
+
+
+        select.innerHTML = `
+
+            <option value="">
+                Pilih Unit
+            </option>
+
+            ${
+                units.map(
+                    unit => `
+
+                        <option
+                            value="${escapeHtml(unit.id)}"
+                        >
+                            ${escapeHtml(
+                                unit.name ||
+                                unit.code
+                            )}
+                            ${
+                                unit.code
+                                    ? ` (${escapeHtml(unit.code)})`
+                                    : ""
+                            }
+                        </option>
+
+                    `
+                ).join("")
+            }
+
+        `;
+
+
+        const liter =
+            units.find(
+                unit =>
+                    String(
+                        unit.code || ""
+                    ).toLowerCase() === "l"
+                    ||
+                    String(
+                        unit.code || ""
+                    ).toLowerCase() === "liter"
+                    ||
+                    String(
+                        unit.name || ""
+                    ).toLowerCase() === "liter"
+                    ||
+                    String(
+                        unit.name || ""
+                    ).toLowerCase() === "liter"
+            );
+
+
+        if(liter){
+
+            select.value =
+                liter.id;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       INGREDIENT ROWS
+    ===================================================== */
+
+    function resetIngredientRows(){
+
+        ingredientRows = 0;
+
+
+        const container =
+            document.getElementById(
+                "recipeIngredients"
+            );
+
+
+        if(!container)
+            return;
+
+
+        container.innerHTML = "";
+
+
+        updateIngredientEmpty();
+
+
+        addIngredientRow();
+
+    }
+
+
+    function addIngredientRow(){
+
+        ingredientRows++;
+
+
+        const rowId =
+            ingredientRows;
+
+
+        const container =
+            document.getElementById(
+                "recipeIngredients"
+            );
+
+
+        if(!container)
+            return;
+
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.className =
+            "recipe-ingredient-row";
+
+
+        row.dataset.rowId =
+            rowId;
+
+
+        row.innerHTML = `
+
+            <div class="recipe-ingredient-number">
+
+                ${rowId}
+
+            </div>
+
+
+            <div class="recipe-field">
+
+                <label>
+                    Ingredient
+                </label>
+
+                <select
+                    class="recipe-ingredient-select"
+                    data-field="ingredient"
+                    required
+                >
+
+                    <option value="">
+                        Pilih bahan
+                    </option>
+
+                    ${
+                        ingredients.map(
+                            ingredient => `
+
+                                <option
+                                    value="${escapeHtml(
+                                        ingredient.id
+                                    )}"
+                                    data-default-unit="${escapeHtml(
+                                        ingredient.default_unit_id || ""
+                                    )}"
+                                >
+                                    ${escapeHtml(
+                                        ingredient.name
+                                    )}
+                                    ${
+                                        ingredient.code
+                                            ? ` (${escapeHtml(
+                                                ingredient.code
+                                              )})`
+                                            : ""
+                                    }
+                                </option>
+
+                            `
+                        ).join("")
+                    }
+
+                </select>
+
+            </div>
+
+
+            <div class="recipe-field">
+
+                <label>
+                    Quantity
+                </label>
+
+                <input
+                    type="number"
+                    class="recipe-ingredient-qty"
+                    data-field="quantity"
+                    min="0.000001"
+                    step="0.000001"
+                    placeholder="0"
+                    required
+                >
+
+            </div>
+
+
+            <div class="recipe-field">
+
+                <label>
+                    Unit
+                </label>
+
+                <select
+                    class="recipe-ingredient-unit"
+                    data-field="unit"
+                    required
+                >
+
+                    <option value="">
+                        Unit
+                    </option>
+
+                    ${
+                        units.map(
+                            unit => `
+
+                                <option
+                                    value="${escapeHtml(
+                                        unit.id
+                                    )}"
+                                >
+                                    ${escapeHtml(
+                                        unit.name ||
+                                        unit.code
+                                    )}
+                                    ${
+                                        unit.code
+                                            ? ` (${escapeHtml(
+                                                unit.code
+                                              )})`
+                                            : ""
+                                    }
+                                </option>
+
+                            `
+                        ).join("")
+                    }
+
+                </select>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="recipe-remove-ingredient"
+                title="Hapus bahan"
+            >
+
+                <i data-lucide="trash-2"></i>
+
+            </button>
+
+        `;
+
+
+        container.appendChild(
+            row
+        );
+
+
+        const ingredientSelect =
+            row.querySelector(
+                ".recipe-ingredient-select"
+            );
+
+
+        ingredientSelect?.addEventListener(
+            "change",
+            () => {
+
+                const selected =
+                    ingredientSelect
+                        .selectedOptions[0];
+
+
+                const defaultUnit =
+                    selected?.dataset
+                        ?.defaultUnit;
+
+
+                const unitSelect =
+                    row.querySelector(
+                        ".recipe-ingredient-unit"
+                    );
+
+
+                if(
+                    defaultUnit &&
+                    unitSelect
+                ){
+
+                    unitSelect.value =
+                        defaultUnit;
+
+                }
+
+            }
+        );
+
+
+        row.querySelector(
+            ".recipe-remove-ingredient"
+        )?.addEventListener(
+            "click",
+            () => {
+
+                row.remove();
+
+                renumberIngredientRows();
+
+                updateIngredientEmpty();
+
+            }
+        );
+
+
+        updateIngredientEmpty();
+
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+    }
+
+
+    function renumberIngredientRows(){
+
+        const rows =
+            document.querySelectorAll(
+                ".recipe-ingredient-row"
+            );
+
+
+        rows.forEach(
+            (row,index) => {
+
+                const number =
+                    row.querySelector(
+                        ".recipe-ingredient-number"
+                    );
+
+
+                if(number){
+
+                    number.textContent =
+                        index + 1;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    function updateIngredientEmpty(){
+
+        const container =
+            document.getElementById(
+                "recipeIngredients"
+            );
+
+        const empty =
+            document.getElementById(
+                "recipeIngredientEmpty"
+            );
+
+
+        const count =
+            container
+                ?.querySelectorAll(
+                    ".recipe-ingredient-row"
+                )
+                .length || 0;
+
+
+        if(empty){
+
+            empty.hidden =
+                count > 0;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       AUTO RECIPE CODE
+    ===================================================== */
+
+    function generateRecipeCode(name){
+
+        const clean =
+            String(name || "")
+                .toUpperCase()
+                .normalize("NFD")
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ""
+                )
+                .replace(
+                    /[^A-Z0-9]+/g,
+                    "-"
+                )
+                .replace(
+                    /^-+|-+$/g,
+                    ""
+                );
+
+
+        if(!clean){
+
+            return "";
+
+        }
+
+
+        return `REC-${clean.substring(0,24)}`;
+
+    }
+
+
+    /* =====================================================
+       MODAL
+    ===================================================== */
+
+    function openRecipeModal(){
+
+        const modal =
+            document.getElementById(
+                "recipeModal"
+            );
+
+
+        if(!modal)
+            return;
+
+
+        modal.removeAttribute(
+            "hidden"
+        );
+
+
+        document.body.classList.add(
+            "recipe-modal-open"
+        );
+
+
+        clearFormError();
+
+
+        const form =
+            document.getElementById(
+                "createRecipeForm"
+            );
+
+
+        form?.reset();
+
+
+        document.getElementById(
+            "recipeYield"
+        ).value = "1";
+
+
+        document.getElementById(
+            "recipeType"
+        ).value =
+            "fermentation";
+
+
+        document.getElementById(
+            "fermentationRequired"
+        ).checked = true;
+
+
+        document.getElementById(
+            "f1TargetDays"
+        ).value = "7";
+
+
+        document.getElementById(
+            "f2TargetDays"
+        ).value = "5";
+
+
+        document.getElementById(
+            "recipeShelfLife"
+        ).value = "30";
+
+
+        const code =
+            document.getElementById(
+                "recipeCode"
+            );
+
+
+        const name =
+            document.getElementById(
+                "recipeName"
+            );
+
+
+        if(code)
+            code.value = "";
+
+
+        if(name)
+            name.value = "";
+
+
+        updateFermentationVisibility();
+
+
+        loadFormData();
+
+
+        setTimeout(
+            () => {
+
+                name?.focus();
+
+            },
+            100
+        );
+
+    }
+
+
+    function closeRecipeModal(){
+
+        const modal =
+            document.getElementById(
+                "recipeModal"
+            );
+
+
+        if(!modal)
+            return;
+
+
+        modal.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        document.body.classList.remove(
+            "recipe-modal-open"
+        );
+
+    }
+
+
+    /* =====================================================
+       FORM ERROR
+    ===================================================== */
+
+    function showFormError(message){
+
+        const box =
+            document.getElementById(
+                "recipeFormError"
+            );
+
+
+        if(!box)
+            return;
+
+
+        box.querySelector(
+            "span"
+        ).textContent =
+            message;
+
+
+        box.removeAttribute(
+            "hidden"
+        );
+
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+    }
+
+
+    function clearFormError(){
+
+        document.getElementById(
+            "recipeFormError"
+        )?.setAttribute(
+            "hidden",
+            ""
+        );
+
+    }
+
+
+    /* =====================================================
+       FERMENTATION TOGGLE
+    ===================================================== */
+
+    function updateFermentationVisibility(){
+
+        const checkbox =
+            document.getElementById(
+                "fermentationRequired"
+            );
+
+
+        const fields =
+            document.getElementById(
+                "fermentationFields"
+            );
+
+
+        if(
+            checkbox?.checked
+        ){
+
+            fields?.removeAttribute(
+                "hidden"
+            );
+
+        }else{
+
+            fields?.setAttribute(
+                "hidden",
+                ""
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SAVE RECIPE
+    ===================================================== */
+
+    async function saveRecipe(){
+
+        clearFormError();
+
+
+        const button =
+            document.getElementById(
+                "saveRecipeButton"
+            );
+
+
+        const originalText =
+            button?.querySelector(
+                "span"
+            )?.textContent ||
+            "Simpan Recipe";
+
+
+        const name =
+            document.getElementById(
+                "recipeName"
+            ).value.trim();
+
+
+        const code =
+            document.getElementById(
+                "recipeCode"
+            ).value.trim()
+            .toUpperCase();
+
+
+        const productId =
+            document.getElementById(
+                "recipeProduct"
+            ).value;
+
+
+        const recipeType =
+            document.getElementById(
+                "recipeType"
+            ).value;
+
+
+        const description =
+            document.getElementById(
+                "recipeDescription"
+            ).value.trim();
+
+
+        const yieldQuantity =
+            Number(
+                document.getElementById(
+                    "recipeYield"
+                ).value
+            );
+
+
+        const yieldUnitId =
+            document.getElementById(
+                "recipeYieldUnit"
+            ).value;
+
+
+        const fermentationRequired =
+            document.getElementById(
+                "fermentationRequired"
+            ).checked;
+
+
+        const f1Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "f1TargetDays"
+                    ).value
+                )
+                : 0;
+
+
+        const f2Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "f2TargetDays"
+                    ).value
+                )
+                : 0;
+
+
+        const shelfLife =
+            Number(
+                document.getElementById(
+                    "recipeShelfLife"
+                ).value
+            );
+
+
+        const notes =
+            document.getElementById(
+                "recipeNotes"
+            ).value.trim();
+
+
+        /* -------------------------------------------------
+           VALIDATION
+        ------------------------------------------------- */
+
+        if(!name){
+
+            showFormError(
+                "Nama recipe wajib diisi."
+            );
+
+            return;
+
+        }
+
+
+        if(!code){
+
+            showFormError(
+                "Recipe code wajib diisi."
+            );
+
+            return;
+
+        }
+
+
+        if(!productId){
+
+            showFormError(
+                "Product wajib dipilih."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            !yieldQuantity ||
+            yieldQuantity <= 0
+        ){
+
+            showFormError(
+                "Yield harus lebih besar dari 0."
+            );
+
+            return;
+
+        }
+
+
+        if(!yieldUnitId){
+
+            showFormError(
+                "Unit yield wajib dipilih."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            fermentationRequired &&
+            (
+                f1Target < 0 ||
+                f2Target < 0
+            )
+        ){
+
+            showFormError(
+                "Target fermentasi tidak valid."
+            );
+
+            return;
+
+        }
+
+
+        const rows =
+            [
+                ...document.querySelectorAll(
+                    ".recipe-ingredient-row"
+                )
+            ];
+
+
+        if(!rows.length){
+
+            showFormError(
+                "Tambahkan minimal satu ingredient."
+            );
+
+            return;
+
+        }
+
+
+        const ingredientPayload =
+            [];
+
+
+        for(
+            let index = 0;
+            index < rows.length;
+            index++
+        ){
+
+            const row =
+                rows[index];
+
+
+            const ingredientId =
+                row.querySelector(
+                    ".recipe-ingredient-select"
+                )?.value;
+
+
+            const quantity =
+                Number(
+                    row.querySelector(
+                        ".recipe-ingredient-qty"
+                    )?.value
+                );
+
+
+            const unitId =
+                row.querySelector(
+                    ".recipe-ingredient-unit"
+                )?.value;
+
+
+            if(!ingredientId){
+
+                showFormError(
+                    `Ingredient nomor ${index + 1} belum dipilih.`
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !quantity ||
+                quantity <= 0
+            ){
+
+                showFormError(
+                    `Quantity ingredient nomor ${index + 1} tidak valid.`
+                );
+
+                return;
+
+            }
+
+
+            if(!unitId){
+
+                showFormError(
+                    `Unit ingredient nomor ${index + 1} belum dipilih.`
+                );
+
+                return;
+
+            }
+
+
+            ingredientPayload.push({
+
+                ingredient_id:
+                    ingredientId,
+
+                quantity,
+
+                unit_id:
+                    unitId
+
+            });
+
+        }
+
+
+        /* -------------------------------------------------
+           BUTTON STATE
+        ------------------------------------------------- */
+
+        if(button){
+
+            button.disabled = true;
+
+            button.classList.add(
+                "is-loading"
+            );
+
+
+            const span =
+                button.querySelector(
+                    "span"
+                );
+
+
+            if(span){
+
+                span.textContent =
+                    "Menyimpan...";
+
+            }
+
+        }
+
+
+        waitForSupabase(
+            async supabase => {
+
+                let createdRecipeId =
+                    null;
+
+
+                try{
+
+                    /* =====================================
+                       1. CREATE RECIPE
+                    ===================================== */
+
+                    const {
+                        data: recipe,
+                        error: recipeError
+                    } = await supabase
+
+                        .from("recipes")
+
+                        .insert({
+
+                            code,
+
+                            name,
+
+                            product_id:
+                                productId,
+
+                            description:
+                                description ||
+                                null,
+
+                            recipe_type:
+                                recipeType,
+
+                            status:
+                                "active",
+
+                            current_version_number:
+                                1
+
+                        })
+
+                        .select(
+                            "id"
+                        )
+
+                        .single();
+
+
+                    if(recipeError){
+
+                        throw recipeError;
+
+                    }
+
+
+                    createdRecipeId =
+                        recipe.id;
+
+
+                    /* =====================================
+                       2. CREATE VERSION 1
+                    ===================================== */
+
+                    const {
+                        data: version,
+                        error: versionError
+                    } = await supabase
+
+                        .from(
+                            "recipe_versions"
+                        )
+
+                        .insert({
+
+                            recipe_id:
+                                createdRecipeId,
+
+                            version_number:
+                                1,
+
+                            yield_quantity:
+                                yieldQuantity,
+
+                            yield_unit_id:
+                                yieldUnitId,
+
+                            fermentation_required:
+                                fermentationRequired,
+
+                            f1_target_days:
+                                fermentationRequired
+                                    ? f1Target
+                                    : 0,
+
+                            f2_target_days:
+                                fermentationRequired
+                                    ? f2Target
+                                    : 0,
+
+                            shelf_life_days:
+                                shelfLife || 0,
+
+                            notes:
+                                notes ||
+                                null,
+
+                            status:
+                                "active",
+
+                            effective_from:
+                                new Date()
+                                    .toISOString()
+
+                        })
+
+                        .select(
+                            "id"
+                        )
+
+                        .single();
+
+
+                    if(versionError){
+
+                        throw versionError;
+
+                    }
+
+
+                    /* =====================================
+                       3. CREATE INGREDIENTS
+                    ===================================== */
+
+                    const ingredientRows =
+                        ingredientPayload.map(
+                            item => ({
+
+                                recipe_version_id:
+                                    version.id,
+
+                                ingredient_id:
+                                    item.ingredient_id,
+
+                                quantity:
+                                    item.quantity,
+
+                                unit_id:
+                                    item.unit_id
+
+                            })
+                        );
+
+
+                    const {
+                        error:
+                            ingredientError
+                    } = await supabase
+
+                        .from(
+                            "recipe_ingredients"
+                        )
+
+                        .insert(
+                            ingredientRows
+                        );
+
+
+                    if(ingredientError){
+
+                        throw ingredientError;
+
+                    }
+
+
+                    /* =====================================
+                       SUCCESS
+                    ===================================== */
+
+                    closeRecipeModal();
+
+
+                    await loadRecipes();
+
+
+                    showSuccessMessage(
+                        "Recipe berhasil dibuat."
+                    );
+
+
+                }catch(error){
+
+                    console.error(
+                        "CREATE RECIPE ERROR:",
+                        error
+                    );
+
+
+                    /*
+                       Best-effort rollback.
+                       Hanya recipe yang dibuat pada proses
+                       ini yang akan dicoba dihapus.
+                    */
+
+                    if(createdRecipeId){
+
+                        try{
+
+                            await supabase
+
+                                .from("recipes")
+
+                                .delete()
+
+                                .eq(
+                                    "id",
+                                    createdRecipeId
+                                );
+
+                        }catch(
+                            rollbackError
+                        ){
+
+                            console.error(
+                                "Rollback error:",
+                                rollbackError
+                            );
+
+                        }
+
+                    }
+
+
+                    showFormError(
+                        error?.message ||
+                        "Recipe gagal disimpan."
+                    );
+
+                }finally{
+
+                    if(button){
+
+                        button.disabled =
+                            false;
+
+                        button.classList.remove(
+                            "is-loading"
+                        );
+
+
+                        const span =
+                            button.querySelector(
+                                "span"
+                            );
+
+
+                        if(span){
+
+                            span.textContent =
+                                originalText;
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       SUCCESS TOAST
+    ===================================================== */
+
+    function showSuccessMessage(message){
+
+        let toast =
+            document.getElementById(
+                "recipeSuccessToast"
+            );
+
+
+        if(!toast){
+
+            toast =
+                document.createElement(
+                    "div"
+                );
+
+
+            toast.id =
+                "recipeSuccessToast";
+
+
+            toast.className =
+                "recipe-success-toast";
+
+
+            document.body.appendChild(
+                toast
+            );
+
+        }
+
+
+        toast.innerHTML = `
+
+            <i data-lucide="circle-check"></i>
+
+            <span>
+                ${escapeHtml(message)}
+            </span>
+
+        `;
+
+
+        toast.classList.add(
+            "show"
+        );
+
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            3000
+        );
+
+    }
+
+
+    /* =====================================================
        ACTIONS
     ===================================================== */
 
@@ -942,22 +2293,19 @@
             );
 
 
-        if(!recipe){
-
+        if(!recipe)
             return;
-
-        }
 
 
         if(action === "view"){
 
             console.log(
-                "MERAMU Recipe View:",
+                "Recipe View:",
                 recipe
             );
 
             alert(
-                "Recipe detail akan kita kerjakan pada H2/H3."
+                "Recipe Detail kita lanjutkan setelah H2."
             );
 
             return;
@@ -967,13 +2315,8 @@
 
         if(action === "edit"){
 
-            console.log(
-                "MERAMU Recipe Edit:",
-                recipe
-            );
-
             alert(
-                "Recipe Edit akan kita kerjakan setelah H1 selesai."
+                "Edit Recipe akan kita kerjakan di H3."
             );
 
             return;
@@ -983,13 +2326,8 @@
 
         if(action === "version"){
 
-            console.log(
-                "MERAMU Recipe New Version:",
-                recipe
-            );
-
             alert(
-                "Recipe Version akan kita kerjakan pada tahap H4."
+                "Recipe Version akan kita kerjakan di H4."
             );
 
         }
@@ -1003,52 +2341,161 @@
 
     function bindEvents(){
 
-        const search =
-            document.getElementById(
-                "recipeSearch"
-            );
-
-        const filter =
-            document.getElementById(
-                "recipeStatusFilter"
-            );
-
-        const retry =
-            document.getElementById(
-                "recipeRetryButton"
-            );
-
-        const create =
-            document.getElementById(
-                "createRecipeButton"
-            );
-
-
-        search?.addEventListener(
+        document.getElementById(
+            "recipeSearch"
+        )?.addEventListener(
             "input",
             applyFilters
         );
 
 
-        filter?.addEventListener(
+        document.getElementById(
+            "recipeStatusFilter"
+        )?.addEventListener(
             "change",
             applyFilters
         );
 
 
-        retry?.addEventListener(
+        document.getElementById(
+            "recipeRetryButton"
+        )?.addEventListener(
             "click",
             loadRecipes
         );
 
 
-        create?.addEventListener(
+        document.getElementById(
+            "createRecipeButton"
+        )?.addEventListener(
             "click",
-            () => {
+            openRecipeModal
+        );
 
-                alert(
-                    "Create Recipe akan kita kerjakan setelah Recipe List."
-                );
+
+        document.getElementById(
+            "closeRecipeModal"
+        )?.addEventListener(
+            "click",
+            closeRecipeModal
+        );
+
+
+        document.getElementById(
+            "cancelRecipeButton"
+        )?.addEventListener(
+            "click",
+            closeRecipeModal
+        );
+
+
+        document.querySelector(
+            ".recipe-modal-backdrop"
+        )?.addEventListener(
+            "click",
+            closeRecipeModal
+        );
+
+
+        document.getElementById(
+            "addIngredientButton"
+        )?.addEventListener(
+            "click",
+            addIngredientRow
+        );
+
+
+        document.getElementById(
+            "fermentationRequired"
+        )?.addEventListener(
+            "change",
+            updateFermentationVisibility
+        );
+
+
+        document.getElementById(
+            "recipeName"
+        )?.addEventListener(
+            "input",
+            event => {
+
+                const code =
+                    document.getElementById(
+                        "recipeCode"
+                    );
+
+
+                if(
+                    code &&
+                    !code.dataset.manual
+                ){
+
+                    code.value =
+                        generateRecipeCode(
+                            event.target.value
+                        );
+
+                }
+
+            }
+        );
+
+
+        document.getElementById(
+            "recipeCode"
+        )?.addEventListener(
+            "input",
+            event => {
+
+                event.target.dataset.manual =
+                    event.target.value
+                        .trim()
+                        .length
+                        ? "true"
+                        : "";
+
+            }
+        );
+
+
+        document.getElementById(
+            "createRecipeForm"
+        )?.addEventListener(
+            "submit",
+            event => {
+
+                event.preventDefault();
+
+                saveRecipe();
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if(
+                    event.key === "Escape"
+                ){
+
+                    const modal =
+                        document.getElementById(
+                            "recipeModal"
+                        );
+
+
+                    if(
+                        modal &&
+                        !modal.hidden
+                    ){
+
+                        closeRecipeModal();
+
+                    }
+
+                }
 
             }
         );
@@ -1064,11 +2511,8 @@
                     );
 
 
-                if(!button){
-
+                if(!button)
                     return;
-
-                }
 
 
                 handleRecipeAction(
@@ -1090,14 +2534,12 @@
 
         bindEvents();
 
+        updateFermentationVisibility();
+
         loadRecipes();
 
     }
 
-
-    /* =====================================================
-       GLOBAL
-    ===================================================== */
 
     window.initRecipePage =
         initRecipePage;
