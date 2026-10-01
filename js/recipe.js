@@ -3,14 +3,35 @@
    ---------------------------------------------------------
    H1  Recipe List
    H2  Create Recipe
-   H3  Recipe Detail
-   ---------------------------------------------------------
-   IMPORTANT:
+   H3  Recipe Detail + Edit Recipe
+   H4  Recipe Version — NEXT
+
+   IMPORTANT BUSINESS RULE
+
    Recipe = MASTER FORMULA
+
    Production = EXECUTION / BATCH
 
-   H3 tidak mengubah Recipe Version / Ingredients lama.
-   Perubahan formula akan dilakukan melalui H4 Version.
+   H3 Edit Recipe hanya mengubah MASTER RECIPE:
+
+   - Name
+   - Code
+   - Product
+   - Recipe Type
+   - Description
+
+   H3 TIDAK mengubah:
+
+   - Recipe Version
+   - Ingredients
+   - Yield
+   - Fermentation Setting
+   - F1 Target
+   - F2 Target
+   - Shelf Life
+
+   Perubahan formula dilakukan melalui
+   Recipe Version pada H4.
 ========================================================= */
 
 (function () {
@@ -36,14 +57,30 @@
 
     let activeDetailRecipeId = null;
 
+    /*
+    =========================================================
+    H3 EDIT STATE
+
+    null = Create Recipe
+    ID   = Edit Recipe
+    =========================================================
+    */
+
+    let editingRecipeId = null;
+
 
     /* =====================================================
        SUPABASE
     ===================================================== */
 
-    function waitForSupabase(callback, attempt = 0) {
+    function waitForSupabase(
+        callback,
+        attempt = 0
+    ) {
 
-        if (window.supabaseClient) {
+        if (
+            window.supabaseClient
+        ) {
 
             callback(
                 window.supabaseClient
@@ -54,7 +91,9 @@
         }
 
 
-        if (attempt >= 50) {
+        if (
+            attempt >= 50
+        ) {
 
             showError(
                 "Supabase client tidak tersedia."
@@ -84,7 +123,9 @@
        GENERAL HELPERS
     ===================================================== */
 
-    function escapeHtml(value) {
+    function escapeHtml(
+        value
+    ) {
 
         if (
             value === null ||
@@ -97,16 +138,38 @@
 
 
         return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
 
     }
 
 
-    function formatNumber(value) {
+    function formatNumber(
+        value
+    ) {
 
         if (
             value === null ||
@@ -123,9 +186,13 @@
             Number(value);
 
 
-        if (Number.isNaN(number)) {
+        if (
+            Number.isNaN(number)
+        ) {
 
-            return escapeHtml(value);
+            return escapeHtml(
+                value
+            );
 
         }
 
@@ -135,12 +202,16 @@
             {
                 maximumFractionDigits: 3
             }
-        ).format(number);
+        ).format(
+            number
+        );
 
     }
 
 
-    function formatCurrency(value) {
+    function formatCurrency(
+        value
+    ) {
 
         if (
             value === null ||
@@ -157,7 +228,9 @@
             Number(value);
 
 
-        if (Number.isNaN(number)) {
+        if (
+            Number.isNaN(number)
+        ) {
 
             return "—";
 
@@ -171,12 +244,16 @@
                 currency: "IDR",
                 maximumFractionDigits: 0
             }
-        ).format(number);
+        ).format(
+            number
+        );
 
     }
 
 
-    function getCurrentVersion(recipe) {
+    function getCurrentVersion(
+        recipe
+    ) {
 
         const versions =
             Array.isArray(
@@ -186,16 +263,23 @@
                 : [];
 
 
-        if (!versions.length) {
+        if (
+            !versions.length
+        ) {
 
             return null;
 
         }
 
 
-        return [...versions]
+        return [
+            ...versions
+        ]
             .sort(
-                (a, b) =>
+                (
+                    a,
+                    b
+                ) =>
                     Number(
                         b.version_number || 0
                     )
@@ -208,10 +292,13 @@
     }
 
 
-    function getRecipeStatus(recipe) {
+    function getRecipeStatus(
+        recipe
+    ) {
 
         return String(
-            recipe?.status || "active"
+            recipe?.status ||
+            "active"
         ).toLowerCase();
 
     }
@@ -219,7 +306,9 @@
 
     function refreshIcons() {
 
-        if (window.lucide) {
+        if (
+            window.lucide
+        ) {
 
             lucide.createIcons();
 
@@ -229,18 +318,24 @@
 
 
     /* =====================================================
-       PAGE ERROR / LOADING
+       PAGE LOADING
     ===================================================== */
 
     function showLoading() {
 
         document
-            .getElementById("recipeLoading")
-            ?.removeAttribute("hidden");
+            .getElementById(
+                "recipeLoading"
+            )
+            ?.removeAttribute(
+                "hidden"
+            );
 
 
         document
-            .getElementById("recipeError")
+            .getElementById(
+                "recipeError"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -248,7 +343,9 @@
 
 
         document
-            .getElementById("recipeEmpty")
+            .getElementById(
+                "recipeEmpty"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -256,7 +353,9 @@
 
 
         document
-            .getElementById("recipeList")
+            .getElementById(
+                "recipeList"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -268,7 +367,9 @@
     function hideLoading() {
 
         document
-            .getElementById("recipeLoading")
+            .getElementById(
+                "recipeLoading"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -277,7 +378,9 @@
     }
 
 
-    function showError(message) {
+    function showError(
+        message
+    ) {
 
         hideLoading();
 
@@ -294,7 +397,9 @@
             );
 
 
-        if (errorText) {
+        if (
+            errorText
+        ) {
 
             errorText.textContent =
                 message ||
@@ -309,7 +414,9 @@
 
 
         document
-            .getElementById("recipeEmpty")
+            .getElementById(
+                "recipeEmpty"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -317,7 +424,9 @@
 
 
         document
-            .getElementById("recipeList")
+            .getElementById(
+                "recipeList"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -335,14 +444,18 @@
 
 
         document
-            .getElementById("recipeEmpty")
+            .getElementById(
+                "recipeEmpty"
+            )
             ?.removeAttribute(
                 "hidden"
             );
 
 
         document
-            .getElementById("recipeError")
+            .getElementById(
+                "recipeError"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -350,7 +463,9 @@
 
 
         document
-            .getElementById("recipeList")
+            .getElementById(
+                "recipeList"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -378,7 +493,9 @@
                         error
                     } = await supabase
 
-                        .from("recipes")
+                        .from(
+                            "recipes"
+                        )
 
                         .select(`
                             id,
@@ -404,12 +521,15 @@
                         .order(
                             "name",
                             {
-                                ascending: true
+                                ascending:
+                                    true
                             }
                         );
 
 
-                    if (error) {
+                    if (
+                        error
+                    ) {
 
                         console.error(
                             "Recipe load error:",
@@ -432,7 +552,9 @@
 
 
                     filteredRecipes =
-                        [...recipes];
+                        [
+                            ...recipes
+                        ];
 
 
                     hideLoading();
@@ -442,7 +564,9 @@
                     renderRecipes();
 
                 }
-                catch (error) {
+                catch (
+                    error
+                ) {
 
                     console.error(
                         "RECIPE LIST ERROR:",
@@ -475,14 +599,19 @@
         const active =
             recipes.filter(
                 recipe =>
-                    getRecipeStatus(recipe) ===
+                    getRecipeStatus(
+                        recipe
+                    ) ===
                     "active"
             ).length;
 
 
         const versions =
             recipes.reduce(
-                (sum, recipe) => {
+                (
+                    sum,
+                    recipe
+                ) => {
 
                     const recipeVersions =
                         Array.isArray(
@@ -520,26 +649,38 @@
             );
 
 
-        if (totalEl) {
+        if (
+            totalEl
+        ) {
 
             totalEl.textContent =
-                formatNumber(total);
+                formatNumber(
+                    total
+                );
 
         }
 
 
-        if (activeEl) {
+        if (
+            activeEl
+        ) {
 
             activeEl.textContent =
-                formatNumber(active);
+                formatNumber(
+                    active
+                );
 
         }
 
 
-        if (versionsEl) {
+        if (
+            versionsEl
+        ) {
 
             versionsEl.textContent =
-                formatNumber(versions);
+                formatNumber(
+                    versions
+                );
 
         }
 
@@ -547,7 +688,7 @@
 
 
     /* =====================================================
-       RENDER RECIPE LIST
+       H1 — RENDER RECIPE LIST
     ===================================================== */
 
     function renderRecipes() {
@@ -558,14 +699,18 @@
             );
 
 
-        if (!list) {
+        if (
+            !list
+        ) {
 
             return;
 
         }
 
 
-        if (!filteredRecipes.length) {
+        if (
+            !filteredRecipes.length
+        ) {
 
             showEmpty();
 
@@ -575,7 +720,9 @@
 
 
         document
-            .getElementById("recipeEmpty")
+            .getElementById(
+                "recipeEmpty"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -583,7 +730,9 @@
 
 
         document
-            .getElementById("recipeError")
+            .getElementById(
+                "recipeError"
+            )
             ?.setAttribute(
                 "hidden",
                 ""
@@ -608,7 +757,9 @@
     }
 
 
-    function renderRecipeCard(recipe) {
+    function renderRecipeCard(
+        recipe
+    ) {
 
         const version =
             getCurrentVersion(
@@ -641,12 +792,18 @@
 
             <article
                 class="recipe-card"
-                data-recipe-id="${escapeHtml(recipe.id)}"
+                data-recipe-id="${escapeHtml(
+                    recipe.id
+                )}"
             >
 
-                <div class="recipe-card-main">
+                <div
+                    class="recipe-card-main"
+                >
 
-                    <div class="recipe-card-icon">
+                    <div
+                        class="recipe-card-icon"
+                    >
 
                         <i
                             data-lucide="flask-conical"
@@ -655,31 +812,43 @@
                     </div>
 
 
-                    <div class="recipe-card-info">
+                    <div
+                        class="recipe-card-info"
+                    >
 
-                        <div class="recipe-card-title-row">
+                        <div
+                            class="recipe-card-title-row"
+                        >
 
                             <h3>
+
                                 ${escapeHtml(
                                     recipe.name ||
                                     "Tanpa Nama"
                                 )}
+
                             </h3>
 
 
                             <span
                                 class="
                                     recipe-status
-                                    ${escapeHtml(status)}
+                                    ${escapeHtml(
+                                        status
+                                    )}
                                 "
                             >
+
                                 ${statusLabel}
+
                             </span>
 
                         </div>
 
 
-                        <div class="recipe-code">
+                        <div
+                            class="recipe-code"
+                        >
 
                             ${escapeHtml(
                                 recipe.code ||
@@ -689,7 +858,9 @@
                         </div>
 
 
-                        <div class="recipe-meta">
+                        <div
+                            class="recipe-meta"
+                        >
 
                             <span>
 
@@ -701,7 +872,7 @@
                                     version
                                         ? `v${escapeHtml(
                                             version.version_number
-                                          )}`
+                                        )}`
                                         : "Belum ada versi"
                                 }
 
@@ -715,11 +886,13 @@
                                 ></i>
 
                                 Yield ${
-                                    yieldValue !== undefined &&
-                                    yieldValue !== null
+                                    yieldValue !==
+                                    undefined &&
+                                    yieldValue !==
+                                    null
                                         ? formatNumber(
                                             yieldValue
-                                          )
+                                        )
                                         : "—"
                                 }
 
@@ -751,9 +924,13 @@
                 </div>
 
 
-                <div class="recipe-card-right">
+                <div
+                    class="recipe-card-right"
+                >
 
-                    <div class="recipe-hpp">
+                    <div
+                        class="recipe-hpp"
+                    >
 
                         <span>
                             HPP / Liter
@@ -766,13 +943,17 @@
                     </div>
 
 
-                    <div class="recipe-actions">
+                    <div
+                        class="recipe-actions"
+                    >
 
                         <button
                             type="button"
                             class="icon-detail-btn"
                             data-action="view"
-                            data-id="${escapeHtml(recipe.id)}"
+                            data-id="${escapeHtml(
+                                recipe.id
+                            )}"
                             title="Lihat recipe"
                         >
 
@@ -787,7 +968,9 @@
                             type="button"
                             class="icon-detail-btn"
                             data-action="edit"
-                            data-id="${escapeHtml(recipe.id)}"
+                            data-id="${escapeHtml(
+                                recipe.id
+                            )}"
                             title="Edit recipe"
                         >
 
@@ -802,7 +985,9 @@
                             type="button"
                             class="icon-detail-btn"
                             data-action="version"
-                            data-id="${escapeHtml(recipe.id)}"
+                            data-id="${escapeHtml(
+                                recipe.id
+                            )}"
                             title="Buat versi baru"
                         >
 
@@ -824,7 +1009,7 @@
 
 
     /* =====================================================
-       FILTER
+       H1 — FILTER
     ===================================================== */
 
     function applyFilters() {
@@ -833,7 +1018,8 @@
             (
                 document.getElementById(
                     "recipeSearch"
-                )?.value || ""
+                )?.value ||
+                ""
             )
                 .trim()
                 .toLowerCase();
@@ -852,22 +1038,28 @@
 
                     const name =
                         String(
-                            recipe.name || ""
+                            recipe.name ||
+                            ""
                         )
                             .toLowerCase();
 
 
                     const code =
                         String(
-                            recipe.code || ""
+                            recipe.code ||
+                            ""
                         )
                             .toLowerCase();
 
 
                     const matchesSearch =
                         !search ||
-                        name.includes(search) ||
-                        code.includes(search);
+                        name.includes(
+                            search
+                        ) ||
+                        code.includes(
+                            search
+                        );
 
 
                     const recipeStatus =
@@ -878,7 +1070,8 @@
 
                     const matchesStatus =
                         status === "all" ||
-                        recipeStatus === status;
+                        recipeStatus ===
+                            status;
 
 
                     return (
@@ -901,134 +1094,175 @@
 
     async function loadFormData() {
 
-        waitForSupabase(
-            async supabase => {
+        return new Promise(
+            resolve => {
 
-                try {
+                waitForSupabase(
+                    async supabase => {
 
-                    const [
-                        productResult,
-                        ingredientResult,
-                        unitResult
-                    ] = await Promise.all([
+                        try {
 
-                        supabase
-                            .from("products")
-                            .select(`
-                                id,
-                                code,
-                                name,
-                                is_active
-                            `)
-                            .eq(
-                                "is_active",
+                            const [
+                                productResult,
+                                ingredientResult,
+                                unitResult
+                            ] =
+                                await Promise.all([
+
+                                    supabase
+                                        .from(
+                                            "products"
+                                        )
+                                        .select(`
+                                            id,
+                                            code,
+                                            name,
+                                            is_active
+                                        `)
+                                        .eq(
+                                            "is_active",
+                                            true
+                                        )
+                                        .order(
+                                            "name",
+                                            {
+                                                ascending:
+                                                    true
+                                            }
+                                        ),
+
+                                    supabase
+                                        .from(
+                                            "ingredients"
+                                        )
+                                        .select(`
+                                            id,
+                                            code,
+                                            name,
+                                            default_unit_id,
+                                            cost_per_unit,
+                                            is_active
+                                        `)
+                                        .eq(
+                                            "is_active",
+                                            true
+                                        )
+                                        .order(
+                                            "name",
+                                            {
+                                                ascending:
+                                                    true
+                                            }
+                                        ),
+
+                                    supabase
+                                        .from(
+                                            "units"
+                                        )
+                                        .select(`
+                                            id,
+                                            code,
+                                            name,
+                                            category
+                                        `)
+                                        .order(
+                                            "name",
+                                            {
+                                                ascending:
+                                                    true
+                                            }
+                                        )
+
+                                ]);
+
+
+                            if (
+                                productResult.error
+                            ) {
+
+                                throw productResult.error;
+
+                            }
+
+
+                            if (
+                                ingredientResult.error
+                            ) {
+
+                                throw ingredientResult.error;
+
+                            }
+
+
+                            if (
+                                unitResult.error
+                            ) {
+
+                                throw unitResult.error;
+
+                            }
+
+
+                            products =
+                                productResult.data ||
+                                [];
+
+
+                            ingredients =
+                                ingredientResult.data ||
+                                [];
+
+
+                            units =
+                                unitResult.data ||
+                                [];
+
+
+                            populateProductSelect();
+
+                            populateUnitSelect();
+
+                            resetIngredientRows();
+
+
+                            resolve(
                                 true
-                            )
-                            .order(
-                                "name",
-                                {
-                                    ascending: true
-                                }
-                            ),
+                            );
 
-                        supabase
-                            .from("ingredients")
-                            .select(`
-                                id,
-                                code,
-                                name,
-                                default_unit_id,
-                                cost_per_unit,
-                                is_active
-                            `)
-                            .eq(
-                                "is_active",
-                                true
-                            )
-                            .order(
-                                "name",
-                                {
-                                    ascending: true
-                                }
-                            ),
+                        }
+                        catch (
+                            error
+                        ) {
 
-                        supabase
-                            .from("units")
-                            .select(`
-                                id,
-                                code,
-                                name,
-                                category
-                            `)
-                            .order(
-                                "name",
-                                {
-                                    ascending: true
-                                }
-                            )
+                            console.error(
+                                "Recipe master data error:",
+                                error
+                            );
 
-                    ]);
+                            showFormError(
+                                error?.message ||
+                                "Gagal mengambil master data."
+                            );
 
 
-                    if (productResult.error) {
+                            resolve(
+                                false
+                            );
 
-                        throw productResult.error;
+                        }
 
                     }
-
-
-                    if (ingredientResult.error) {
-
-                        throw ingredientResult.error;
-
-                    }
-
-
-                    if (unitResult.error) {
-
-                        throw unitResult.error;
-
-                    }
-
-
-                    products =
-                        productResult.data || [];
-
-
-                    ingredients =
-                        ingredientResult.data || [];
-
-
-                    units =
-                        unitResult.data || [];
-
-
-                    populateProductSelect();
-
-                    populateUnitSelect();
-
-                    resetIngredientRows();
-
-                }
-                catch (error) {
-
-                    console.error(
-                        "Recipe master data error:",
-                        error
-                    );
-
-                    showFormError(
-                        error?.message ||
-                        "Gagal mengambil master data."
-                    );
-
-                }
+                );
 
             }
         );
 
     }
 
+
+    /* =====================================================
+       PRODUCT SELECT
+    ===================================================== */
 
     function populateProductSelect() {
 
@@ -1038,7 +1272,9 @@
             );
 
 
-        if (!select) {
+        if (
+            !select
+        ) {
 
             return;
 
@@ -1070,7 +1306,7 @@
                                     product.code
                                         ? ` (${escapeHtml(
                                             product.code
-                                          )})`
+                                        )})`
                                         : ""
                                 }
 
@@ -1086,6 +1322,10 @@
     }
 
 
+    /* =====================================================
+       UNIT SELECT
+    ===================================================== */
+
     function populateUnitSelect() {
 
         const select =
@@ -1094,7 +1334,9 @@
             );
 
 
-        if (!select) {
+        if (
+            !select
+        ) {
 
             return;
 
@@ -1127,7 +1369,7 @@
                                     unit.code
                                         ? ` (${escapeHtml(
                                             unit.code
-                                          )})`
+                                        )})`
                                         : ""
                                 }
 
@@ -1147,14 +1389,16 @@
 
                     const code =
                         String(
-                            unit.code || ""
+                            unit.code ||
+                            ""
                         )
                             .toLowerCase();
 
 
                     const name =
                         String(
-                            unit.name || ""
+                            unit.name ||
+                            ""
                         )
                             .toLowerCase();
 
@@ -1169,7 +1413,9 @@
             );
 
 
-        if (liter) {
+        if (
+            liter
+        ) {
 
             select.value =
                 liter.id;
@@ -1194,17 +1440,21 @@
             );
 
 
-        if (!container) {
+        if (
+            !container
+        ) {
 
             return;
 
         }
 
 
-        container.innerHTML = "";
+        container.innerHTML =
+            "";
 
 
         updateIngredientEmpty();
+
 
         addIngredientRow();
 
@@ -1226,7 +1476,9 @@
             );
 
 
-        if (!container) {
+        if (
+            !container
+        ) {
 
             return;
 
@@ -1252,11 +1504,15 @@
             <div
                 class="recipe-ingredient-number"
             >
+
                 ${rowId}
+
             </div>
 
 
-            <div class="recipe-field">
+            <div
+                class="recipe-field"
+            >
 
                 <label>
                     Ingredient
@@ -1282,7 +1538,8 @@
                                             ingredient.id
                                         )}"
                                         data-default-unit="${escapeHtml(
-                                            ingredient.default_unit_id || ""
+                                            ingredient.default_unit_id ||
+                                            ""
                                         )}"
                                     >
 
@@ -1294,7 +1551,7 @@
                                             ingredient.code
                                                 ? ` (${escapeHtml(
                                                     ingredient.code
-                                                  )})`
+                                                )})`
                                                 : ""
                                         }
 
@@ -1310,7 +1567,9 @@
             </div>
 
 
-            <div class="recipe-field">
+            <div
+                class="recipe-field"
+            >
 
                 <label>
                     Quantity
@@ -1329,7 +1588,9 @@
             </div>
 
 
-            <div class="recipe-field">
+            <div
+                class="recipe-field"
+            >
 
                 <label>
                     Unit
@@ -1365,7 +1626,7 @@
                                             unit.code
                                                 ? ` (${escapeHtml(
                                                     unit.code
-                                                  )})`
+                                                )})`
                                                 : ""
                                         }
 
@@ -1473,7 +1734,10 @@
 
 
         rows.forEach(
-            (row, index) => {
+            (
+                row,
+                index
+            ) => {
 
                 const number =
                     row.querySelector(
@@ -1481,7 +1745,9 @@
                     );
 
 
-                if (number) {
+                if (
+                    number
+                ) {
 
                     number.textContent =
                         index + 1;
@@ -1513,10 +1779,13 @@
                 ?.querySelectorAll(
                     ".recipe-ingredient-row"
                 )
-                .length || 0;
+                .length ||
+            0;
 
 
-        if (empty) {
+        if (
+            empty
+        ) {
 
             empty.hidden =
                 count > 0;
@@ -1530,12 +1799,19 @@
        H2 — AUTO RECIPE CODE
     ===================================================== */
 
-    function generateRecipeCode(name) {
+    function generateRecipeCode(
+        name
+    ) {
 
         const clean =
-            String(name || "")
+            String(
+                name ||
+                ""
+            )
                 .toUpperCase()
-                .normalize("NFD")
+                .normalize(
+                    "NFD"
+                )
                 .replace(
                     /[\u0300-\u036f]/g,
                     ""
@@ -1550,14 +1826,126 @@
                 );
 
 
-        if (!clean) {
+        if (
+            !clean
+        ) {
 
             return "";
 
         }
 
 
-        return `REC-${clean.substring(0, 24)}`;
+        return `REC-${clean.substring(
+            0,
+            24
+        )}`;
+
+    }
+
+
+    /* =====================================================
+       H2 / H3 — RECIPE MODAL MODE
+    ===================================================== */
+
+    function setRecipeModalMode(
+        mode
+    ) {
+
+        const title =
+            document.querySelector(
+                "#recipeModal h2"
+            );
+
+
+        const subtitle =
+            document.querySelector(
+                "#recipeModal .recipe-modal-header p"
+            );
+
+
+        const saveButton =
+            document.getElementById(
+                "saveRecipeButton"
+            );
+
+
+        const saveText =
+            saveButton?.querySelector(
+                "span"
+            );
+
+
+        if (
+            mode === "edit"
+        ) {
+
+            if (
+                title
+            ) {
+
+                title.textContent =
+                    "Edit Recipe";
+
+            }
+
+
+            if (
+                subtitle
+            ) {
+
+                subtitle.textContent =
+                    "Edit informasi master recipe tanpa mengubah formula version.";
+
+            }
+
+
+            if (
+                saveText
+            ) {
+
+                saveText.textContent =
+                    "Simpan Perubahan";
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+        CREATE MODE
+        */
+
+        if (
+            title
+        ) {
+
+            title.textContent =
+                "Buat Recipe";
+
+        }
+
+
+        if (
+            subtitle
+        ) {
+
+            subtitle.textContent =
+                "Buat master formula baru untuk digunakan sebagai template Production.";
+
+        }
+
+
+        if (
+            saveText
+        ) {
+
+            saveText.textContent =
+                "Simpan Recipe";
+
+        }
 
     }
 
@@ -1568,13 +1956,19 @@
 
     function openRecipeModal() {
 
+        editingRecipeId =
+            null;
+
+
         const modal =
             document.getElementById(
                 "recipeModal"
             );
 
 
-        if (!modal) {
+        if (
+            !modal
+        ) {
 
             return;
 
@@ -1603,13 +1997,37 @@
         form?.reset();
 
 
+        /*
+        -----------------------------------------------------
+        CREATE MODE
+        -----------------------------------------------------
+        */
+
+        setRecipeModalMode(
+            "create"
+        );
+
+
+        setEditFormulaReadonly(
+            false
+        );
+
+
+        /*
+        -----------------------------------------------------
+        DEFAULT VALUE
+        -----------------------------------------------------
+        */
+
         const yieldInput =
             document.getElementById(
                 "recipeYield"
             );
 
 
-        if (yieldInput) {
+        if (
+            yieldInput
+        ) {
 
             yieldInput.value =
                 "1";
@@ -1623,7 +2041,9 @@
             );
 
 
-        if (typeSelect) {
+        if (
+            typeSelect
+        ) {
 
             typeSelect.value =
                 "fermentation";
@@ -1637,7 +2057,9 @@
             );
 
 
-        if (fermentation) {
+        if (
+            fermentation
+        ) {
 
             fermentation.checked =
                 true;
@@ -1645,19 +2067,52 @@
         }
 
 
-        document.getElementById(
-            "f1TargetDays"
-        ).value = "7";
+        const f1 =
+            document.getElementById(
+                "f1TargetDays"
+            );
 
 
-        document.getElementById(
-            "f2TargetDays"
-        ).value = "5";
+        if (
+            f1
+        ) {
+
+            f1.value =
+                "7";
+
+        }
 
 
-        document.getElementById(
-            "recipeShelfLife"
-        ).value = "30";
+        const f2 =
+            document.getElementById(
+                "f2TargetDays"
+            );
+
+
+        if (
+            f2
+        ) {
+
+            f2.value =
+                "5";
+
+        }
+
+
+        const shelf =
+            document.getElementById(
+                "recipeShelfLife"
+            );
+
+
+        if (
+            shelf
+        ) {
+
+            shelf.value =
+                "30";
+
+        }
 
 
         const code =
@@ -1666,13 +2121,9 @@
             );
 
 
-        const name =
-            document.getElementById(
-                "recipeName"
-            );
-
-
-        if (code) {
+        if (
+            code
+        ) {
 
             code.value =
                 "";
@@ -1682,7 +2133,15 @@
         }
 
 
-        if (name) {
+        const name =
+            document.getElementById(
+                "recipeName"
+            );
+
+
+        if (
+            name
+        ) {
 
             name.value =
                 "";
@@ -1691,6 +2150,7 @@
 
 
         updateFermentationVisibility();
+
 
         loadFormData();
 
@@ -1707,6 +2167,432 @@
     }
 
 
+    /* =====================================================
+       H3 — OPEN EDIT RECIPE
+    ===================================================== */
+
+    async function openEditRecipe(
+        recipeId
+    ) {
+
+        if (
+            !recipeId
+        ) {
+
+            return;
+
+        }
+
+
+        editingRecipeId =
+            recipeId;
+
+
+        /*
+        -----------------------------------------------------
+        CLOSE DETAIL
+        -----------------------------------------------------
+        */
+
+        closeRecipeDetail();
+
+
+        /*
+        -----------------------------------------------------
+        OPEN FORM
+        -----------------------------------------------------
+        */
+
+        const modal =
+            document.getElementById(
+                "recipeModal"
+            );
+
+
+        if (
+            !modal
+        ) {
+
+            return;
+
+        }
+
+
+        modal.removeAttribute(
+            "hidden"
+        );
+
+
+        document.body.classList.add(
+            "recipe-modal-open"
+        );
+
+
+        clearFormError();
+
+
+        setRecipeModalMode(
+            "edit"
+        );
+
+
+        /*
+        -----------------------------------------------------
+        LOAD MASTER DATA
+        -----------------------------------------------------
+        */
+
+        const loaded =
+            await loadFormData();
+
+
+        if (
+            !loaded
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+        -----------------------------------------------------
+        LOAD RECIPE
+        -----------------------------------------------------
+        */
+
+        waitForSupabase(
+            async supabase => {
+
+                try {
+
+                    const {
+                        data: recipe,
+                        error
+                    } = await supabase
+
+                        .from(
+                            "recipes"
+                        )
+
+                        .select(`
+                            id,
+                            code,
+                            name,
+                            description,
+                            recipe_type,
+                            status,
+                            product_id
+                        `)
+
+                        .eq(
+                            "id",
+                            recipeId
+                        )
+
+                        .single();
+
+
+                    if (
+                        error
+                    ) {
+
+                        throw error;
+
+                    }
+
+
+                    /*
+                    -------------------------------------------------
+                    ISI FORM
+                    -------------------------------------------------
+                    */
+
+                    const name =
+                        document.getElementById(
+                            "recipeName"
+                        );
+
+
+                    const code =
+                        document.getElementById(
+                            "recipeCode"
+                        );
+
+
+                    const product =
+                        document.getElementById(
+                            "recipeProduct"
+                        );
+
+
+                    const type =
+                        document.getElementById(
+                            "recipeType"
+                        );
+
+
+                    const description =
+                        document.getElementById(
+                            "recipeDescription"
+                        );
+
+
+                    if (
+                        name
+                    ) {
+
+                        name.value =
+                            recipe.name ||
+                            "";
+
+                    }
+
+
+                    if (
+                        code
+                    ) {
+
+                        code.value =
+                            recipe.code ||
+                            "";
+
+                        code.dataset.manual =
+                            "true";
+
+                    }
+
+
+                    if (
+                        product
+                    ) {
+
+                        product.value =
+                            recipe.product_id ||
+                            "";
+
+                    }
+
+
+                    if (
+                        type
+                    ) {
+
+                        type.value =
+                            recipe.recipe_type ||
+                            "fermentation";
+
+                    }
+
+
+                    if (
+                        description
+                    ) {
+
+                        description.value =
+                            recipe.description ||
+                            "";
+
+                    }
+
+
+                    /*
+                    -------------------------------------------------
+                    FORMULA LOCK
+                    -------------------------------------------------
+
+                    H3 Edit Recipe hanya mengubah
+                    master recipe.
+
+                    Formula version tetap aman.
+                    -------------------------------------------------
+                    */
+
+                    setEditFormulaReadonly(
+                        true
+                    );
+
+
+                    const form =
+                        document.getElementById(
+                            "createRecipeForm"
+                        );
+
+
+                    if (
+                        form &&
+                        typeof form.scrollTo ===
+                            "function"
+                    ) {
+
+                        form.scrollTo(
+                            {
+                                top: 0,
+                                behavior: "instant"
+                            }
+                        );
+
+                    }
+
+
+                    name?.focus();
+
+                }
+                catch (
+                    error
+                ) {
+
+                    console.error(
+                        "OPEN EDIT RECIPE ERROR:",
+                        error
+                    );
+
+
+                    showFormError(
+                        error?.message ||
+                        "Gagal memuat recipe."
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       H3 — FORMULA PROTECTION
+    ===================================================== */
+
+    function setEditFormulaReadonly(
+        isEdit
+    ) {
+
+        /*
+        -----------------------------------------------------
+        INGREDIENTS
+        -----------------------------------------------------
+        */
+
+        const ingredientContainer =
+            document.getElementById(
+                "recipeIngredients"
+            );
+
+
+        if (
+            ingredientContainer
+        ) {
+
+            ingredientContainer
+                .querySelectorAll(
+                    "select, input, button"
+                )
+                .forEach(
+                    element => {
+
+                        element.disabled =
+                            isEdit;
+
+                    }
+                );
+
+        }
+
+
+        const addIngredient =
+            document.getElementById(
+                "addIngredientButton"
+            );
+
+
+        if (
+            addIngredient
+        ) {
+
+            addIngredient.disabled =
+                isEdit;
+
+        }
+
+
+        /*
+        -----------------------------------------------------
+        VERSION PARAMETERS
+        -----------------------------------------------------
+        */
+
+        const yieldInput =
+            document.getElementById(
+                "recipeYield"
+            );
+
+
+        const yieldUnit =
+            document.getElementById(
+                "recipeYieldUnit"
+            );
+
+
+        const fermentation =
+            document.getElementById(
+                "fermentationRequired"
+            );
+
+
+        const f1 =
+            document.getElementById(
+                "f1TargetDays"
+            );
+
+
+        const f2 =
+            document.getElementById(
+                "f2TargetDays"
+            );
+
+
+        const shelfLife =
+            document.getElementById(
+                "recipeShelfLife"
+            );
+
+
+        const notes =
+            document.getElementById(
+                "recipeNotes"
+            );
+
+
+        [
+            yieldInput,
+            yieldUnit,
+            fermentation,
+            f1,
+            f2,
+            shelfLife,
+            notes
+        ]
+            .filter(
+                Boolean
+            )
+            .forEach(
+                element => {
+
+                    element.disabled =
+                        isEdit;
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       H2 — CLOSE CREATE / EDIT MODAL
+    ===================================================== */
+
     function closeRecipeModal() {
 
         const modal =
@@ -1715,7 +2601,9 @@
             );
 
 
-        if (!modal) {
+        if (
+            !modal
+        ) {
 
             return;
 
@@ -1732,6 +2620,20 @@
             "recipe-modal-open"
         );
 
+
+        editingRecipeId =
+            null;
+
+
+        setRecipeModalMode(
+            "create"
+        );
+
+
+        setEditFormulaReadonly(
+            false
+        );
+
     }
 
 
@@ -1739,7 +2641,9 @@
        H2 — FORM ERROR
     ===================================================== */
 
-    function showFormError(message) {
+    function showFormError(
+        message
+    ) {
 
         const box =
             document.getElementById(
@@ -1747,7 +2651,9 @@
             );
 
 
-        if (!box) {
+        if (
+            !box
+        ) {
 
             return;
 
@@ -1760,7 +2666,9 @@
             );
 
 
-        if (text) {
+        if (
+            text
+        ) {
 
             text.textContent =
                 message;
@@ -1832,10 +2740,16 @@
 
 
     /* =====================================================
-       H2 — SAVE RECIPE
+       H2 / H3 — SAVE RECIPE
     ===================================================== */
 
     async function saveRecipe() {
+
+        const isEdit =
+            Boolean(
+                editingRecipeId
+            );
+
 
         clearFormError();
 
@@ -1853,99 +2767,65 @@
 
 
         const originalText =
-            buttonText?.textContent ||
-            "Simpan Recipe";
+            isEdit
+                ? "Simpan Perubahan"
+                : "Simpan Recipe";
 
+
+        /*
+        -----------------------------------------------------
+        READ MASTER FIELDS
+        -----------------------------------------------------
+        */
 
         const name =
             document.getElementById(
                 "recipeName"
-            ).value.trim();
+            )?.value
+            ?.trim() ||
+            "";
 
 
         const code =
             document.getElementById(
                 "recipeCode"
-            ).value.trim().toUpperCase();
+            )?.value
+            ?.trim()
+            .toUpperCase() ||
+            "";
 
 
         const productId =
             document.getElementById(
                 "recipeProduct"
-            ).value;
+            )?.value ||
+            "";
 
 
         const recipeType =
             document.getElementById(
                 "recipeType"
-            ).value;
+            )?.value ||
+            "";
 
 
         const description =
             document.getElementById(
                 "recipeDescription"
-            ).value.trim();
+            )?.value
+            ?.trim() ||
+            "";
 
 
-        const yieldQuantity =
-            Number(
-                document.getElementById(
-                    "recipeYield"
-                ).value
-            );
+        /*
+        -----------------------------------------------------
+        BASIC VALIDATION
+        -----------------------------------------------------
+        */
 
-
-        const yieldUnitId =
-            document.getElementById(
-                "recipeYieldUnit"
-            ).value;
-
-
-        const fermentationRequired =
-            document.getElementById(
-                "fermentationRequired"
-            ).checked;
-
-
-        const f1Target =
-            fermentationRequired
-                ? Number(
-                    document.getElementById(
-                        "f1TargetDays"
-                    ).value
-                )
-                : 0;
-
-
-        const f2Target =
-            fermentationRequired
-                ? Number(
-                    document.getElementById(
-                        "f2TargetDays"
-                    ).value
-                )
-                : 0;
-
-
-        const shelfLife =
-            Number(
-                document.getElementById(
-                    "recipeShelfLife"
-                ).value
-            );
-
-
-        const notes =
-            document.getElementById(
-                "recipeNotes"
-            ).value.trim();
-
-
-        /* -------------------------------------------------
-           VALIDATION
-        ------------------------------------------------- */
-
-        if (!name) {
+        if (
+            !name
+        ) {
 
             showFormError(
                 "Nama recipe wajib diisi."
@@ -1956,7 +2836,9 @@
         }
 
 
-        if (!code) {
+        if (
+            !code
+        ) {
 
             showFormError(
                 "Recipe code wajib diisi."
@@ -1967,7 +2849,9 @@
         }
 
 
-        if (!productId) {
+        if (
+            !productId
+        ) {
 
             showFormError(
                 "Product wajib dipilih."
@@ -1976,6 +2860,239 @@
             return;
 
         }
+
+
+        /*
+        =====================================================
+        H3 EDIT MODE
+        =====================================================
+        */
+
+        if (
+            isEdit
+        ) {
+
+            if (
+                button
+            ) {
+
+                button.disabled =
+                    true;
+
+                button.classList.add(
+                    "is-loading"
+                );
+
+            }
+
+
+            if (
+                buttonText
+            ) {
+
+                buttonText.textContent =
+                    "Menyimpan...";
+
+            }
+
+
+            waitForSupabase(
+                async supabase => {
+
+                    try {
+
+                        /*
+                        -------------------------------------------------
+                        UPDATE MASTER RECIPE ONLY
+                        -------------------------------------------------
+                        */
+
+                        const {
+                            error
+                        } = await supabase
+
+                            .from(
+                                "recipes"
+                            )
+
+                            .update({
+
+                                code,
+
+                                name,
+
+                                product_id:
+                                    productId,
+
+                                description:
+                                    description ||
+                                    null,
+
+                                recipe_type:
+                                    recipeType
+
+                            })
+
+                            .eq(
+                                "id",
+                                editingRecipeId
+                            );
+
+
+                        if (
+                            error
+                        ) {
+
+                            throw error;
+
+                        }
+
+
+                        /*
+                        -------------------------------------------------
+                        IMPORTANT
+                        -------------------------------------------------
+
+                        TIDAK UPDATE:
+
+                        recipe_versions
+                        recipe_ingredients
+
+                        Formula lama tetap aman.
+                        -------------------------------------------------
+                        */
+
+
+                        closeRecipeModal();
+
+
+                        await loadRecipes();
+
+
+                        showSuccessMessage(
+                            "Recipe berhasil diperbarui."
+                        );
+
+                    }
+                    catch (
+                        error
+                    ) {
+
+                        console.error(
+                            "UPDATE RECIPE ERROR:",
+                            error
+                        );
+
+
+                        showFormError(
+                            error?.message ||
+                            "Recipe gagal diperbarui."
+                        );
+
+                    }
+                    finally {
+
+                        if (
+                            button
+                        ) {
+
+                            button.disabled =
+                                false;
+
+                            button.classList.remove(
+                                "is-loading"
+                            );
+
+                        }
+
+
+                        if (
+                            buttonText
+                        ) {
+
+                            buttonText.textContent =
+                                originalText;
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+        =====================================================
+        H2 CREATE MODE
+        =====================================================
+
+        Formula fields hanya divalidasi
+        saat membuat Recipe baru.
+        =====================================================
+        */
+
+        const yieldQuantity =
+            Number(
+                document.getElementById(
+                    "recipeYield"
+                )?.value
+            );
+
+
+        const yieldUnitId =
+            document.getElementById(
+                "recipeYieldUnit"
+            )?.value ||
+            "";
+
+
+        const fermentationRequired =
+            Boolean(
+                document.getElementById(
+                    "fermentationRequired"
+                )?.checked
+            );
+
+
+        const f1Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "f1TargetDays"
+                    )?.value
+                )
+                : 0;
+
+
+        const f2Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "f2TargetDays"
+                    )?.value
+                )
+                : 0;
+
+
+        const shelfLife =
+            Number(
+                document.getElementById(
+                    "recipeShelfLife"
+                )?.value
+            );
+
+
+        const notes =
+            document.getElementById(
+                "recipeNotes"
+            )?.value
+            ?.trim() ||
+            "";
 
 
         if (
@@ -1992,7 +3109,9 @@
         }
 
 
-        if (!yieldUnitId) {
+        if (
+            !yieldUnitId
+        ) {
 
             showFormError(
                 "Unit yield wajib dipilih."
@@ -2028,7 +3147,9 @@
             ];
 
 
-        if (!rows.length) {
+        if (
+            !rows.length
+        ) {
 
             showFormError(
                 "Tambahkan minimal satu ingredient."
@@ -2056,7 +3177,8 @@
             const ingredientId =
                 row.querySelector(
                     ".recipe-ingredient-select"
-                )?.value;
+                )?.value ||
+                "";
 
 
             const quantity =
@@ -2070,10 +3192,13 @@
             const unitId =
                 row.querySelector(
                     ".recipe-ingredient-unit"
-                )?.value;
+                )?.value ||
+                "";
 
 
-            if (!ingredientId) {
+            if (
+                !ingredientId
+            ) {
 
                 showFormError(
                     `Ingredient nomor ${
@@ -2102,7 +3227,9 @@
             }
 
 
-            if (!unitId) {
+            if (
+                !unitId
+            ) {
 
                 showFormError(
                     `Unit ingredient nomor ${
@@ -2130,11 +3257,15 @@
         }
 
 
-        /* -------------------------------------------------
-           BUTTON LOADING
-        ------------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        BUTTON LOADING
+        -----------------------------------------------------
+        */
 
-        if (button) {
+        if (
+            button
+        ) {
 
             button.disabled =
                 true;
@@ -2146,7 +3277,9 @@
         }
 
 
-        if (buttonText) {
+        if (
+            buttonText
+        ) {
 
             buttonText.textContent =
                 "Menyimpan...";
@@ -2163,17 +3296,21 @@
 
                 try {
 
-                    /* =====================================
-                       STEP 1
-                       CREATE RECIPE
-                    ===================================== */
+                    /*
+                    =========================================
+                    STEP 1
+                    CREATE RECIPE
+                    =========================================
+                    */
 
                     const {
                         data: recipe,
                         error: recipeError
                     } = await supabase
 
-                        .from("recipes")
+                        .from(
+                            "recipes"
+                        )
 
                         .insert({
 
@@ -2206,7 +3343,9 @@
                         .single();
 
 
-                    if (recipeError) {
+                    if (
+                        recipeError
+                    ) {
 
                         throw recipeError;
 
@@ -2217,10 +3356,12 @@
                         recipe.id;
 
 
-                    /* =====================================
-                       STEP 2
-                       CREATE VERSION 1
-                    ===================================== */
+                    /*
+                    =========================================
+                    STEP 2
+                    CREATE VERSION 1
+                    =========================================
+                    */
 
                     const {
                         data: version,
@@ -2259,7 +3400,8 @@
                                     : 0,
 
                             shelf_life_days:
-                                shelfLife || 0,
+                                shelfLife ||
+                                0,
 
                             notes:
                                 notes ||
@@ -2281,17 +3423,21 @@
                         .single();
 
 
-                    if (versionError) {
+                    if (
+                        versionError
+                    ) {
 
                         throw versionError;
 
                     }
 
 
-                    /* =====================================
-                       STEP 3
-                       CREATE INGREDIENTS
-                    ===================================== */
+                    /*
+                    =========================================
+                    STEP 3
+                    CREATE INGREDIENTS
+                    =========================================
+                    */
 
                     const ingredientRows =
                         ingredientPayload.map(
@@ -2327,27 +3473,35 @@
                         );
 
 
-                    if (ingredientError) {
+                    if (
+                        ingredientError
+                    ) {
 
                         throw ingredientError;
 
                     }
 
 
-                    /* =====================================
-                       SUCCESS
-                    ===================================== */
+                    /*
+                    =========================================
+                    SUCCESS
+                    =========================================
+                    */
 
                     closeRecipeModal();
 
+
                     await loadRecipes();
+
 
                     showSuccessMessage(
                         "Recipe berhasil dibuat."
                     );
 
                 }
-                catch (error) {
+                catch (
+                    error
+                ) {
 
                     console.error(
                         "CREATE RECIPE ERROR:",
@@ -2356,16 +3510,25 @@
 
 
                     /*
-                     * Best effort rollback.
-                     */
+                    -------------------------------------------------
+                    BEST EFFORT ROLLBACK
+                    -------------------------------------------------
+                    */
 
-                    if (createdRecipeId) {
+                    if (
+                        createdRecipeId
+                    ) {
 
                         try {
 
                             await supabase
-                                .from("recipes")
+
+                                .from(
+                                    "recipes"
+                                )
+
                                 .delete()
+
                                 .eq(
                                     "id",
                                     createdRecipeId
@@ -2394,7 +3557,9 @@
                 }
                 finally {
 
-                    if (button) {
+                    if (
+                        button
+                    ) {
 
                         button.disabled =
                             false;
@@ -2406,7 +3571,9 @@
                     }
 
 
-                    if (buttonText) {
+                    if (
+                        buttonText
+                    ) {
 
                         buttonText.textContent =
                             originalText;
@@ -2425,7 +3592,9 @@
        H2 — SUCCESS TOAST
     ===================================================== */
 
-    function showSuccessMessage(message) {
+    function showSuccessMessage(
+        message
+    ) {
 
         let toast =
             document.getElementById(
@@ -2433,7 +3602,9 @@
             );
 
 
-        if (!toast) {
+        if (
+            !toast
+        ) {
 
             toast =
                 document.createElement(
@@ -2463,7 +3634,9 @@
             ></i>
 
             <span>
-                ${escapeHtml(message)}
+                ${escapeHtml(
+                    message
+                )}
             </span>
 
         `;
@@ -2495,7 +3668,9 @@
        H3 — RECIPE DETAIL
     ===================================================== */
 
-    async function openRecipeDetail(id) {
+    async function openRecipeDetail(
+        id
+    ) {
 
         activeDetailRecipeId =
             id;
@@ -2507,7 +3682,9 @@
             );
 
 
-        if (!modal) {
+        if (
+            !modal
+        ) {
 
             console.error(
                 "recipeDetailModal tidak ditemukan."
@@ -2568,16 +3745,20 @@
 
                 try {
 
-                    /* =====================================
-                       1. LOAD RECIPE
-                    ===================================== */
+                    /*
+                    =========================================
+                    1. LOAD RECIPE
+                    =========================================
+                    */
 
                     const {
                         data: recipe,
                         error: recipeError
                     } = await supabase
 
-                        .from("recipes")
+                        .from(
+                            "recipes"
+                        )
 
                         .select(`
                             id,
@@ -2598,28 +3779,37 @@
                         .single();
 
 
-                    if (recipeError) {
+                    if (
+                        recipeError
+                    ) {
 
                         throw recipeError;
 
                     }
 
 
-                    /* =====================================
-                       2. LOAD PRODUCT
-                    ===================================== */
+                    /*
+                    =========================================
+                    2. LOAD PRODUCT
+                    =========================================
+                    */
 
-                    let product = null;
+                    let product =
+                        null;
 
 
-                    if (recipe.product_id) {
+                    if (
+                        recipe.product_id
+                    ) {
 
                         const {
                             data,
                             error
                         } = await supabase
 
-                            .from("products")
+                            .from(
+                                "products"
+                            )
 
                             .select(`
                                 id,
@@ -2635,7 +3825,9 @@
                             .maybeSingle();
 
 
-                        if (error) {
+                        if (
+                            error
+                        ) {
 
                             throw error;
 
@@ -2648,9 +3840,11 @@
                     }
 
 
-                    /* =====================================
-                       3. LOAD VERSION
-                    ===================================== */
+                    /*
+                    =========================================
+                    3. LOAD VERSION
+                    =========================================
+                    */
 
                     const {
                         data: versions,
@@ -2682,12 +3876,15 @@
                         .order(
                             "version_number",
                             {
-                                ascending: false
+                                ascending:
+                                    false
                             }
                         );
 
 
-                    if (versionError) {
+                    if (
+                        versionError
+                    ) {
 
                         throw versionError;
 
@@ -2695,17 +3892,22 @@
 
 
                     const version =
-                        Array.isArray(versions) &&
+                        Array.isArray(
+                            versions
+                        ) &&
                         versions.length
                             ? versions[0]
                             : null;
 
 
-                    /* =====================================
-                       4. LOAD YIELD UNIT
-                    ===================================== */
+                    /*
+                    =========================================
+                    4. LOAD YIELD UNIT
+                    =========================================
+                    */
 
-                    let yieldUnit = null;
+                    let yieldUnit =
+                        null;
 
 
                     if (
@@ -2717,7 +3919,9 @@
                             error
                         } = await supabase
 
-                            .from("units")
+                            .from(
+                                "units"
+                            )
 
                             .select(`
                                 id,
@@ -2733,7 +3937,9 @@
                             .maybeSingle();
 
 
-                        if (error) {
+                        if (
+                            error
+                        ) {
 
                             throw error;
 
@@ -2746,15 +3952,19 @@
                     }
 
 
-                    /* =====================================
-                       5. LOAD INGREDIENT ROWS
-                    ===================================== */
+                    /*
+                    =========================================
+                    5. LOAD INGREDIENT ROWS
+                    =========================================
+                    */
 
                     let recipeIngredients =
                         [];
 
 
-                    if (version?.id) {
+                    if (
+                        version?.id
+                    ) {
 
                         const {
                             data,
@@ -2778,7 +3988,9 @@
                             );
 
 
-                        if (error) {
+                        if (
+                            error
+                        ) {
 
                             throw error;
 
@@ -2786,14 +3998,17 @@
 
 
                         recipeIngredients =
-                            data || [];
+                            data ||
+                            [];
 
                     }
 
 
-                    /* =====================================
-                       6. LOAD INGREDIENT MASTER DATA
-                    ===================================== */
+                    /*
+                    =========================================
+                    6. LOAD INGREDIENT + UNIT MASTER
+                    =========================================
+                    */
 
                     if (
                         recipeIngredients.length
@@ -2807,7 +4022,9 @@
                                             item =>
                                                 item.ingredient_id
                                         )
-                                        .filter(Boolean)
+                                        .filter(
+                                            Boolean
+                                        )
                                 )
                             ];
 
@@ -2820,16 +4037,18 @@
                                             item =>
                                                 item.unit_id
                                         )
-                                        .filter(Boolean)
+                                        .filter(
+                                            Boolean
+                                        )
                                 )
                             ];
 
 
-                        let ingredientMap =
+                        const ingredientMap =
                             new Map();
 
 
-                        let unitMap =
+                        const unitMap =
                             new Map();
 
 
@@ -2858,14 +4077,19 @@
                                 );
 
 
-                            if (error) {
+                            if (
+                                error
+                            ) {
 
                                 throw error;
 
                             }
 
 
-                            (data || [])
+                            (
+                                data ||
+                                []
+                            )
                                 .forEach(
                                     item => {
 
@@ -2891,7 +4115,9 @@
                                 error
                             } = await supabase
 
-                                .from("units")
+                                .from(
+                                    "units"
+                                )
 
                                 .select(`
                                     id,
@@ -2905,14 +4131,19 @@
                                 );
 
 
-                            if (error) {
+                            if (
+                                error
+                            ) {
 
                                 throw error;
 
                             }
 
 
-                            (data || [])
+                            (
+                                data ||
+                                []
+                            )
                                 .forEach(
                                     item => {
 
@@ -2940,14 +4171,16 @@
                                             String(
                                                 item.ingredient_id
                                             )
-                                        ) || null,
+                                        ) ||
+                                        null,
 
                                     unit:
                                         unitMap.get(
                                             String(
                                                 item.unit_id
                                             )
-                                        ) || null
+                                        ) ||
+                                        null
 
                                 })
                             );
@@ -2955,9 +4188,11 @@
                     }
 
 
-                    /* =====================================
-                       7. RENDER
-                    ===================================== */
+                    /*
+                    =========================================
+                    7. RENDER DETAIL
+                    =========================================
+                    */
 
                     renderRecipeDetail({
 
@@ -2989,7 +4224,9 @@
                     refreshIcons();
 
                 }
-                catch (error) {
+                catch (
+                    error
+                ) {
 
                     console.error(
                         "RECIPE DETAIL ERROR:",
@@ -3020,20 +4257,25 @@
        H3 — RENDER DETAIL
     ===================================================== */
 
-    function renderRecipeDetail(data) {
+    function renderRecipeDetail(
+        data
+    ) {
 
         const {
             recipe,
             product,
             version,
             yieldUnit,
-            ingredients: recipeIngredients
+            ingredients:
+                recipeIngredients
         } = data;
 
 
-        /* ---------------------------------------------
-           HEADER
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        HEADER
+        -----------------------------------------------------
+        */
 
         setText(
             "recipeDetailTitle",
@@ -3049,9 +4291,11 @@
         );
 
 
-        /* ---------------------------------------------
-           IDENTITY
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        IDENTITY
+        -----------------------------------------------------
+        */
 
         setText(
             "detailRecipeName",
@@ -3089,9 +4333,11 @@
         );
 
 
-        /* ---------------------------------------------
-           STATUS
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        STATUS
+        -----------------------------------------------------
+        */
 
         const status =
             String(
@@ -3106,10 +4352,13 @@
             );
 
 
-        if (statusElement) {
+        if (
+            statusElement
+        ) {
 
             statusElement.textContent =
-                status === "archived"
+                status ===
+                "archived"
                     ? "Archived"
                     : "Active";
 
@@ -3120,9 +4369,11 @@
         }
 
 
-        /* ---------------------------------------------
-           DESCRIPTION
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        DESCRIPTION
+        -----------------------------------------------------
+        */
 
         const descriptionBox =
             document.getElementById(
@@ -3135,7 +4386,9 @@
             "";
 
 
-        if (description) {
+        if (
+            description
+        ) {
 
             descriptionBox?.removeAttribute(
                 "hidden"
@@ -3158,9 +4411,11 @@
         }
 
 
-        /* ---------------------------------------------
-           VERSION
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        VERSION
+        -----------------------------------------------------
+        */
 
         setText(
             "detailVersionNumber",
@@ -3206,9 +4461,11 @@
         );
 
 
-        /* ---------------------------------------------
-           F1 / F2
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        F1 / F2
+        -----------------------------------------------------
+        */
 
         setText(
             "detailF1",
@@ -3232,9 +4489,11 @@
         );
 
 
-        /* ---------------------------------------------
-           INGREDIENTS
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        INGREDIENTS
+        -----------------------------------------------------
+        */
 
         renderRecipeDetailIngredients(
             recipeIngredients
@@ -3254,7 +4513,9 @@
             );
 
 
-        if (element) {
+        if (
+            element
+        ) {
 
             element.textContent =
                 value ??
@@ -3264,6 +4525,10 @@
 
     }
 
+
+    /* =====================================================
+       H3 — RENDER DETAIL INGREDIENTS
+    ===================================================== */
 
     function renderRecipeDetailIngredients(
         recipeIngredients
@@ -3275,7 +4540,9 @@
             );
 
 
-        if (!container) {
+        if (
+            !container
+        ) {
 
             return;
 
@@ -3311,6 +4578,7 @@
 
             refreshIcons();
 
+
             return;
 
         }
@@ -3319,7 +4587,10 @@
         container.innerHTML =
             recipeIngredients
                 .map(
-                    (item, index) => {
+                    (
+                        item,
+                        index
+                    ) => {
 
                         const ingredient =
                             item.ingredient;
@@ -3358,7 +4629,11 @@
                                         recipe-detail-ingredient-number
                                     "
                                 >
-                                    ${index + 1}
+
+                                    ${
+                                        index + 1
+                                    }
+
                                 </div>
 
 
@@ -3408,7 +4683,7 @@
                                         unitLabel
                                             ? ` ${escapeHtml(
                                                 unitLabel
-                                              )}`
+                                            )}`
                                             : ""
                                     }
 
@@ -3442,7 +4717,9 @@
             );
 
 
-        if (!error) {
+        if (
+            !error
+        ) {
 
             return;
 
@@ -3455,10 +4732,13 @@
             );
 
 
-        if (text) {
+        if (
+            text
+        ) {
 
             text.textContent =
                 message;
+
         }
 
 
@@ -3500,27 +4780,22 @@
 
 
     /* =====================================================
-       H3 — EDIT
-       -----------------------------------------------------
-       Untuk H3 kita belum overwrite formula.
-       Edit master information akan kita sambungkan
-       ke Edit Form setelah detail sudah tervalidasi.
+       H3 — EDIT FROM DETAIL
     ===================================================== */
 
     function handleEditRecipe() {
 
-        if (!activeDetailRecipeId) {
+        if (
+            !activeDetailRecipeId
+        ) {
 
             return;
 
         }
 
 
-        closeRecipeDetail();
-
-
-        alert(
-            "Edit Recipe akan kita sambungkan pada form Edit H3."
+        openEditRecipe(
+            activeDetailRecipeId
         );
 
     }
@@ -3532,12 +4807,24 @@
 
     function handleNewRecipeVersion() {
 
-        if (!activeDetailRecipeId) {
+        if (
+            !activeDetailRecipeId
+        ) {
 
             return;
 
         }
 
+
+        /*
+        -----------------------------------------------------
+        H4 BELUM AKTIF
+
+        Kita tidak boleh membuat version
+        setengah jadi karena akan berpengaruh
+        ke Production dan histori.
+        -----------------------------------------------------
+        */
 
         alert(
             "Recipe Version akan kita kerjakan pada H4."
@@ -3555,7 +4842,9 @@
         id
     ) {
 
-        if (!id) {
+        if (
+            !id
+        ) {
 
             return;
 
@@ -3565,19 +4854,27 @@
         const recipe =
             recipes.find(
                 item =>
-                    String(item.id) ===
-                    String(id)
+                    String(
+                        item.id
+                    ) ===
+                    String(
+                        id
+                    )
             );
 
 
-        if (!recipe) {
+        if (
+            !recipe
+        ) {
 
             return;
 
         }
 
 
-        switch (action) {
+        switch (
+            action
+        ) {
 
             case "view":
 
@@ -3590,12 +4887,7 @@
 
             case "edit":
 
-                /*
-                 * H3 Edit akan menggunakan
-                 * master recipe information.
-                 */
-
-                openRecipeDetail(
+                openEditRecipe(
                     id
                 );
 
@@ -3626,9 +4918,11 @@
 
     function bindEvents() {
 
-        /* ---------------------------------------------
-           SEARCH
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        SEARCH
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3640,9 +4934,11 @@
             );
 
 
-        /* ---------------------------------------------
-           STATUS FILTER
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        STATUS FILTER
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3654,9 +4950,11 @@
             );
 
 
-        /* ---------------------------------------------
-           RETRY
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        RETRY
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3668,9 +4966,11 @@
             );
 
 
-        /* ---------------------------------------------
-           CREATE RECIPE
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        CREATE RECIPE
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3682,9 +4982,11 @@
             );
 
 
-        /* ---------------------------------------------
-           CLOSE CREATE MODAL
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        CLOSE CREATE / EDIT MODAL
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3716,9 +5018,11 @@
             );
 
 
-        /* ---------------------------------------------
-           ADD INGREDIENT
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        ADD INGREDIENT
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3730,9 +5034,11 @@
             );
 
 
-        /* ---------------------------------------------
-           FERMENTATION
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        FERMENTATION
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3744,9 +5050,11 @@
             );
 
 
-        /* ---------------------------------------------
-           AUTO RECIPE CODE
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        AUTO RECIPE CODE
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3797,9 +5105,11 @@
             );
 
 
-        /* ---------------------------------------------
-           CREATE FORM SUBMIT
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        CREATE / EDIT FORM SUBMIT
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3817,9 +5127,11 @@
             );
 
 
-        /* ---------------------------------------------
-           DETAIL MODAL CLOSE
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        DETAIL MODAL CLOSE
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3851,9 +5163,11 @@
             );
 
 
-        /* ---------------------------------------------
-           DETAIL → EDIT
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        DETAIL → EDIT
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3865,9 +5179,11 @@
             );
 
 
-        /* ---------------------------------------------
-           DETAIL → NEW VERSION
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        DETAIL → NEW VERSION
+        -----------------------------------------------------
+        */
 
         document
             .getElementById(
@@ -3879,9 +5195,11 @@
             );
 
 
-        /* ---------------------------------------------
-           GLOBAL RECIPE ACTION
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        GLOBAL RECIPE ACTION
+        -----------------------------------------------------
+        */
 
         document.addEventListener(
             "click",
@@ -3893,7 +5211,9 @@
                     );
 
 
-                if (!button) {
+                if (
+                    !button
+                ) {
 
                     return;
 
@@ -3909,16 +5229,19 @@
         );
 
 
-        /* ---------------------------------------------
-           ESCAPE
-        --------------------------------------------- */
+        /*
+        -----------------------------------------------------
+        ESCAPE
+        -----------------------------------------------------
+        */
 
         document.addEventListener(
             "keydown",
             event => {
 
                 if (
-                    event.key !== "Escape"
+                    event.key !==
+                    "Escape"
                 ) {
 
                     return;
