@@ -2490,11 +2490,8 @@ function renderUnits() {
                     ================================================== */
 
                     @page{
-
-                        size:58mm auto;
-
+                        size:58mm 60mm;
                         margin:0;
-
                     }
 
 
@@ -2503,131 +2500,84 @@ function renderUnits() {
                     ================================================== */
 
                     .thermal-label{
-
                         position:relative;
-
                         width:58mm;
-
-                        min-height:70mm;
-
-                        padding:
-
-                            3mm
-                            3mm
-                            3mm
-                            3mm;
-
+                        height:60mm;
+                        min-height:60mm;
+                        max-height:60mm;
+                    
+                        padding:2mm 3mm;
+                    
+                        box-sizing:border-box;
+                    
                         background:#FFFFFF;
-
                         color:#000000;
-
+                    
                         display:flex;
-
                         flex-direction:column;
-
                         align-items:center;
-
                         text-align:center;
-
+                    
                         overflow:hidden;
-
+                    
                         page-break-after:always;
-
-                    }
-
-
-                    .thermal-label:last-child{
-
-                        page-break-after:auto;
-
+                        break-after:page;
                     }
 
 
                     /* =================================================
                        BRAND
                     ================================================== */
-
                     .thermal-brand{
-
                         width:100%;
-
+                    
                         display:flex;
-
                         flex-direction:column;
-
                         align-items:center;
-
                         justify-content:center;
-
-                        margin-bottom:2.8mm;
-
+                    
+                        margin-bottom:1.5mm;
                     }
-
-
-                    .thermal-logo-icon{
-
+    
+    
+                      .thermal-logo-icon{
                         display:block;
-
                         width:5mm;
-
                         height:5mm;
-
                         object-fit:contain;
-
-                        margin-bottom:.5mm;
-
-                        filter:
-
-                            grayscale(1)
-                            brightness(0);
-
+                        margin-bottom:.3mm;
+                        filter:grayscale(1) brightness(0);
                     }
 
 
                     .thermal-logo-text{
-
                         display:block;
-
-                        width:21mm;
-
+                        width:20mm;
                         height:auto;
-
-                        max-height:5mm;
-
+                        max-height:4.5mm;
                         object-fit:contain;
-
-                        filter:
-
-                            grayscale(1)
-                            brightness(0);
-
+                        filter:grayscale(1) brightness(0);
                     }
-
 
                     /* =================================================
                        PRODUCT
                     ================================================== */
 
                     .thermal-product{
-
                         width:100%;
-
-                        margin-bottom:3.4mm;
-
-                        font-size:9px;
-
+                    
+                        margin-bottom:1.5mm;
+                    
+                        font-size:8.5px;
                         line-height:1.05;
-
                         font-weight:800;
-
-                        letter-spacing:-.2px;
-
+                    
+                        letter-spacing:-.15px;
+                    
                         text-transform:uppercase;
-
+                    
                         color:#000000;
-
                     }
-
 
                     /* =================================================
                        SIZE
@@ -2769,39 +2719,25 @@ function renderUnits() {
                     ================================================== */
 
                     .thermal-qr{
-
                         display:flex;
-
                         align-items:center;
-
                         justify-content:center;
-
+                    
                         width:30mm;
-
                         height:30mm;
-
-                        margin:
-
-                            0 auto
-                            2.2mm;
-
+                    
+                        margin:0 auto 1.2mm;
                     }
-
-
+                    
                     .thermal-qr img,
-
                     .thermal-qr canvas{
-
                         display:block;
-
+                    
                         width:30mm !important;
-
                         height:30mm !important;
-
+                    
                         max-width:30mm !important;
-
                         max-height:30mm !important;
-
                     }
 
 
@@ -2810,23 +2746,20 @@ function renderUnits() {
                     ================================================== */
 
                     .thermal-code{
-
                         width:100%;
-
-                        font-size:7.8px;
-
-                        line-height:1.1;
-
+                    
+                        font-size:7px;
+                        line-height:1;
+                    
                         font-weight:500;
-
-                        letter-spacing:.1px;
-
+                    
+                        letter-spacing:.05px;
+                    
                         color:#000000;
-
+                    
                         white-space:nowrap;
-
+                    
                         text-align:center;
-
                     }
 
 
