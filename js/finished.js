@@ -678,6 +678,236 @@ async function updateFinishedStatus(
     }
 
 }
+    /* =====================================================
+   UPDATE FINISHED UNIT STATUS
+===================================================== */
+
+async function updateFinishedUnitStatus(
+    unitId,
+    newStatus,
+    reason = null
+) {
+
+    if (!unitId) {
+
+        showToast(
+            "Finished unit tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    const status =
+        String(newStatus || "")
+            .toLowerCase()
+            .trim();
+
+
+    const allowedStatuses = [
+        "done",
+        "damaged",
+        "expired"
+    ];
+
+
+    if (!allowedStatuses.includes(status)) {
+
+        showToast(
+            "Status bottle tidak valid."
+        );
+
+        return;
+
+    }
+
+
+    const unit =
+        finishedUnits.find(
+            item =>
+                String(item.id) ===
+                String(unitId)
+        );
+
+
+    if (!unit) {
+
+        showToast(
+            "Finished unit tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    const currentStatus =
+        String(
+            unit.status || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    /*
+     * Hanya bottle AVAILABLE
+     * yang boleh diubah.
+     */
+
+    if (
+        currentStatus !==
+        "available"
+    ) {
+
+        showToast(
+            `Bottle ${unit.trace_code} sudah ${currentStatus.toUpperCase()} dan terkunci.`
+        );
+
+        return;
+
+    }
+
+
+    const supabase =
+        getSupabaseClient();
+
+
+    try {
+
+        console.log(
+            "MERAMU: mengubah status bottle:",
+            {
+                unitId,
+                traceCode: unit.trace_code,
+                from: currentStatus,
+                to: status,
+                reason
+            }
+        );
+
+
+        const {
+            data,
+            error
+        } = await supabase.rpc(
+            "update_meramu_finished_unit_status",
+            {
+                p_finished_unit_id:
+                    unitId,
+
+                p_new_status:
+                    status,
+
+                p_reason:
+                    reason
+            }
+        );
+
+
+        if (error) {
+
+            console.error(
+                "MERAMU Finished Unit Status RPC Error:",
+                error
+            );
+
+
+            throw new Error(
+                error.message ||
+                "Gagal mengubah status bottle."
+            );
+
+        }
+
+
+        /*
+         * RPC mengembalikan
+         * row finished_units terbaru.
+         */
+
+        const updatedUnit =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+
+        if (!updatedUnit) {
+
+            throw new Error(
+                "Status berhasil diproses, tetapi data bottle terbaru tidak diterima."
+            );
+
+        }
+
+
+        /*
+         * Update data lokal.
+         */
+
+        const index =
+            finishedUnits.findIndex(
+                item =>
+                    String(item.id) ===
+                    String(unitId)
+            );
+
+
+        if (index !== -1) {
+
+            finishedUnits[index] = {
+
+                ...finishedUnits[index],
+
+                ...updatedUnit
+
+            };
+
+        }
+
+
+        /*
+         * Render ulang kartu bottle.
+         *
+         * Setelah status menjadi:
+         * DONE / DAMAGED / EXPIRED
+         *
+         * tombol status akan hilang
+         * dan berubah menjadi
+         * "Status terkunci".
+         */
+
+        renderUnits();
+
+
+        showToast(
+            `Bottle #${unit.unit_number} menjadi ${status.toUpperCase()}.`
+        );
+
+
+        console.log(
+            "MERAMU: Finished Unit status updated:",
+            updatedUnit.trace_code,
+            updatedUnit.status
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "MERAMU update finished unit status error:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Gagal mengubah status bottle."
+        );
+
+    }
+
+}
 
 /* =====================================================
    RENDER BATCH INFO
