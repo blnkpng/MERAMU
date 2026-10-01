@@ -4801,37 +4801,2815 @@
     }
 
 
-    /* =====================================================
-       H4 PLACEHOLDER
-    ===================================================== */
+/* =====================================================
+   H4 — RECIPE VERSION
+   -----------------------------------------------------
+   BUSINESS RULE
 
-    function handleNewRecipeVersion() {
+   Recipe = MASTER FORMULA
+
+   Recipe Version = SNAPSHOT / FORMULA REVISION
+
+   H4 TIDAK membuat Production.
+
+   H4 hanya:
+   - membaca version terakhir
+   - membuat version baru
+   - copy ingredient dari version sebelumnya
+   - memungkinkan formula version baru diedit
+   - menyimpan version baru
+   - update current_version_number
+
+   Version lama TIDAK diubah.
+===================================================== */
+
+
+/* =====================================================
+   H4 — STATE
+===================================================== */
+
+let activeVersionRecipe = null;
+let activeVersionSource = null;
+let versionIngredientRows = 0;
+
+
+/* =====================================================
+   H4 — LOAD RECIPE + CURRENT VERSION
+===================================================== */
+
+async function loadRecipeVersionData(recipeId) {
+
+    if (!recipeId) {
+        throw new Error(
+            "Recipe ID tidak ditemukan."
+        );
+    }
+
+    return new Promise(
+        (resolve, reject) => {
+
+            waitForSupabase(
+                async supabase => {
+
+                    try {
+
+                        /*
+                        =========================================
+                        1. LOAD MASTER RECIPE
+                        =========================================
+                        */
+
+                        const {
+                            data: recipe,
+                            error: recipeError
+                        } = await supabase
+
+                            .from(
+                                "recipes"
+                            )
+
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                description,
+                                recipe_type,
+                                status,
+                                product_id,
+                                current_version_number
+                            `)
+
+                            .eq(
+                                "id",
+                                recipeId
+                            )
+
+                            .single();
+
+
+                        if (
+                            recipeError
+                        ) {
+
+                            throw recipeError;
+
+                        }
+
+
+                        /*
+                        =========================================
+                        2. LOAD VERSION
+                        =========================================
+                        */
+
+                        const {
+                            data: versions,
+                            error: versionsError
+                        } = await supabase
+
+                            .from(
+                                "recipe_versions"
+                            )
+
+                            .select(`
+                                id,
+                                recipe_id,
+                                version_number,
+                                yield_quantity,
+                                yield_unit_id,
+                                fermentation_required,
+                                f1_target_days,
+                                f2_target_days,
+                                shelf_life_days,
+                                notes,
+                                status,
+                                effective_from
+                            `)
+
+                            .eq(
+                                "recipe_id",
+                                recipeId
+                            )
+
+                            .order(
+                                "version_number",
+                                {
+                                    ascending: false
+                                }
+                            );
+
+
+                        if (
+                            versionsError
+                        ) {
+
+                            throw versionsError;
+
+                        }
+
+
+                        const currentVersion =
+                            Array.isArray(
+                                versions
+                            ) &&
+                            versions.length
+                                ? versions[0]
+                                : null;
+
+
+                        /*
+                        =========================================
+                        3. LOAD INGREDIENTS
+                        =========================================
+                        */
+
+                        let recipeIngredients = [];
+
+
+                        if (
+                            currentVersion?.id
+                        ) {
+
+                            const {
+                                data,
+                                error
+                            } = await supabase
+
+                                .from(
+                                    "recipe_ingredients"
+                                )
+
+                                .select(`
+                                    id,
+                                    recipe_version_id,
+                                    ingredient_id,
+                                    quantity,
+                                    unit_id
+                                `)
+
+                                .eq(
+                                    "recipe_version_id",
+                                    currentVersion.id
+                                );
+
+
+                            if (
+                                error
+                            ) {
+
+                                throw error;
+
+                            }
+
+
+                            recipeIngredients =
+                                data || [];
+
+                        }
+
+
+                        /*
+                        =========================================
+                        4. LOAD MASTER INGREDIENT
+                        =========================================
+                        */
+
+                        let ingredientMap =
+                            new Map();
+
+
+                        let unitMap =
+                            new Map();
+
+
+                        const ingredientIds =
+                            [
+                                ...new Set(
+                                    recipeIngredients
+                                        .map(
+                                            item =>
+                                                item.ingredient_id
+                                        )
+                                        .filter(
+                                            Boolean
+                                        )
+                                )
+                            ];
+
+
+                        const unitIds =
+                            [
+                                ...new Set(
+                                    recipeIngredients
+                                        .map(
+                                            item =>
+                                                item.unit_id
+                                        )
+                                        .filter(
+                                            Boolean
+                                        )
+                                )
+                            ];
+
+
+                        if (
+                            ingredientIds.length
+                        ) {
+
+                            const {
+                                data,
+                                error
+                            } = await supabase
+
+                                .from(
+                                    "ingredients"
+                                )
+
+                                .select(`
+                                    id,
+                                    code,
+                                    name,
+                                    default_unit_id,
+                                    cost_per_unit,
+                                    is_active
+                                `)
+
+                                .in(
+                                    "id",
+                                    ingredientIds
+                                );
+
+
+                            if (
+                                error
+                            ) {
+
+                                throw error;
+
+                            }
+
+
+                            (
+                                data || []
+                            )
+                                .forEach(
+                                    item => {
+
+                                        ingredientMap.set(
+                                            String(
+                                                item.id
+                                            ),
+                                            item
+                                        );
+
+                                    }
+                                );
+
+                        }
+
+
+                        if (
+                            unitIds.length
+                        ) {
+
+                            const {
+                                data,
+                                error
+                            } = await supabase
+
+                                .from(
+                                    "units"
+                                )
+
+                                .select(`
+                                    id,
+                                    code,
+                                    name,
+                                    category
+                                `)
+
+                                .in(
+                                    "id",
+                                    unitIds
+                                );
+
+
+                            if (
+                                error
+                            ) {
+
+                                throw error;
+
+                            }
+
+
+                            (
+                                data || []
+                            )
+                                .forEach(
+                                    item => {
+
+                                        unitMap.set(
+                                            String(
+                                                item.id
+                                            ),
+                                            item
+                                        );
+
+                                    }
+                                );
+
+                        }
+
+
+                        recipeIngredients =
+                            recipeIngredients.map(
+                                item => ({
+
+                                    ...item,
+
+                                    ingredient:
+                                        ingredientMap.get(
+                                            String(
+                                                item.ingredient_id
+                                            )
+                                        ) ||
+                                        null,
+
+                                    unit:
+                                        unitMap.get(
+                                            String(
+                                                item.unit_id
+                                            )
+                                        ) ||
+                                        null
+
+                                })
+                            );
+
+
+                        resolve({
+
+                            recipe,
+
+                            currentVersion,
+
+                            ingredients:
+                                recipeIngredients
+
+                        });
+
+                    }
+                    catch (
+                        error
+                    ) {
+
+                        console.error(
+                            "LOAD RECIPE VERSION ERROR:",
+                            error
+                        );
+
+                        reject(
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   H4 — CREATE VERSION MODAL
+   -----------------------------------------------------
+   Modal dibuat dari JS supaya H4 tidak membutuhkan
+   perubahan HTML tambahan.
+===================================================== */
+
+function ensureRecipeVersionModal() {
+
+    let modal =
+        document.getElementById(
+            "recipeVersionModal"
+        );
+
+
+    if (
+        modal
+    ) {
+
+        return modal;
+
+    }
+
+
+    modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "recipeVersionModal";
+
+
+    modal.className =
+        "recipe-version-modal";
+
+
+    modal.hidden =
+        true;
+
+
+    modal.innerHTML = `
+
+        <div
+            class="recipe-version-backdrop"
+            data-version-close
+        ></div>
+
+
+        <div
+            class="recipe-version-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="recipeVersionModalTitle"
+        >
+
+            <div
+                class="recipe-version-header"
+            >
+
+                <div>
+
+                    <span
+                        class="recipe-version-eyebrow"
+                    >
+                        RECIPE VERSION
+                    </span>
+
+                    <h2
+                        id="recipeVersionModalTitle"
+                    >
+                        Buat Versi Baru
+                    </h2>
+
+                    <p
+                        id="recipeVersionModalSubtitle"
+                    >
+                        Buat revision formula tanpa mengubah
+                        version sebelumnya.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="recipe-version-close"
+                    data-version-close
+                    aria-label="Tutup"
+                >
+
+                    <i
+                        data-lucide="x"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="recipeVersionError"
+                class="recipe-version-error"
+                hidden
+            >
+
+                <i
+                    data-lucide="circle-alert"
+                ></i>
+
+                <span></span>
+
+            </div>
+
+
+            <div
+                class="recipe-version-body"
+            >
+
+                <!-- MASTER INFO -->
+
+                <div
+                    class="recipe-version-master"
+                >
+
+                    <div>
+
+                        <span>
+                            Recipe
+                        </span>
+
+                        <strong
+                            id="versionRecipeName"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Code
+                        </span>
+
+                        <strong
+                            id="versionRecipeCode"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Previous Version
+                        </span>
+
+                        <strong
+                            id="versionPreviousNumber"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            New Version
+                        </span>
+
+                        <strong
+                            id="versionNewNumber"
+                        >
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VERSION PARAMETERS -->
+
+                <section
+                    class="recipe-version-section"
+                >
+
+                    <div
+                        class="recipe-version-section-title"
+                    >
+
+                        <div>
+
+                            <span>
+                                Formula Settings
+                            </span>
+
+                            <small>
+                                Parameter khusus version ini.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="recipe-version-grid"
+                    >
+
+                        <div
+                            class="recipe-field"
+                        >
+
+                            <label>
+                                Yield
+                            </label>
+
+                            <input
+                                id="versionYield"
+                                type="number"
+                                min="0.000001"
+                                step="0.000001"
+                            >
+
+                        </div>
+
+
+                        <div
+                            class="recipe-field"
+                        >
+
+                            <label>
+                                Yield Unit
+                            </label>
+
+                            <select
+                                id="versionYieldUnit"
+                            >
+
+                                <option value="">
+                                    Pilih Unit
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div
+                            class="recipe-field"
+                        >
+
+                            <label>
+                                Shelf Life
+                            </label>
+
+                            <div
+                                class="recipe-version-input-suffix"
+                            >
+
+                                <input
+                                    id="versionShelfLife"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                >
+
+                                <span>
+                                    hari
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="recipe-field recipe-version-checkbox-field"
+                        >
+
+                            <label>
+                                Fermentation
+                            </label>
+
+                            <label
+                                class="recipe-version-check"
+                            >
+
+                                <input
+                                    id="versionFermentationRequired"
+                                    type="checkbox"
+                                >
+
+                                <span>
+                                    Fermentasi diperlukan
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="versionFermentationFields"
+                        class="recipe-version-grid"
+                    >
+
+                        <div
+                            class="recipe-field"
+                        >
+
+                            <label>
+                                F1 Target
+                            </label>
+
+                            <div
+                                class="recipe-version-input-suffix"
+                            >
+
+                                <input
+                                    id="versionF1Target"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                >
+
+                                <span>
+                                    hari
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="recipe-field"
+                        >
+
+                            <label>
+                                F2 Target
+                            </label>
+
+                            <div
+                                class="recipe-version-input-suffix"
+                            >
+
+                                <input
+                                    id="versionF2Target"
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                >
+
+                                <span>
+                                    hari
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="recipe-field"
+                    >
+
+                        <label>
+                            Notes Version
+                        </label>
+
+                        <textarea
+                            id="versionNotes"
+                            rows="3"
+                            placeholder="Catatan perubahan formula / proses..."
+                        ></textarea>
+
+                    </div>
+
+                </section>
+
+
+                <!-- INGREDIENTS -->
+
+                <section
+                    class="recipe-version-section"
+                >
+
+                    <div
+                        class="recipe-version-section-header"
+                    >
+
+                        <div>
+
+                            <span
+                                class="recipe-version-section-label"
+                            >
+                                Ingredients
+                            </span>
+
+                            <small>
+                                Formula disalin dari version sebelumnya.
+                                Silakan sesuaikan untuk version baru.
+                            </small>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            id="addVersionIngredientButton"
+                            class="recipe-version-add-button"
+                        >
+
+                            <i
+                                data-lucide="plus"
+                            ></i>
+
+                            <span>
+                                Tambah Ingredient
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="versionIngredients"
+                        class="recipe-version-ingredients"
+                    ></div>
+
+
+                    <div
+                        id="versionIngredientEmpty"
+                        class="recipe-version-empty"
+                        hidden
+                    >
+
+                        <i
+                            data-lucide="package-open"
+                        ></i>
+
+                        <span>
+                            Belum ada ingredient.
+                        </span>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <div
+                class="recipe-version-footer"
+            >
+
+                <button
+                    type="button"
+                    class="recipe-version-cancel"
+                    data-version-close
+                >
+                    Batal
+                </button>
+
+
+                <button
+                    type="button"
+                    id="saveRecipeVersionButton"
+                    class="recipe-version-save"
+                >
+
+                    <i
+                        data-lucide="git-branch"
+                    ></i>
+
+                    <span>
+                        Simpan Version
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    bindRecipeVersionModalEvents();
+
+
+    return modal;
+
+}
+
+
+/* =====================================================
+   H4 — POPULATE UNIT
+===================================================== */
+
+function populateVersionUnitSelect(
+    selectedId
+) {
+
+    const select =
+        document.getElementById(
+            "versionYieldUnit"
+        );
+
+
+    if (
+        !select
+    ) {
+
+        return;
+
+    }
+
+
+    select.innerHTML = `
+
+        <option value="">
+            Pilih Unit
+        </option>
+
+        ${
+            units
+                .map(
+                    unit => `
+
+                        <option
+                            value="${escapeHtml(
+                                unit.id
+                            )}"
+                        >
+
+                            ${escapeHtml(
+                                unit.name ||
+                                unit.code ||
+                                ""
+                            )}
+
+                            ${
+                                unit.code
+                                    ? ` (${escapeHtml(
+                                        unit.code
+                                    )})`
+                                    : ""
+                            }
+
+                        </option>
+
+                    `
+                )
+                .join("")
+        }
+
+    `;
+
+
+    if (
+        selectedId
+    ) {
+
+        select.value =
+            selectedId;
+
+    }
+
+}
+
+
+/* =====================================================
+   H4 — ADD INGREDIENT ROW
+===================================================== */
+
+function addVersionIngredientRow(
+    item = null
+) {
+
+    versionIngredientRows++;
+
+
+    const rowId =
+        versionIngredientRows;
+
+
+    const container =
+        document.getElementById(
+            "versionIngredients"
+        );
+
+
+    if (
+        !container
+    ) {
+
+        return;
+
+    }
+
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+
+    row.className =
+        "recipe-version-ingredient-row";
+
+
+    row.dataset.rowId =
+        rowId;
+
+
+    row.innerHTML = `
+
+        <div
+            class="recipe-version-ingredient-number"
+        >
+            ${rowId}
+        </div>
+
+
+        <div
+            class="recipe-field"
+        >
+
+            <label>
+                Ingredient
+            </label>
+
+            <select
+                class="version-ingredient-select"
+                required
+            >
+
+                <option value="">
+                    Pilih bahan
+                </option>
+
+                ${
+                    ingredients
+                        .map(
+                            ingredient => `
+
+                                <option
+                                    value="${escapeHtml(
+                                        ingredient.id
+                                    )}"
+                                    data-default-unit="${escapeHtml(
+                                        ingredient.default_unit_id ||
+                                        ""
+                                    )}"
+                                >
+
+                                    ${escapeHtml(
+                                        ingredient.name
+                                    )}
+
+                                    ${
+                                        ingredient.code
+                                            ? ` (${escapeHtml(
+                                                ingredient.code
+                                            )})`
+                                            : ""
+                                    }
+
+                                </option>
+
+                            `
+                        )
+                        .join("")
+                }
+
+            </select>
+
+        </div>
+
+
+        <div
+            class="recipe-field"
+        >
+
+            <label>
+                Quantity
+            </label>
+
+            <input
+                type="number"
+                class="version-ingredient-qty"
+                min="0.000001"
+                step="0.000001"
+                placeholder="0"
+                required
+            >
+
+        </div>
+
+
+        <div
+            class="recipe-field"
+        >
+
+            <label>
+                Unit
+            </label>
+
+            <select
+                class="version-ingredient-unit"
+                required
+            >
+
+                <option value="">
+                    Unit
+                </option>
+
+                ${
+                    units
+                        .map(
+                            unit => `
+
+                                <option
+                                    value="${escapeHtml(
+                                        unit.id
+                                    )}"
+                                >
+
+                                    ${escapeHtml(
+                                        unit.name ||
+                                        unit.code ||
+                                        ""
+                                    )}
+
+                                    ${
+                                        unit.code
+                                            ? ` (${escapeHtml(
+                                                unit.code
+                                            )})`
+                                            : ""
+                                    }
+
+                                </option>
+
+                            `
+                        )
+                        .join("")
+                }
+
+            </select>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="recipe-version-remove-ingredient"
+            title="Hapus ingredient"
+        >
+
+            <i
+                data-lucide="trash-2"
+            ></i>
+
+        </button>
+
+    `;
+
+
+    container.appendChild(
+        row
+    );
+
+
+    const ingredientSelect =
+        row.querySelector(
+            ".version-ingredient-select"
+        );
+
+
+    const unitSelect =
+        row.querySelector(
+            ".version-ingredient-unit"
+        );
+
+
+    ingredientSelect?.addEventListener(
+        "change",
+        () => {
+
+            const selected =
+                ingredientSelect
+                    .selectedOptions[0];
+
+
+            const defaultUnit =
+                selected
+                    ?.dataset
+                    ?.defaultUnit;
+
+
+            if (
+                defaultUnit &&
+                unitSelect
+            ) {
+
+                unitSelect.value =
+                    defaultUnit;
+
+            }
+
+        }
+    );
+
+
+    row.querySelector(
+        ".recipe-version-remove-ingredient"
+    )?.addEventListener(
+        "click",
+        () => {
+
+            row.remove();
+
+            renumberVersionIngredientRows();
+
+            updateVersionIngredientEmpty();
+
+        }
+    );
+
+
+    /*
+    -----------------------------------------------------
+    PREFILL
+    -----------------------------------------------------
+    */
+
+    if (
+        item
+    ) {
 
         if (
-            !activeDetailRecipeId
+            ingredientSelect
         ) {
 
-            return;
+            ingredientSelect.value =
+                item.ingredient_id ||
+                "";
+
+        }
+
+
+        const qtyInput =
+            row.querySelector(
+                ".version-ingredient-qty"
+            );
+
+
+        if (
+            qtyInput
+        ) {
+
+            qtyInput.value =
+                item.quantity ??
+                "";
+
+        }
+
+
+        if (
+            unitSelect
+        ) {
+
+            unitSelect.value =
+                item.unit_id ||
+                "";
+
+        }
+
+    }
+
+
+    updateVersionIngredientEmpty();
+
+    refreshIcons();
+
+}
+
+
+/* =====================================================
+   H4 — RENUMBER INGREDIENTS
+===================================================== */
+
+function renumberVersionIngredientRows() {
+
+    const rows =
+        document.querySelectorAll(
+            ".recipe-version-ingredient-row"
+        );
+
+
+    rows.forEach(
+        (
+            row,
+            index
+        ) => {
+
+            const number =
+                row.querySelector(
+                    ".recipe-version-ingredient-number"
+                );
+
+
+            if (
+                number
+            ) {
+
+                number.textContent =
+                    index + 1;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   H4 — EMPTY STATE
+===================================================== */
+
+function updateVersionIngredientEmpty() {
+
+    const container =
+        document.getElementById(
+            "versionIngredients"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "versionIngredientEmpty"
+        );
+
+
+    const count =
+        container
+            ?.querySelectorAll(
+                ".recipe-version-ingredient-row"
+            )
+            ?.length ||
+        0;
+
+
+    if (
+        empty
+    ) {
+
+        empty.hidden =
+            count > 0;
+
+    }
+
+}
+
+
+/* =====================================================
+   H4 — FERMENTATION VISIBILITY
+===================================================== */
+
+function updateVersionFermentationVisibility() {
+
+    const checkbox =
+        document.getElementById(
+            "versionFermentationRequired"
+        );
+
+
+    const fields =
+        document.getElementById(
+            "versionFermentationFields"
+        );
+
+
+    if (
+        checkbox?.checked
+    ) {
+
+        fields?.removeAttribute(
+            "hidden"
+        );
+
+    }
+    else {
+
+        fields?.setAttribute(
+            "hidden",
+            ""
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   H4 — SHOW ERROR
+===================================================== */
+
+function showRecipeVersionError(
+    message
+) {
+
+    const box =
+        document.getElementById(
+            "recipeVersionError"
+        );
+
+
+    if (
+        !box
+    ) {
+
+        alert(
+            message ||
+            "Terjadi kesalahan."
+        );
+
+        return;
+
+    }
+
+
+    const text =
+        box.querySelector(
+            "span"
+        );
+
+
+    if (
+        text
+    ) {
+
+        text.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    box.removeAttribute(
+        "hidden"
+    );
+
+
+    refreshIcons();
+
+}
+
+
+/* =====================================================
+   H4 — CLEAR ERROR
+===================================================== */
+
+function clearRecipeVersionError() {
+
+    document
+        .getElementById(
+            "recipeVersionError"
+        )
+        ?.setAttribute(
+            "hidden",
+            ""
+        );
+
+}
+
+
+/* =====================================================
+   H4 — OPEN NEW VERSION
+===================================================== */
+
+async function handleNewRecipeVersion() {
+
+    if (
+        !activeDetailRecipeId
+    ) {
+
+        return;
+
+    }
+
+
+    clearRecipeVersionError();
+
+
+    const modal =
+        ensureRecipeVersionModal();
+
+
+    modal.hidden =
+        false;
+
+
+    document.body.classList.add(
+        "recipe-modal-open"
+    );
+
+
+    const saveButton =
+        document.getElementById(
+            "saveRecipeVersionButton"
+        );
+
+
+    if (
+        saveButton
+    ) {
+
+        saveButton.disabled =
+            true;
+
+    }
+
+
+    /*
+    -----------------------------------------------------
+    RESET
+    -----------------------------------------------------
+    */
+
+    versionIngredientRows =
+        0;
+
+
+    const ingredientContainer =
+        document.getElementById(
+            "versionIngredients"
+        );
+
+
+    if (
+        ingredientContainer
+    ) {
+
+        ingredientContainer.innerHTML =
+            "";
+
+    }
+
+
+    try {
+
+        /*
+        =========================================
+        LOAD DATA
+        =========================================
+        */
+
+        const data =
+            await loadRecipeVersionData(
+                activeDetailRecipeId
+            );
+
+
+        activeVersionRecipe =
+            data.recipe;
+
+
+        activeVersionSource =
+            data.currentVersion;
+
+
+        const recipe =
+            data.recipe;
+
+
+        const currentVersion =
+            data.currentVersion;
+
+
+        const sourceIngredients =
+            data.ingredients ||
+            [];
+
+
+        /*
+        =========================================
+        VERSION NUMBER
+        =========================================
+        */
+
+        const previousNumber =
+            Number(
+                currentVersion?.version_number ||
+                recipe.current_version_number ||
+                0
+            );
+
+
+        const newNumber =
+            previousNumber + 1;
+
+
+        /*
+        =========================================
+        MASTER INFO
+        =========================================
+        */
+
+        const nameElement =
+            document.getElementById(
+                "versionRecipeName"
+            );
+
+
+        const codeElement =
+            document.getElementById(
+                "versionRecipeCode"
+            );
+
+
+        const previousElement =
+            document.getElementById(
+                "versionPreviousNumber"
+            );
+
+
+        const newElement =
+            document.getElementById(
+                "versionNewNumber"
+            );
+
+
+        if (
+            nameElement
+        ) {
+
+            nameElement.textContent =
+                recipe.name ||
+                "Recipe";
+
+        }
+
+
+        if (
+            codeElement
+        ) {
+
+            codeElement.textContent =
+                recipe.code ||
+                "—";
+
+        }
+
+
+        if (
+            previousElement
+        ) {
+
+            previousElement.textContent =
+                currentVersion
+                    ? `v${previousNumber}`
+                    : "Belum ada";
+
+        }
+
+
+        if (
+            newElement
+        ) {
+
+            newElement.textContent =
+                `v${newNumber}`;
 
         }
 
 
         /*
-        -----------------------------------------------------
-        H4 BELUM AKTIF
-
-        Kita tidak boleh membuat version
-        setengah jadi karena akan berpengaruh
-        ke Production dan histori.
-        -----------------------------------------------------
+        =========================================
+        PREFILL PARAMETERS
+        =========================================
         */
 
-        alert(
-            "Recipe Version akan kita kerjakan pada H4."
+        const yieldInput =
+            document.getElementById(
+                "versionYield"
+            );
+
+
+        const yieldUnit =
+            document.getElementById(
+                "versionYieldUnit"
+            );
+
+
+        const fermentation =
+            document.getElementById(
+                "versionFermentationRequired"
+            );
+
+
+        const f1 =
+            document.getElementById(
+                "versionF1Target"
+            );
+
+
+        const f2 =
+            document.getElementById(
+                "versionF2Target"
+            );
+
+
+        const shelf =
+            document.getElementById(
+                "versionShelfLife"
+            );
+
+
+        const notes =
+            document.getElementById(
+                "versionNotes"
+            );
+
+
+        if (
+            yieldInput
+        ) {
+
+            yieldInput.value =
+                currentVersion
+                    ?.yield_quantity ??
+                "1";
+
+        }
+
+
+        populateVersionUnitSelect(
+            currentVersion
+                ?.yield_unit_id ||
+            ""
+        );
+
+
+        if (
+            fermentation
+        ) {
+
+            fermentation.checked =
+                Boolean(
+                    currentVersion
+                        ?.fermentation_required
+                );
+
+        }
+
+
+        if (
+            f1
+        ) {
+
+            f1.value =
+                currentVersion
+                    ?.f1_target_days ??
+                "0";
+
+        }
+
+
+        if (
+            f2
+        ) {
+
+            f2.value =
+                currentVersion
+                    ?.f2_target_days ??
+                "0";
+
+        }
+
+
+        if (
+            shelf
+        ) {
+
+            shelf.value =
+                currentVersion
+                    ?.shelf_life_days ??
+                "0";
+
+        }
+
+
+        if (
+            notes
+        ) {
+
+            notes.value =
+                "";
+
+        }
+
+
+        updateVersionFermentationVisibility();
+
+
+        /*
+        =========================================
+        COPY INGREDIENTS
+        =========================================
+        */
+
+        if (
+            sourceIngredients.length
+        ) {
+
+            sourceIngredients.forEach(
+                item => {
+
+                    addVersionIngredientRow({
+
+                        ingredient_id:
+                            item.ingredient_id,
+
+                        quantity:
+                            item.quantity,
+
+                        unit_id:
+                            item.unit_id
+
+                    });
+
+                }
+            );
+
+        }
+        else {
+
+            addVersionIngredientRow();
+
+        }
+
+
+        /*
+        =========================================
+        ENABLE SAVE
+        =========================================
+        */
+
+        if (
+            saveButton
+        ) {
+
+            saveButton.disabled =
+                false;
+
+        }
+
+
+        refreshIcons();
+
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "OPEN NEW RECIPE VERSION ERROR:",
+            error
+        );
+
+
+        showRecipeVersionError(
+            error?.message ||
+            "Gagal memuat formula version sebelumnya."
         );
 
     }
 
+}
+
+
+/* =====================================================
+   H4 — CLOSE MODAL
+===================================================== */
+
+function closeRecipeVersionModal() {
+
+    const modal =
+        document.getElementById(
+            "recipeVersionModal"
+        );
+
+
+    if (
+        modal
+    ) {
+
+        modal.hidden =
+            true;
+
+    }
+
+
+    document.body.classList.remove(
+        "recipe-modal-open"
+    );
+
+
+    activeVersionRecipe =
+        null;
+
+
+    activeVersionSource =
+        null;
+
+
+    versionIngredientRows =
+        0;
+
+}
+
+
+/* =====================================================
+   H4 — COLLECT INGREDIENTS
+===================================================== */
+
+function collectVersionIngredients() {
+
+    const rows =
+        [
+            ...document.querySelectorAll(
+                "#versionIngredients .recipe-version-ingredient-row"
+            )
+        ];
+
+
+    if (
+        !rows.length
+    ) {
+
+        throw new Error(
+            "Tambahkan minimal satu ingredient."
+        );
+
+    }
+
+
+    const payload =
+        [];
+
+
+    rows.forEach(
+        (
+            row,
+            index
+        ) => {
+
+            const ingredientId =
+                row.querySelector(
+                    ".version-ingredient-select"
+                )?.value ||
+                "";
+
+
+            const quantity =
+                Number(
+                    row.querySelector(
+                        ".version-ingredient-qty"
+                    )?.value
+                );
+
+
+            const unitId =
+                row.querySelector(
+                    ".version-ingredient-unit"
+                )?.value ||
+                "";
+
+
+            if (
+                !ingredientId
+            ) {
+
+                throw new Error(
+                    `Ingredient nomor ${
+                        index + 1
+                    } belum dipilih.`
+                );
+
+            }
+
+
+            if (
+                !quantity ||
+                quantity <= 0
+            ) {
+
+                throw new Error(
+                    `Quantity ingredient nomor ${
+                        index + 1
+                    } tidak valid.`
+                );
+
+            }
+
+
+            if (
+                !unitId
+            ) {
+
+                throw new Error(
+                    `Unit ingredient nomor ${
+                        index + 1
+                    } belum dipilih.`
+                );
+
+            }
+
+
+            payload.push({
+
+                ingredient_id:
+                    ingredientId,
+
+                quantity,
+
+                unit_id:
+                    unitId
+
+            });
+
+        }
+    );
+
+
+    return payload;
+
+}
+
+
+/* =====================================================
+   H4 — SAVE VERSION
+===================================================== */
+
+async function saveRecipeVersion() {
+
+    clearRecipeVersionError();
+
+
+    if (
+        !activeVersionRecipe
+    ) {
+
+        showRecipeVersionError(
+            "Recipe belum dimuat."
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveRecipeVersionButton"
+        );
+
+
+    const buttonText =
+        saveButton?.querySelector(
+            "span"
+        );
+
+
+    const originalText =
+        "Simpan Version";
+
+
+    try {
+
+        /*
+        =========================================
+        READ FORM
+        =========================================
+        */
+
+        const yieldQuantity =
+            Number(
+                document.getElementById(
+                    "versionYield"
+                )?.value
+            );
+
+
+        const yieldUnitId =
+            document.getElementById(
+                "versionYieldUnit"
+            )?.value ||
+            "";
+
+
+        const fermentationRequired =
+            Boolean(
+                document.getElementById(
+                    "versionFermentationRequired"
+                )?.checked
+            );
+
+
+        const f1Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "versionF1Target"
+                    )?.value
+                )
+                : 0;
+
+
+        const f2Target =
+            fermentationRequired
+                ? Number(
+                    document.getElementById(
+                        "versionF2Target"
+                    )?.value
+                )
+                : 0;
+
+
+        const shelfLife =
+            Number(
+                document.getElementById(
+                    "versionShelfLife"
+                )?.value
+            );
+
+
+        const notes =
+            document.getElementById(
+                "versionNotes"
+            )?.value
+            ?.trim() ||
+            "";
+
+
+        /*
+        =========================================
+        VALIDATION
+        =========================================
+        */
+
+        if (
+            !yieldQuantity ||
+            yieldQuantity <= 0
+        ) {
+
+            throw new Error(
+                "Yield harus lebih besar dari 0."
+            );
+
+        }
+
+
+        if (
+            !yieldUnitId
+        ) {
+
+            throw new Error(
+                "Unit yield wajib dipilih."
+            );
+
+        }
+
+
+        if (
+            fermentationRequired &&
+            (
+                f1Target < 0 ||
+                f2Target < 0
+            )
+        ) {
+
+            throw new Error(
+                "Target fermentasi tidak valid."
+            );
+
+        }
+
+
+        if (
+            shelfLife < 0
+        ) {
+
+            throw new Error(
+                "Shelf life tidak valid."
+            );
+
+        }
+
+
+        const ingredientPayload =
+            collectVersionIngredients();
+
+
+        /*
+        =========================================
+        BUTTON LOADING
+        =========================================
+        */
+
+        if (
+            saveButton
+        ) {
+
+            saveButton.disabled =
+                true;
+
+            saveButton.classList.add(
+                "is-loading"
+            );
+
+        }
+
+
+        if (
+            buttonText
+        ) {
+
+            buttonText.textContent =
+                "Menyimpan...";
+
+        }
+
+
+        /*
+        =========================================
+        SUPABASE
+        =========================================
+        */
+
+        await new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+
+                waitForSupabase(
+                    async supabase => {
+
+                        try {
+
+                            /*
+                            =================================
+                            GET LATEST VERSION
+                            =================================
+                            */
+
+                            const {
+                                data: latestVersions,
+                                error:
+                                    latestError
+                            } = await supabase
+
+                                .from(
+                                    "recipe_versions"
+                                )
+
+                                .select(
+                                    `
+                                        id,
+                                        version_number
+                                    `
+                                )
+
+                                .eq(
+                                    "recipe_id",
+                                    activeVersionRecipe.id
+                                )
+
+                                .order(
+                                    "version_number",
+                                    {
+                                        ascending:
+                                            false
+                                    }
+                                )
+
+                                .limit(
+                                    1
+                                );
+
+
+                            if (
+                                latestError
+                            ) {
+
+                                throw latestError;
+
+                            }
+
+
+                            const latestVersion =
+                                latestVersions?.[0] ||
+                                null;
+
+
+                            const newVersionNumber =
+                                Number(
+                                    latestVersion
+                                        ?.version_number ||
+                                    activeVersionRecipe
+                                        .current_version_number ||
+                                    0
+                                ) + 1;
+
+
+                            /*
+                            =================================
+                            CREATE NEW VERSION
+                            =================================
+                            */
+
+                            const {
+                                data:
+                                    newVersion,
+                                error:
+                                    versionError
+                            } = await supabase
+
+                                .from(
+                                    "recipe_versions"
+                                )
+
+                                .insert({
+
+                                    recipe_id:
+                                        activeVersionRecipe.id,
+
+                                    version_number:
+                                        newVersionNumber,
+
+                                    yield_quantity:
+                                        yieldQuantity,
+
+                                    yield_unit_id:
+                                        yieldUnitId,
+
+                                    fermentation_required:
+                                        fermentationRequired,
+
+                                    f1_target_days:
+                                        fermentationRequired
+                                            ? f1Target
+                                            : 0,
+
+                                    f2_target_days:
+                                        fermentationRequired
+                                            ? f2Target
+                                            : 0,
+
+                                    shelf_life_days:
+                                        shelfLife ||
+                                        0,
+
+                                    notes:
+                                        notes ||
+                                        null,
+
+                                    status:
+                                        "active",
+
+                                    effective_from:
+                                        new Date()
+                                            .toISOString()
+
+                                })
+
+                                .select(
+                                    "id"
+                                )
+
+                                .single();
+
+
+                            if (
+                                versionError
+                            ) {
+
+                                throw versionError;
+
+                            }
+
+
+                            /*
+                            =================================
+                            CREATE INGREDIENTS
+                            =================================
+                            */
+
+                            const ingredientRows =
+                                ingredientPayload.map(
+                                    item => ({
+
+                                        recipe_version_id:
+                                            newVersion.id,
+
+                                        ingredient_id:
+                                            item.ingredient_id,
+
+                                        quantity:
+                                            item.quantity,
+
+                                        unit_id:
+                                            item.unit_id
+
+                                    })
+                                );
+
+
+                            const {
+                                error:
+                                    ingredientError
+                            } = await supabase
+
+                                .from(
+                                    "recipe_ingredients"
+                                )
+
+                                .insert(
+                                    ingredientRows
+                                );
+
+
+                            if (
+                                ingredientError
+                            ) {
+
+                                /*
+                                ---------------------------------
+                                BEST EFFORT ROLLBACK
+                                ---------------------------------
+                                */
+
+                                try {
+
+                                    await supabase
+
+                                        .from(
+                                            "recipe_versions"
+                                        )
+
+                                        .delete()
+
+                                        .eq(
+                                            "id",
+                                            newVersion.id
+                                        );
+
+                                }
+                                catch (
+                                    rollbackError
+                                ) {
+
+                                    console.error(
+                                        "Version rollback error:",
+                                        rollbackError
+                                    );
+
+                                }
+
+
+                                throw ingredientError;
+
+                            }
+
+
+                            /*
+                            =================================
+                            UPDATE MASTER CURRENT VERSION
+                            =================================
+                            */
+
+                            const {
+                                error:
+                                    recipeUpdateError
+                            } = await supabase
+
+                                .from(
+                                    "recipes"
+                                )
+
+                                .update({
+
+                                    current_version_number:
+                                        newVersionNumber
+
+                                })
+
+                                .eq(
+                                    "id",
+                                    activeVersionRecipe.id
+                                );
+
+
+                            if (
+                                recipeUpdateError
+                            ) {
+
+                                /*
+                                ---------------------------------
+                                IMPORTANT
+                                ---------------------------------
+
+                                Version + ingredients sudah
+                                tersimpan.
+
+                                Jangan menghapus version hanya
+                                karena current_version gagal
+                                update.
+
+                                Kita laporkan error supaya
+                                data tidak hilang.
+                                ---------------------------------
+                                */
+
+                                throw recipeUpdateError;
+
+                            }
+
+
+                            /*
+                            =================================
+                            SUCCESS
+                            =================================
+                            */
+
+                            resolve(
+                                newVersionNumber
+                            );
+
+                        }
+                        catch (
+                            error
+                        ) {
+
+                            reject(
+                                error
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        /*
+        =========================================
+        CLOSE
+        =========================================
+        */
+
+        closeRecipeVersionModal();
+
+
+        /*
+        =========================================
+        REFRESH LIST
+        =========================================
+        */
+
+        await loadRecipes();
+
+
+        /*
+        =========================================
+        REFRESH DETAIL
+        =========================================
+        */
+
+        if (
+            activeDetailRecipeId
+        ) {
+
+            await openRecipeDetail(
+                activeDetailRecipeId
+            );
+
+        }
+
+
+        showSuccessMessage(
+            "Recipe Version berhasil dibuat."
+        );
+
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "CREATE RECIPE VERSION ERROR:",
+            error
+        );
+
+
+        showRecipeVersionError(
+            error?.message ||
+            "Recipe Version gagal disimpan."
+        );
+
+    }
+    finally {
+
+        if (
+            saveButton
+        ) {
+
+            saveButton.disabled =
+                false;
+
+            saveButton.classList.remove(
+                "is-loading"
+            );
+
+        }
+
+
+        if (
+            buttonText
+        ) {
+
+            buttonText.textContent =
+                originalText;
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   H4 — MODAL EVENTS
+===================================================== */
+
+function bindRecipeVersionModalEvents() {
+
+    /*
+    -----------------------------------------------------
+    CLOSE
+    -----------------------------------------------------
+    */
+
+    document
+        .querySelectorAll(
+            "[data-version-close]"
+        )
+        .forEach(
+            element => {
+
+                element.addEventListener(
+                    "click",
+                    closeRecipeVersionModal
+                );
+
+            }
+        );
+
+
+    /*
+    -----------------------------------------------------
+    SAVE
+    -----------------------------------------------------
+    */
+
+    document
+        .getElementById(
+            "saveRecipeVersionButton"
+        )
+        ?.addEventListener(
+            "click",
+            saveRecipeVersion
+        );
+
+
+    /*
+    -----------------------------------------------------
+    ADD INGREDIENT
+    -----------------------------------------------------
+    */
+
+    document
+        .getElementById(
+            "addVersionIngredientButton"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                addVersionIngredientRow();
+
+            }
+        );
+
+
+    /*
+    -----------------------------------------------------
+    FERMENTATION
+    -----------------------------------------------------
+    */
+
+    document
+        .getElementById(
+            "versionFermentationRequired"
+        )
+        ?.addEventListener(
+            "change",
+            updateVersionFermentationVisibility
+        );
+
+
+    /*
+    -----------------------------------------------------
+    ESCAPE
+    -----------------------------------------------------
+    */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key !==
+                "Escape"
+            ) {
+
+                return;
+
+            }
+
+
+            const modal =
+                document.getElementById(
+                    "recipeVersionModal"
+                );
+
+
+            if (
+                modal &&
+                !modal.hidden
+            ) {
+
+                closeRecipeVersionModal();
+
+            }
+
+        }
+    );
+
+}
 
     /* =====================================================
        RECIPE ACTIONS
