@@ -3344,6 +3344,112 @@ if (statusButton) {
 
                 }
 
+                const statusButton =
+    event.target.closest(
+        "[data-unit-status]"
+    );
+
+if (statusButton) {
+
+    const unitId =
+        statusButton.dataset.unitId;
+
+    const newStatus =
+        statusButton.dataset.unitStatus;
+
+    const unit =
+        finishedUnits.find(
+            item =>
+                String(item.id) ===
+                String(unitId)
+        );
+
+    if (!unit) {
+
+        showToast(
+            "Finished unit tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+    if (
+        String(unit.status)
+            .toLowerCase() !== "available"
+    ) {
+
+        showToast(
+            `Bottle ${unit.trace_code} sudah ${String(unit.status).toUpperCase()} dan terkunci.`
+        );
+
+        return;
+
+    }
+
+    const labels = {
+        done: "DONE",
+        damaged: "DAMAGED",
+        expired: "EXPIRED"
+    };
+
+    const label =
+        labels[newStatus] ||
+        newStatus.toUpperCase();
+
+    const confirmed =
+        window.confirm(
+            `Ubah Bottle #${unit.unit_number} menjadi ${label}?`
+        );
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+    let reason = "";
+
+    if (newStatus === "done") {
+
+        reason =
+            window.prompt(
+                "Keterangan distribusi / pengiriman:",
+                "Dikirim ke toko"
+            ) || "";
+
+    }
+
+    if (newStatus === "damaged") {
+
+        reason =
+            window.prompt(
+                "Alasan bottle damaged:",
+                "Bottle rusak"
+            ) || "";
+
+    }
+
+    if (newStatus === "expired") {
+
+        reason =
+            window.prompt(
+                "Keterangan expired:",
+                "Produk melewati tanggal expiry"
+            ) || "";
+
+    }
+
+    await updateFinishedUnitStatus(
+        unitId,
+        newStatus,
+        reason
+    );
+
+    return;
+
+}
+
             }
         );
 
