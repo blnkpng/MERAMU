@@ -2190,7 +2190,7 @@ function printThermalLabel(units) {
                         <div class="thermal-qr-panel">
 
                             <div class="thermal-scan-title">
-                                SCAN INFORMATION
+                                
                             </div>
 
                             <div
