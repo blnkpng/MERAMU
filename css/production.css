@@ -1712,3 +1712,26 @@
     }
 
 }
+
+/* =========================================================
+   BUTTON LOADER
+========================================================= */
+
+.production-button-loader{
+
+    width: 15px;
+
+    height: 15px;
+
+    border:
+        2px solid rgba(255,255,255,.35);
+
+    border-top-color:
+        #ffffff;
+
+    border-radius: 50%;
+
+    animation:
+        productionSpin .7s linear infinite;
+
+}
