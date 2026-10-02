@@ -2163,12 +2163,15 @@ function printThermalLabel(units) {
     /* =====================================================
        BUILD MINI BOTTLE LABELS
 
-       Target:
-       55mm wide x 25mm high
+       OUTER / CUT AREA
+       55mm x 25mm
 
-       Layout:
-       LEFT  = QR + SCAN INFORMATION
-       RIGHT = Product + Size + BB
+       INNER / SAFE LABEL AREA
+       48mm x 20mm
+
+       LAYOUT
+       LEFT  = QR
+       RIGHT = PRODUCT + ML + BB
        ===================================================== */
 
     const labels =
@@ -2183,15 +2186,11 @@ function printThermalLabel(units) {
 
                     <div class="thermal-label">
 
-                        <!-- ==============================
+                        <!-- =================================
                              LEFT : QR
-                             ============================== -->
+                             ================================= -->
 
                         <div class="thermal-qr-panel">
-
-                            <div class="thermal-scan-title">
-                                
-                            </div>
 
                             <div
                                 class="thermal-qr"
@@ -2203,16 +2202,20 @@ function printThermalLabel(units) {
                         </div>
 
 
-                        <!-- ==============================
-                             RIGHT : PRODUCT INFO
-                             ============================== -->
+                        <!-- =================================
+                             RIGHT : PRODUCT INFORMATION
+                             ================================= -->
 
                         <div class="thermal-info-panel">
+
+                            <!-- PRODUCT NAME -->
 
                             <div class="thermal-product">
                                 ${escapeHtml(product)}
                             </div>
 
+
+                            <!-- META -->
 
                             <div class="thermal-meta">
 
@@ -2387,7 +2390,9 @@ function printThermalLabel(units) {
 
 
                 /* =================================================
-                   PRINT SIZE
+                   PRINT PAGE / CUT AREA
+
+                   OUTER:
                    55MM x 25MM
                    ================================================= */
 
@@ -2401,7 +2406,14 @@ function printThermalLabel(units) {
 
 
                 /* =================================================
-                   LABEL
+                   OUTER LABEL / CUT AREA
+
+                   55MM x 25MM
+
+                   INNER CONTENT:
+                   48MM x 20MM
+
+                   Border is the cut-line guide.
                    ================================================= */
 
                 .thermal-label {
@@ -2422,87 +2434,132 @@ function printThermalLabel(units) {
 
                     margin: 0;
 
-                    padding: 1.8mm 2mm;
+                    /*
+                     * 0.25mm border
+                     *
+                     * Content calculation:
+                     *
+                     * Width:
+                     * 55 - 0.5 border - 6.5 padding
+                     * = 48mm
+                     *
+                     * Height:
+                     * 25 - 0.5 border - 4.5 padding
+                     * = 20mm
+                     */
 
-                    background: #FFFFFF;
+                    padding:
+                        2.25mm
+                        3.25mm;
 
-                    color: #000000;
+                    border:
+                        0.25mm
+                        dashed
+                        #777777;
 
-                    display: grid;
+                    border-radius:
+                        2.5mm;
+
+                    background:
+                        #FFFFFF;
+
+                    color:
+                        #000000;
+
+                    display:
+                        grid;
+
+                    /*
+                     * INNER WIDTH = 48mm
+                     *
+                     * QR   = 16mm
+                     * GAP  = 2mm
+                     * INFO = 30mm
+                     *
+                     * TOTAL = 48mm
+                     */
 
                     grid-template-columns:
-                        21mm 1fr;
+                        16mm 1fr;
 
-                    column-gap: 2mm;
+                    column-gap:
+                        2mm;
 
-                    align-items: center;
+                    /*
+                     * INNER HEIGHT = 20mm
+                     */
 
-                    overflow: hidden;
+                    align-items:
+                        center;
 
-                    page-break-after: always;
+                    overflow:
+                        hidden;
 
-                    break-after: page;
+                    page-break-after:
+                        always;
+
+                    break-after:
+                        page;
 
                 }
 
 
                 /* =================================================
                    QR PANEL
+
+                   QR DIAMETER:
+                   16MM x 16MM
                    ================================================= */
 
                 .thermal-qr-panel {
 
-                    width: 21mm;
+                    width:
+                        16mm;
 
-                    height: 21mm;
+                    height:
+                        20mm;
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    flex-direction: column;
+                    align-items:
+                        center;
 
-                    align-items: center;
+                    justify-content:
+                        center;
 
-                    justify-content: center;
-
-                }
-
-
-                .thermal-scan-title {
-
-                    width: 100%;
-
-                    margin-bottom: 0.7mm;
-
-                    font-size: 5.3px;
-
-                    line-height: 1;
-
-                    font-weight: 800;
-
-                    letter-spacing: 1.15px;
-
-                    white-space: nowrap;
-
-                    text-align: center;
+                    overflow:
+                        hidden;
 
                 }
 
+
+                /* =================================================
+                   QR
+                   ================================================= */
 
                 .thermal-qr {
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
-                    justify-content: center;
+                    justify-content:
+                        center;
 
-                    width: 19mm;
+                    width:
+                        16mm;
 
-                    height: 19mm;
+                    height:
+                        16mm;
 
-                    flex: 0 0 19mm;
+                    flex:
+                        0 0 16mm;
 
-                    margin: 0 auto;
+                    margin:
+                        0 auto;
 
                 }
 
@@ -2510,106 +2567,148 @@ function printThermalLabel(units) {
                 .thermal-qr img,
                 .thermal-qr canvas {
 
-                    display: block;
+                    display:
+                        block;
 
-                    width: 19mm !important;
+                    width:
+                        16mm !important;
 
-                    height: 19mm !important;
+                    height:
+                        16mm !important;
 
-                    max-width: 19mm !important;
+                    max-width:
+                        16mm !important;
 
-                    max-height: 19mm !important;
+                    max-height:
+                        16mm !important;
 
                 }
 
 
                 /* =================================================
                    INFORMATION PANEL
+
+                   RIGHT SIDE
+
+                   PRODUCT
+                   ML
+                   BB
                    ================================================= */
 
                 .thermal-info-panel {
 
-                    min-width: 0;
+                    min-width:
+                        0;
 
-                    height: 21mm;
+                    width:
+                        30mm;
 
-                    display: flex;
+                    height:
+                        20mm;
 
-                    flex-direction: column;
+                    display:
+                        flex;
 
-                    align-items: flex-start;
+                    flex-direction:
+                        column;
 
-                    justify-content: center;
+                    align-items:
+                        flex-start;
 
-                    text-align: left;
+                    justify-content:
+                        center;
 
-                    overflow: hidden;
+                    text-align:
+                        left;
+
+                    overflow:
+                        hidden;
 
                 }
 
 
                 /* =================================================
                    PRODUCT NAME
-                   =================================================
-
-                   DIPERKECIL AGAR:
-                   TELANG KOMBUCHA
-                   TIDAK TERPOTONG
                    ================================================= */
 
                 .thermal-product {
 
-                    width: 100%;
+                    width:
+                        100%;
 
-                    margin: 0 0 2mm 0;
+                    margin:
+                        0 0 1.6mm 0;
 
-                    font-size: 7.2px;
+                    font-size:
+                        7px;
 
-                    line-height: 1;
+                    line-height:
+                        1;
 
-                    font-weight: 800;
+                    font-weight:
+                        800;
 
-                    letter-spacing: -0.15px;
+                    letter-spacing:
+                        -0.15px;
 
-                    text-transform: uppercase;
+                    text-transform:
+                        uppercase;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
 
-                    overflow: hidden;
+                    overflow:
+                        hidden;
 
-                    text-overflow: ellipsis;
+                    text-overflow:
+                        ellipsis;
 
                 }
 
 
                 /* =================================================
                    META INFORMATION
+
+                   ML
+                   BB
                    ================================================= */
 
                 .thermal-meta {
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    flex-direction: column;
+                    flex-direction:
+                        column;
 
-                    gap: 1.7mm;
+                    gap:
+                        1.5mm;
 
                 }
 
 
                 .thermal-meta-row {
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
-                    justify-content: flex-start;
+                    justify-content:
+                        flex-start;
 
-                    gap: 1.1mm;
+                    gap:
+                        0.9mm;
 
-                    min-height: 3.8mm;
+                    min-height:
+                        3.6mm;
 
-                    white-space: nowrap;
+                    white-space:
+                        nowrap;
+
+                    overflow:
+                        hidden;
 
                 }
 
@@ -2617,23 +2716,27 @@ function printThermalLabel(units) {
                 .thermal-meta-row span,
                 .thermal-meta-row strong {
 
-                    font-size: 7.7px;
+                    font-size:
+                        7.2px;
 
-                    line-height: 1;
+                    line-height:
+                        1;
 
                 }
 
 
                 .thermal-meta-row strong {
 
-                    font-weight: 700;
+                    font-weight:
+                        700;
 
                 }
 
 
                 .thermal-meta-row span {
 
-                    font-weight: 600;
+                    font-weight:
+                        600;
 
                 }
 
@@ -2645,13 +2748,17 @@ function printThermalLabel(units) {
                 .thermal-bottle-icon,
                 .thermal-calendar-icon {
 
-                    display: flex;
+                    display:
+                        flex;
 
-                    align-items: center;
+                    align-items:
+                        center;
 
-                    justify-content: center;
+                    justify-content:
+                        center;
 
-                    flex: 0 0 auto;
+                    flex:
+                        0 0 auto;
 
                 }
 
@@ -2659,19 +2766,26 @@ function printThermalLabel(units) {
                 .thermal-bottle-icon svg,
                 .thermal-calendar-icon svg {
 
-                    width: 4mm;
+                    width:
+                        3.2mm;
 
-                    height: 4mm;
+                    height:
+                        3.2mm;
 
-                    fill: none;
+                    fill:
+                        none;
 
-                    stroke: #000000;
+                    stroke:
+                        #000000;
 
-                    stroke-width: 1.6;
+                    stroke-width:
+                        1.6;
 
-                    stroke-linecap: round;
+                    stroke-linecap:
+                        round;
 
-                    stroke-linejoin: round;
+                    stroke-linejoin:
+                        round;
 
                 }
 
@@ -2685,34 +2799,46 @@ function printThermalLabel(units) {
                     html,
                     body {
 
-                        width: 55mm;
+                        width:
+                            55mm;
 
-                        height: 25mm;
+                        height:
+                            25mm;
 
-                        margin: 0;
+                        margin:
+                            0;
 
-                        padding: 0;
+                        padding:
+                            0;
 
-                        background: #FFFFFF;
+                        background:
+                            #FFFFFF;
 
                     }
 
 
                     .thermal-label {
 
-                        width: 55mm;
+                        width:
+                            55mm;
 
-                        height: 25mm;
+                        height:
+                            25mm;
 
-                        min-width: 55mm;
+                        min-width:
+                            55mm;
 
-                        max-width: 55mm;
+                        max-width:
+                            55mm;
 
-                        min-height: 25mm;
+                        min-height:
+                            25mm;
 
-                        max-height: 25mm;
+                        max-height:
+                            25mm;
 
-                        margin: 0;
+                        margin:
+                            0;
 
                     }
 
@@ -2800,11 +2926,14 @@ function printThermalLabel(units) {
                         container,
                         {
 
-                            text: url,
+                            text:
+                                url,
 
-                            width: 72,
+                            width:
+                                72,
 
-                            height: 72,
+                            height:
+                                72,
 
                             correctLevel:
                                 QRCode.CorrectLevel.M
@@ -2836,7 +2965,6 @@ function printThermalLabel(units) {
     );
 
 }
-
     /* =====================================================
        EMPTY STATE
     ===================================================== */
