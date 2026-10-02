@@ -2163,10 +2163,16 @@ function printThermalLabel(units) {
     /* =====================================================
        BUILD MINI BOTTLE LABELS
 
-       OUTER / CUT AREA
+       LABEL / CUT AREA
        55mm x 25mm
 
-       INNER / SAFE LABEL AREA
+       PRINT PAGE
+       55mm x 27mm
+
+       TOP OFFSET
+       1.5mm
+
+       INNER CONTENT
        48mm x 20mm
 
        LAYOUT
@@ -2215,7 +2221,7 @@ function printThermalLabel(units) {
                             </div>
 
 
-                            <!-- META -->
+                            <!-- META INFORMATION -->
 
                             <div class="thermal-meta">
 
@@ -2366,13 +2372,17 @@ function printThermalLabel(units) {
                 html,
                 body {
 
-                    width: 55mm;
+                    width:
+                        55mm;
 
-                    margin: 0;
+                    margin:
+                        0;
 
-                    padding: 0;
+                    padding:
+                        0;
 
-                    background: #FFFFFF;
+                    background:
+                        #FFFFFF;
 
                 }
 
@@ -2384,73 +2394,98 @@ function printThermalLabel(units) {
                         Helvetica,
                         sans-serif;
 
-                    color: #000000;
+                    color:
+                        #000000;
 
                 }
 
 
                 /* =================================================
-                   PRINT PAGE / CUT AREA
+                   PRINT PAGE
 
-                   OUTER:
+                   PAGE:
+                   55MM x 27MM
+
+                   LABEL:
                    55MM x 25MM
+
+                   LABEL DITURUNKAN 1.5MM
+                   AGAR GARIS ATAS TIDAK TERPOTONG
                    ================================================= */
 
                 @page {
 
-                    size: 55mm 25mm;
+                    size:
+                        55mm 27mm;
 
-                    margin: 0;
+                    margin:
+                        0;
 
                 }
 
 
                 /* =================================================
-                   OUTER LABEL / CUT AREA
+                   LABEL / CUT AREA
 
+                   ACTUAL CUT AREA:
                    55MM x 25MM
+
+                   TOP OFFSET:
+                   1.5MM
 
                    INNER CONTENT:
                    48MM x 20MM
-
-                   Border is the cut-line guide.
                    ================================================= */
 
                 .thermal-label {
 
-                    position: relative;
+                    position:
+                        relative;
 
-                    width: 55mm;
+                    width:
+                        55mm;
 
-                    height: 25mm;
+                    height:
+                        25mm;
 
-                    min-width: 55mm;
+                    min-width:
+                        55mm;
 
-                    max-width: 55mm;
+                    max-width:
+                        55mm;
 
-                    min-height: 25mm;
+                    min-height:
+                        25mm;
 
-                    max-height: 25mm;
-
-                    margin: 0;
+                    max-height:
+                        25mm;
 
                     /*
-                     * 0.25mm border
+                     * TURUNKAN LABEL
+                     * DARI BAGIAN ATAS
+                     */
+
+                    margin:
+                        1.5mm 0 0 0;
+
+                    /*
+                     * INNER CONTENT CALCULATION
                      *
-                     * Content calculation:
-                     *
-                     * Width:
-                     * 55 - 0.5 border - 6.5 padding
+                     * WIDTH:
+                     * 55
+                     * - 0.5 border
+                     * - 6.5 padding
                      * = 48mm
                      *
-                     * Height:
-                     * 25 - 0.5 border - 4.5 padding
+                     * HEIGHT:
+                     * 25
+                     * - 0.5 border
+                     * - 4.5 padding
                      * = 20mm
                      */
 
                     padding:
-                        2.25mm
-                        3.25mm;
+                        2.25mm 3.25mm;
 
                     border:
                         0.25mm
@@ -2470,13 +2505,11 @@ function printThermalLabel(units) {
                         grid;
 
                     /*
-                     * INNER WIDTH = 48mm
+                     * 48MM INNER WIDTH
                      *
-                     * QR   = 16mm
-                     * GAP  = 2mm
-                     * INFO = 30mm
-                     *
-                     * TOTAL = 48mm
+                     * QR   = 16MM
+                     * GAP  = 2MM
+                     * INFO = 30MM
                      */
 
                     grid-template-columns:
@@ -2484,10 +2517,6 @@ function printThermalLabel(units) {
 
                     column-gap:
                         2mm;
-
-                    /*
-                     * INNER HEIGHT = 20mm
-                     */
 
                     align-items:
                         center;
@@ -2506,9 +2535,6 @@ function printThermalLabel(units) {
 
                 /* =================================================
                    QR PANEL
-
-                   QR DIAMETER:
-                   16MM x 16MM
                    ================================================= */
 
                 .thermal-qr-panel {
@@ -2536,6 +2562,8 @@ function printThermalLabel(units) {
 
                 /* =================================================
                    QR
+
+                   TETAP 16MM
                    ================================================= */
 
                 .thermal-qr {
@@ -2587,12 +2615,6 @@ function printThermalLabel(units) {
 
                 /* =================================================
                    INFORMATION PANEL
-
-                   RIGHT SIDE
-
-                   PRODUCT
-                   ML
-                   BB
                    ================================================= */
 
                 .thermal-info-panel {
@@ -2629,6 +2651,9 @@ function printThermalLabel(units) {
 
                 /* =================================================
                    PRODUCT NAME
+
+                   DIBESARKAN
+                   7px -> 9px
                    ================================================= */
 
                 .thermal-product {
@@ -2637,10 +2662,10 @@ function printThermalLabel(units) {
                         100%;
 
                     margin:
-                        0 0 1.6mm 0;
+                        0 0 1.8mm 0;
 
                     font-size:
-                        7px;
+                        9px;
 
                     line-height:
                         1;
@@ -2649,7 +2674,7 @@ function printThermalLabel(units) {
                         800;
 
                     letter-spacing:
-                        -0.15px;
+                        -0.1px;
 
                     text-transform:
                         uppercase;
@@ -2668,9 +2693,6 @@ function printThermalLabel(units) {
 
                 /* =================================================
                    META INFORMATION
-
-                   ML
-                   BB
                    ================================================= */
 
                 .thermal-meta {
@@ -2682,7 +2704,7 @@ function printThermalLabel(units) {
                         column;
 
                     gap:
-                        1.5mm;
+                        1.8mm;
 
                 }
 
@@ -2699,10 +2721,10 @@ function printThermalLabel(units) {
                         flex-start;
 
                     gap:
-                        0.9mm;
+                        1mm;
 
                     min-height:
-                        3.6mm;
+                        4mm;
 
                     white-space:
                         nowrap;
@@ -2713,11 +2735,18 @@ function printThermalLabel(units) {
                 }
 
 
+                /* =================================================
+                   ML + BB
+
+                   DIBESARKAN
+                   7.2px -> 8.5px
+                   ================================================= */
+
                 .thermal-meta-row span,
                 .thermal-meta-row strong {
 
                     font-size:
-                        7.2px;
+                        8.5px;
 
                     line-height:
                         1;
@@ -2802,8 +2831,13 @@ function printThermalLabel(units) {
                         width:
                             55mm;
 
+                        /*
+                         * PAGE HEIGHT
+                         * SEKARANG 27MM
+                         */
+
                         height:
-                            25mm;
+                            27mm;
 
                         margin:
                             0;
@@ -2837,8 +2871,12 @@ function printThermalLabel(units) {
                         max-height:
                             25mm;
 
+                        /*
+                         * TETAP TURUN 1.5MM
+                         */
+
                         margin:
-                            0;
+                            1.5mm 0 0 0;
 
                     }
 
