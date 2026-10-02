@@ -545,7 +545,39 @@
                         <span>
                             Mengambil data dari Supabase.
                         </span>
-
+                        <!-- VERSION HISTORY -->
+                        
+                        <section class="recipe-detail-section">
+                        
+                            <div class="recipe-detail-section-title">
+                        
+                                <div class="recipe-form-section-icon">
+                        
+                                    <i data-lucide="history"></i>
+                        
+                                </div>
+                        
+                                <div>
+                        
+                                    <strong>
+                                        Version History
+                                    </strong>
+                        
+                                    <span>
+                                        Riwayat perubahan formula recipe
+                                    </span>
+                        
+                                </div>
+                        
+                            </div>
+                        
+                        
+                            <div
+                                id="recipeVersionHistory"
+                                class="recipe-version-history"
+                            ></div>
+                        
+                        </section>
                     </div>
 
 
@@ -1604,27 +1636,52 @@
 
         <div class="recipe-modal-footer">
 
-            <button
-                type="button"
-                class="page-btn secondary"
-                id="closeRecipeDetailBottom"
-            >
-                Tutup
-            </button>
-
-
-            <button
-                type="button"
-                class="page-btn secondary"
-                id="editRecipeFromDetail"
-            >
-
-                <i data-lucide="pencil"></i>
-
-                Edit Recipe
-
-            </button>
-
+        <button
+            type="button"
+            class="page-btn secondary"
+            id="closeRecipeDetailBottom"
+        >
+            Tutup
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn secondary"
+            id="editRecipeFromDetail"
+        >
+        
+            <i data-lucide="pencil"></i>
+        
+            Edit Recipe
+        
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn danger"
+            id="deleteRecipeFromDetail"
+        >
+        
+            <i data-lucide="trash-2"></i>
+        
+            Hapus Recipe
+        
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn primary"
+            id="newRecipeVersionFromDetail"
+        >
+        
+            <i data-lucide="git-branch"></i>
+        
+            Buat Versi Baru
+        
+        </button>
 
             <button
                 type="button"
