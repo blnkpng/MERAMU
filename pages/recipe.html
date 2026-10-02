@@ -81,407 +81,225 @@ Recipe Version.
 
     <style id="recipe-detail-modal-polish">
 
-        .recipe-detail-dialog {
+.recipe-detail-dialog {
+    width: min(720px, calc(100vw - 32px)) !important;
+    max-width: 720px !important;
+    max-height: 82vh !important;
 
-            width:
-                min(
-                    720px,
-                    calc(100vw - 32px)
-                ) !important;
+    display: flex !important;
+    flex-direction: column !important;
 
-            max-width:
-                720px !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+}
 
-            max-height:
-                82vh !important;
 
-            display:
-                flex !important;
+.recipe-detail-dialog
+.recipe-modal-header {
+    flex: 0 0 auto !important;
 
-            flex-direction:
-                column !important;
+    min-height: 74px !important;
 
-            overflow:
-                hidden !important;
+    padding: 17px 20px !important;
+}
 
-            border-radius:
-                18px !important;
 
-        }
+.recipe-detail-dialog
+.recipe-detail-content {
+    flex: 1 1 auto !important;
 
+    min-height: 0 !important;
 
-        .recipe-detail-dialog
-        .recipe-modal-header {
+    overflow-y: auto !important;
 
-            min-height:
-                74px;
+    padding: 18px 20px 22px !important;
+}
 
-            padding:
-                17px 20px;
 
-            flex:
-                0 0 auto;
+/* =====================================================
+   FOOTER
+===================================================== */
 
-        }
+.recipe-detail-dialog
+.recipe-modal-footer {
 
+    flex: 0 0 auto !important;
 
-        .recipe-detail-dialog
-        .recipe-detail-content {
+    min-height: 64px !important;
 
-            flex:
-                1 1 auto;
+    padding: 10px 18px !important;
 
-            min-height:
-                0;
+    display: flex !important;
 
-            overflow-y:
-                auto;
+    align-items: center !important;
 
-            padding:
-                18px 20px 22px;
+    justify-content: flex-end !important;
 
-        }
+    gap: 10px !important;
 
+    border-top:
+        1px solid rgba(15, 23, 42, 0.08) !important;
 
-        .recipe-detail-dialog
-        .recipe-detail-content::-webkit-scrollbar {
+    background: #ffffff !important;
+}
 
-            width:
-                6px;
 
-        }
+/* =====================================================
+   SEMUA BUTTON
+===================================================== */
 
+.recipe-detail-dialog
+.recipe-modal-footer
+.page-btn {
 
-        .recipe-detail-dialog
-        .recipe-detail-content::-webkit-scrollbar-thumb {
+    height: 50px !important;
 
-            border-radius:
-                999px;
+    min-height: 50px !important;
 
-        }
+    padding: 0 18px !important;
 
+    border-radius: 12px !important;
 
-        .recipe-detail-dialog
-        .recipe-detail-section {
+    font-size: 13px !important;
 
-            margin-bottom:
-                18px;
+    font-weight: 600 !important;
 
-            padding:
-                16px;
+    line-height: 1 !important;
 
-            border-radius:
-                14px;
+    display: inline-flex !important;
 
-        }
+    align-items: center !important;
 
+    justify-content: center !important;
 
-        .recipe-detail-dialog
-        .recipe-detail-section:last-child {
+    gap: 8px !important;
 
-            margin-bottom:
-                0;
+    white-space: nowrap !important;
 
-        }
+    box-sizing: border-box !important;
+}
 
 
-        .recipe-detail-dialog
-        .recipe-detail-grid {
+/* TUTUP */
 
-            gap:
-                12px;
+.recipe-detail-dialog
+#closeRecipeDetailBottom {
 
-        }
+    width: auto !important;
 
+    min-width: 90px !important;
 
-        .recipe-detail-dialog
-        .recipe-detail-item {
+    max-width: 100px !important;
+}
 
-            min-width:
-                0;
 
-        }
+/* EDIT RECIPE */
 
+.recipe-detail-dialog
+#editRecipeFromDetail {
 
-        .recipe-detail-dialog
-        .recipe-detail-item
-        .label {
+    width: auto !important;
 
-            font-size:
-                10px;
+    min-width: 128px !important;
 
-            line-height:
-                1.3;
+    max-width: 140px !important;
+}
 
-        }
 
+/* BUAT VERSI BARU */
 
-        .recipe-detail-dialog
-        .recipe-detail-item
-        .value {
+.recipe-detail-dialog
+#newRecipeVersionFromDetail {
 
-            font-size:
-                13px;
+    width: auto !important;
 
-            line-height:
-                1.45;
+    min-width: 150px !important;
 
-        }
+    max-width: 165px !important;
+}
 
 
-        .recipe-detail-dialog
-        .recipe-detail-description {
+/* ICON */
 
-            line-height:
-                1.55;
+.recipe-detail-dialog
+.recipe-modal-footer
+.page-btn svg {
 
-            font-size:
-                13px;
+    width: 16px !important;
 
-        }
+    height: 16px !important;
+}
 
 
-        .recipe-detail-dialog
-        .recipe-detail-ingredients {
+/* =====================================================
+   MOBILE
+===================================================== */
 
-            overflow-x:
-                auto;
+@media (max-width: 600px) {
 
-        }
+    .recipe-detail-dialog {
 
+        width:
+            calc(100vw - 20px) !important;
 
-        .recipe-detail-dialog
-        .recipe-modal-footer {
+        max-width:
+            calc(100vw - 20px) !important;
 
-            flex:
-                0 0 auto;
+        max-height:
+            88vh !important;
+    }
 
-            min-height:
-                64px;
 
-            padding:
-                13px 20px;
+    .recipe-detail-dialog
+    .recipe-modal-footer {
 
-            display:
-                flex;
+        min-height: 60px !important;
 
-            align-items:
-                center;
+        padding: 8px 12px !important;
 
-            justify-content:
-                flex-end;
+        gap: 7px !important;
+    }
 
-            gap:
-                8px;
 
-            border-top:
-                1px solid
-                rgba(15, 23, 42, 0.08);
+    .recipe-detail-dialog
+    .recipe-modal-footer
+    .page-btn {
 
-            background:
-                #ffffff;
+        height: 44px !important;
 
-        }
+        min-height: 44px !important;
 
+        padding: 0 13px !important;
 
-        .recipe-detail-dialog
-        .recipe-modal-footer
-        .page-btn {
+        font-size: 11px !important;
 
-            height:
-                36px;
+        border-radius: 10px !important;
+    }
 
-            min-height:
-                36px;
 
-            padding:
-                0 12px;
+    .recipe-detail-dialog
+    #closeRecipeDetailBottom {
 
-            border-radius:
-                9px;
+        min-width: 78px !important;
+    }
 
-            font-size:
-                10px;
 
-            line-height:
-                1;
+    .recipe-detail-dialog
+    #editRecipeFromDetail {
 
-            white-space:
-                nowrap;
+        min-width: 110px !important;
+    }
 
-            display:
-                inline-flex;
 
-            align-items:
-                center;
+    .recipe-detail-dialog
+    #newRecipeVersionFromDetail {
 
-            justify-content:
-                center;
+        min-width: 130px !important;
+    }
 
-            gap:
-                6px;
+}
 
-        }
-
-
-        .recipe-detail-dialog
-        #closeRecipeDetailBottom {
-
-            min-width:
-                76px;
-
-        }
-
-
-        .recipe-detail-dialog
-        #editRecipeFromDetail {
-
-            min-width:
-                108px;
-
-        }
-
-
-        .recipe-detail-dialog
-        #newRecipeVersionFromDetail {
-
-            min-width:
-                140px;
-
-        }
-
-
-        @media (
-            max-width: 700px
-        ) {
-
-            .recipe-detail-dialog {
-
-                width:
-                    calc(100vw - 20px)
-                    !important;
-
-                max-width:
-                    calc(100vw - 20px)
-                    !important;
-
-                max-height:
-                    88vh
-                    !important;
-
-                border-radius:
-                    16px
-                    !important;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-modal-header {
-
-                padding:
-                    14px 16px;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-detail-content {
-
-                padding:
-                    14px 16px 18px;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-detail-section {
-
-                padding:
-                    14px;
-
-                margin-bottom:
-                    14px;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-modal-footer {
-
-                padding:
-                    11px 16px;
-
-                gap:
-                    7px;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-modal-footer
-            .page-btn {
-
-                min-height:
-                    35px;
-
-                height:
-                    35px;
-
-                padding:
-                    0 10px;
-
-                font-size:
-                    9.5px;
-
-            }
-
-        }
-
-
-        @media (
-            max-width: 430px
-        ) {
-
-            .recipe-detail-dialog
-            .recipe-modal-footer {
-
-                display:
-                    grid;
-
-                grid-template-columns:
-                    1fr 1fr;
-
-                align-items:
-                    stretch;
-
-            }
-
-
-            .recipe-detail-dialog
-            .recipe-modal-footer
-            .page-btn {
-
-                width:
-                    100%;
-
-                min-width:
-                    0;
-
-            }
-
-
-            .recipe-detail-dialog
-            #newRecipeVersionFromDetail {
-
-                grid-column:
-                    1 / -1;
-
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
