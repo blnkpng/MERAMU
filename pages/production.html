@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Production • MERAMU</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Global CSS -->
+    <link
+        rel="stylesheet"
+        href="../css/variables.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+    <!-- Production CSS -->
+    <link
+        rel="stylesheet"
+        href="../css/production.css"
+    >
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         MOBILE SIDEBAR OVERLAY
+    ====================================================== -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+    ></div>
+
+
+    <!-- =====================================================
+         APP SHELL
+    ====================================================== -->
+
+    <div
+        id="appShell"
+        class="app-shell"
+    >
+
+        <!-- SIDEBAR -->
+
+        <aside
+            id="sidebar-container"
+        ></aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
+        <main class="content">
+
+            <!-- TOPBAR -->
+
+            <div
+                id="topbar-container"
+            ></div>
+
+
+            <!-- =================================================
+                 PRODUCTION PAGE
+            ================================================== -->
+
+            <section
+                class="production-page"
+                id="productionPage"
+            >
+
+
+                <!-- =============================================
+                     PAGE HEADER
+                ============================================== -->
+
+                <div class="production-page-header">
+
+                    <div>
+
+                        <div class="production-eyebrow">
+
+                            <span class="production-eyebrow-dot"></span>
+
+                            PRODUCTION
+
+                        </div>
+
+
+                        <h1>
+                            Production Batch
+                        </h1>
+
+
+                        <p>
+                            Kelola batch produksi dan formula
+                            yang digunakan pada setiap produksi.
+                        </p>
+
+                    </div>
+
+
+                    <div class="production-header-actions">
+
+                        <button
+                            type="button"
+                            class="production-btn production-btn-secondary"
+                            id="refreshProductionBtn"
+                        >
+
+                            <i
+                                data-lucide="refresh-cw"
+                            ></i>
+
+                            <span>
+                                Refresh
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="production-btn production-btn-primary"
+                            id="openCreateBatchBtn"
+                        >
+
+                            <i
+                                data-lucide="plus"
+                            ></i>
+
+                            <span>
+                                Buat Batch
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     SUMMARY
+                ============================================== -->
+
+                <div class="production-summary-grid">
+
+
+                    <div class="production-summary-card">
+
+                        <div class="production-summary-icon">
+
+                            <i
+                                data-lucide="layers-3"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Total Batch
+                            </span>
+
+                            <strong
+                                id="summaryTotal"
+                            >
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="production-summary-card">
+
+                        <div class="production-summary-icon">
+
+                            <i
+                                data-lucide="activity"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Batch Aktif
+                            </span>
+
+                            <strong
+                                id="summaryActive"
+                            >
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="production-summary-card">
+
+                        <div class="production-summary-icon">
+
+                            <i
+                                data-lucide="flask-conical"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Sedang Produksi
+                            </span>
+
+                            <strong
+                                id="summaryProduction"
+                            >
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="production-summary-card">
+
+                        <div class="production-summary-icon">
+
+                            <i
+                                data-lucide="check-circle-2"
+                            ></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Selesai
+                            </span>
+
+                            <strong
+                                id="summaryCompleted"
+                            >
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =============================================
+                     TOOLBAR
+                ============================================== -->
+
+                <div class="production-toolbar">
+
+
+                    <div class="production-search">
+
+                        <i
+                            data-lucide="search"
+                        ></i>
+
+                        <input
+                            type="search"
+                            id="productionSearch"
+                            placeholder="Cari batch atau produk..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <div class="production-filters">
+
+                        <button
+                            type="button"
+                            class="production-filter active"
+                            data-status-filter="all"
+                        >
+                            Semua
+                        </button>
+
+                        <button
+                            type="button"
+                            class="production-filter"
+                            data-status-filter="active"
+                        >
+                            Aktif
+                        </button>
+
+                        <button
+                            type="button"
+                            class="production-filter"
+                            data-status-filter="completed"
+                        >
+                            Selesai
+                        </button>
+
+                        <button
+                            type="button"
+                            class="production-filter"
+                            data-status-filter="cancelled"
+                        >
+                            Dibatalkan
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     CONTENT
+                ============================================== -->
+
+                <div
+                    class="production-card"
+                    id="productionListCard"
+                >
+
+
+                    <!-- LOADING -->
+
+                    <div
+                        class="production-state"
+                        id="productionLoading"
+                    >
+
+                        <div class="production-spinner"></div>
+
+                        <strong>
+                            Memuat batch...
+                        </strong>
+
+                        <span>
+                            Mengambil data Production dari Supabase.
+                        </span>
+
+                    </div>
+
+
+                    <!-- ERROR -->
+
+                    <div
+                        class="production-state production-state-error hidden"
+                        id="productionError"
+                    >
+
+                        <div class="production-state-icon">
+
+                            <i
+                                data-lucide="alert-circle"
+                            ></i>
+
+                        </div>
+
+                        <strong>
+                            Gagal memuat Production
+                        </strong>
+
+                        <span
+                            id="productionErrorMessage"
+                        >
+                            Terjadi kesalahan saat mengambil data.
+                        </span>
+
+                        <button
+                            type="button"
+                            class="production-btn production-btn-secondary"
+                            id="retryProductionBtn"
+                        >
+                            Coba Lagi
+                        </button>
+
+                    </div>
+
+
+                    <!-- EMPTY -->
+
+                    <div
+                        class="production-state hidden"
+                        id="productionEmpty"
+                    >
+
+                        <div class="production-state-icon">
+
+                            <i
+                                data-lucide="flask-conical"
+                            ></i>
+
+                        </div>
+
+                        <strong>
+                            Belum ada Production Batch
+                        </strong>
+
+                        <span>
+                            Buat batch pertama untuk memulai
+                            pencatatan produksi.
+                        </span>
+
+                        <button
+                            type="button"
+                            class="production-btn production-btn-primary"
+                            id="emptyCreateBatchBtn"
+                        >
+
+                            <i
+                                data-lucide="plus"
+                            ></i>
+
+                            Buat Batch
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- TABLE -->
+
+                    <div
+                        class="production-table-wrap hidden"
+                        id="productionTableWrap"
+                    >
+
+                        <table class="production-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Batch
+                                    </th>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Recipe
+                                    </th>
+
+                                    <th>
+                                        Version
+                                    </th>
+
+                                    <th>
+                                        Produksi
+                                    </th>
+
+                                    <th>
+                                        Volume
+                                    </th>
+
+                                    <th>
+                                        Stage
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th class="production-table-action-head">
+                                        Aksi
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="productionTableBody"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         CREATE BATCH MODAL
+    ====================================================== -->
+
+    <div
+        class="production-modal-backdrop hidden"
+        id="createBatchModal"
+    >
+
+        <div
+            class="production-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="createBatchModalTitle"
+        >
+
+
+            <div class="production-modal-header">
+
+                <div>
+
+                    <div class="production-modal-kicker">
+
+                        <span></span>
+
+                        NEW PRODUCTION BATCH
+
+                    </div>
+
+                    <h2 id="createBatchModalTitle">
+                        Buat Production Batch
+                    </h2>
+
+                    <p>
+                        Tentukan produk dan Recipe Version
+                        yang benar-benar digunakan untuk produksi.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="production-modal-close"
+                    id="closeCreateBatchBtn"
+                    aria-label="Tutup"
+                >
+
+                    <i
+                        data-lucide="x"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <form
+                id="createBatchForm"
+                class="production-form"
+                novalidate
+            >
+
+
+                <!-- PRODUCT -->
+
+                <div class="production-form-field">
+
+                    <label for="batchProduct">
+
+                        Product
+
+                        <span>*</span>
+
+                    </label>
+
+                    <select
+                        id="batchProduct"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Product
+                        </option>
+
+                    </select>
+
+                    <small>
+                        Hanya product aktif yang dapat digunakan.
+                    </small>
+
+                </div>
+
+
+                <!-- RECIPE -->
+
+                <div class="production-form-field">
+
+                    <label for="batchRecipe">
+
+                        Recipe
+
+                        <span>*</span>
+
+                    </label>
+
+                    <select
+                        id="batchRecipe"
+                        required
+                        disabled
+                    >
+
+                        <option value="">
+                            Pilih Recipe
+                        </option>
+
+                    </select>
+
+                    <small>
+                        Recipe akan mengikuti Product yang dipilih.
+                    </small>
+
+                </div>
+
+
+                <!-- VERSION -->
+
+                <div class="production-form-field">
+
+                    <label for="batchRecipeVersion">
+
+                        Recipe Version
+
+                        <span>*</span>
+
+                    </label>
+
+                    <select
+                        id="batchRecipeVersion"
+                        required
+                        disabled
+                    >
+
+                        <option value="">
+                            Pilih Recipe Version
+                        </option>
+
+                    </select>
+
+                    <small
+                        id="batchVersionHint"
+                    >
+                        Pilih Recipe terlebih dahulu.
+                    </small>
+
+                </div>
+
+
+                <!-- PRODUCTION DATE -->
+
+                <div class="production-form-row">
+
+
+                    <div class="production-form-field">
+
+                        <label for="batchProductionDate">
+
+                            Production Date
+
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            type="date"
+                            id="batchProductionDate"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="production-form-field">
+
+                        <label for="batchPlannedVolume">
+
+                            Planned Volume
+
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="batchPlannedVolume"
+                            min="0"
+                            step="0.001"
+                            placeholder="Contoh: 15"
+                            required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- UNIT -->
+
+                <div class="production-form-field">
+
+                    <label for="batchVolumeUnit">
+
+                        Volume Unit
+
+                        <span>*</span>
+
+                    </label>
+
+                    <select
+                        id="batchVolumeUnit"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Unit
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="production-form-field">
+
+                    <label for="batchNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="batchNotes"
+                        rows="4"
+                        maxlength="1000"
+                        placeholder="Catatan produksi jika diperlukan..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- FORM ERROR -->
+
+                <div
+                    class="production-form-error hidden"
+                    id="createBatchError"
+                >
+
+                    <i
+                        data-lucide="alert-circle"
+                    ></i>
+
+                    <span
+                        id="createBatchErrorMessage"
+                    ></span>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="production-modal-footer">
+
+                    <button
+                        type="button"
+                        class="production-btn production-btn-secondary"
+                        id="cancelCreateBatchBtn"
+                    >
+                        Batal
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="production-btn production-btn-primary"
+                        id="saveCreateBatchBtn"
+                    >
+
+                        <i
+                            data-lucide="plus"
+                        ></i>
+
+                        <span>
+                            Buat Batch
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BATCH DETAIL MODAL
+    ====================================================== -->
+
+    <div
+        class="production-modal-backdrop hidden"
+        id="batchDetailModal"
+    >
+
+        <div
+            class="production-modal production-modal-detail"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="batchDetailTitle"
+        >
+
+
+            <div class="production-modal-header">
+
+                <div>
+
+                    <div class="production-modal-kicker">
+
+                        <span></span>
+
+                        PRODUCTION BATCH
+
+                    </div>
+
+                    <h2 id="batchDetailTitle">
+                        -
+                    </h2>
+
+                    <p id="batchDetailProduct">
+                        -
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="production-modal-close"
+                    id="closeBatchDetailBtn"
+                    aria-label="Tutup"
+                >
+
+                    <i
+                        data-lucide="x"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <div class="production-detail-body">
+
+
+                <!-- MAIN INFO -->
+
+                <div class="production-detail-grid">
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Batch Code
+                        </span>
+
+                        <strong id="detailBatchCode">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Product
+                        </span>
+
+                        <strong id="detailProduct">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Recipe
+                        </span>
+
+                        <strong id="detailRecipe">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Recipe Version
+                        </span>
+
+                        <strong id="detailRecipeVersion">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Production Date
+                        </span>
+
+                        <strong id="detailProductionDate">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Planned Volume
+                        </span>
+
+                        <strong id="detailPlannedVolume">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Current Stage
+                        </span>
+
+                        <strong id="detailCurrentStage">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="production-detail-item">
+
+                        <span>
+                            Status
+                        </span>
+
+                        <strong id="detailStatus">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="production-detail-section">
+
+                    <div class="production-detail-section-title">
+
+                        <i
+                            data-lucide="notebook-pen"
+                        ></i>
+
+                        <div>
+
+                            <strong>
+                                Notes
+                            </strong>
+
+                            <span>
+                                Catatan Production Batch
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="production-detail-notes"
+                        id="detailNotes"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <!-- FUTURE FLOW -->
+
+                <div class="production-detail-section">
+
+                    <div class="production-detail-section-title">
+
+                        <i
+                            data-lucide="route"
+                        ></i>
+
+                        <div>
+
+                            <strong>
+                                Production Flow
+                            </strong>
+
+                            <span>
+                                Tahap produksi berikutnya akan
+                                dikelola dari modul F1, F2 dan Harvest.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="production-flow">
+
+                        <div class="production-flow-step active">
+
+                            <span>
+                                01
+                            </span>
+
+                            <strong>
+                                Production
+                            </strong>
+
+                        </div>
+
+
+                        <div class="production-flow-line"></div>
+
+
+                        <div class="production-flow-step">
+
+                            <span>
+                                02
+                            </span>
+
+                            <strong>
+                                F1
+                            </strong>
+
+                        </div>
+
+
+                        <div class="production-flow-line"></div>
+
+
+                        <div class="production-flow-step">
+
+                            <span>
+                                03
+                            </span>
+
+                            <strong>
+                                F2
+                            </strong>
+
+                        </div>
+
+
+                        <div class="production-flow-line"></div>
+
+
+                        <div class="production-flow-step">
+
+                            <span>
+                                04
+                            </span>
+
+                            <strong>
+                                Harvest
+                            </strong>
+
+                        </div>
+
+
+                        <div class="production-flow-line"></div>
+
+
+                        <div class="production-flow-step">
+
+                            <span>
+                                05
+                            </span>
+
+                            <strong>
+                                Finished
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="production-modal-footer">
+
+                <button
+                    type="button"
+                    class="production-btn production-btn-secondary"
+                    id="closeBatchDetailBottomBtn"
+                >
+
+                    Tutup
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GLOBAL / SUPABASE
+    ====================================================== -->
+
+    <script src="../js/config.js"></script>
+
+    <script src="../js/supabase.js"></script>
+
+    <script src="../js/component-loader.js"></script>
+
+    <script src="../js/app.js"></script>
+
+
+    <!-- =====================================================
+         PRODUCTION
+    ====================================================== -->
+
+    <script src="../js/production.js"></script>
+
+
+    <script>
+
+        window.addEventListener(
+            "load",
+            () => {
+
+                if(window.lucide){
+
+                    lucide.createIcons();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
