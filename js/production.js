@@ -681,31 +681,33 @@ function bindProductionEvents(){
 
     }
 
-   const startF1FromDetail =
-    document.getElementById(
-        "startF1FromDetailBtn"
-    );
 
-if(startF1FromDetail){
+    const startF1FromDetail =
+        document.getElementById(
+            "startF1FromDetailBtn"
+        );
 
-    startF1FromDetail.addEventListener(
-        "click",
-        () => {
+    if(startF1FromDetail){
 
-            if(
-                activeDetailBatch?.id
-            ){
+        startF1FromDetail.addEventListener(
+            "click",
+            () => {
 
-                startBatchF1(
-                    activeDetailBatch.id
-                );
+                if(
+                    activeDetailBatch?.id
+                ){
+
+                    startBatchF1(
+                        activeDetailBatch.id
+                    );
+
+                }
 
             }
+        );
 
-        }
-    );
+    }
 
-}
 
     document.addEventListener(
         "keydown",
@@ -2409,6 +2411,7 @@ function createProductionRow(
 
 }
 
+
 /* =========================================================
    TABLE ACTION DELEGATION
 ========================================================= */
@@ -2492,6 +2495,8 @@ document.addEventListener(
 
     }
 );
+
+
 /* =========================================================
    START F1
 ========================================================= */
@@ -2791,8 +2796,7 @@ async function startBatchF1(
 
 
         /*
-         * Tutup detail jika sedang
-         * dibuka dari modal.
+         * Update active detail batch.
          */
 
         if(
@@ -2874,6 +2878,35 @@ async function startBatchF1(
     }
 
 }
+
+
+/* =========================================================
+   CLOSE DETAIL
+========================================================= */
+
+function closeBatchDetailModal(){
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    modal?.classList.add(
+        "hidden"
+    );
+
+
+    document.body.classList.remove(
+        "production-modal-open"
+    );
+
+
+    activeDetailBatch =
+        null;
+
+}
+
 
 /* =========================================================
    DETAIL
@@ -3070,6 +3103,7 @@ function openBatchDetail(
 
 }
 
+
 /* =========================================================
    PRODUCTION FLOW
 ========================================================= */
@@ -3157,6 +3191,7 @@ function updateProductionFlow(
 
 }
 
+
 /* =========================================================
    LOADING
 ========================================================= */
@@ -3225,9 +3260,13 @@ function showProductionError(
         );
 
 
-    messageElement.textContent =
-        message ||
-        "Terjadi kesalahan.";
+    if(messageElement){
+
+        messageElement.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
 
 
     element?.classList.remove(
