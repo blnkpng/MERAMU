@@ -2416,7 +2416,7 @@ function printThermalLabel(units) {
                 @page {
 
                     size:
-                        55mm 27mm;
+                        55mm 28mm;
 
                     margin:
                         0;
@@ -2466,7 +2466,7 @@ function printThermalLabel(units) {
                      */
 
                     margin:
-                        1.5mm 0 0 0;
+                        2.5mm 0 0 0;
 
                     /*
                      * INNER CONTENT CALCULATION
@@ -2493,7 +2493,7 @@ function printThermalLabel(units) {
                         #777777;
 
                     border-radius:
-                        2.5mm;
+                        3mm;
 
                     background:
                         #FFFFFF;
@@ -2522,7 +2522,7 @@ function printThermalLabel(units) {
                         center;
 
                     overflow:
-                        hidden;
+                        visible;
 
                     page-break-after:
                         always;
@@ -2657,37 +2657,37 @@ function printThermalLabel(units) {
                    ================================================= */
 
                 .thermal-product {
-
+                
                     width:
                         100%;
-
+                
                     margin:
-                        0 0 1.8mm 0;
-
+                        0 0 1.6mm 0;
+                
                     font-size:
-                        9px;
-
+                        10.5px;
+                
                     line-height:
                         1;
-
+                
                     font-weight:
                         800;
-
+                
                     letter-spacing:
                         -0.1px;
-
+                
                     text-transform:
                         uppercase;
-
+                
                     white-space:
                         nowrap;
-
+                
                     overflow:
                         hidden;
-
+                
                     text-overflow:
                         ellipsis;
-
+                
                 }
 
 
@@ -2704,7 +2704,7 @@ function printThermalLabel(units) {
                         column;
 
                     gap:
-                        1.8mm;
+                        1.6mm;
 
                 }
 
@@ -2746,7 +2746,7 @@ function printThermalLabel(units) {
                 .thermal-meta-row strong {
 
                     font-size:
-                        8.5px;
+                        9.5px;
 
                     line-height:
                         1;
@@ -2824,62 +2824,57 @@ function printThermalLabel(units) {
                    ================================================= */
 
                 @media print {
-
+                
                     html,
                     body {
-
+                
                         width:
                             55mm;
-
-                        /*
-                         * PAGE HEIGHT
-                         * SEKARANG 27MM
-                         */
-
+                
                         height:
-                            27mm;
-
+                            28mm;
+                
                         margin:
                             0;
-
+                
                         padding:
                             0;
-
+                
                         background:
                             #FFFFFF;
-
+                
                     }
-
-
+                
+                
                     .thermal-label {
-
+                
                         width:
                             55mm;
-
+                
                         height:
                             25mm;
-
+                
                         min-width:
                             55mm;
-
+                
                         max-width:
                             55mm;
-
+                
                         min-height:
                             25mm;
-
+                
                         max-height:
                             25mm;
-
+                
                         /*
-                         * TETAP TURUN 1.5MM
+                         * TURUN 2.5MM
                          */
-
+                
                         margin:
-                            1.5mm 0 0 0;
-
+                            2.5mm 0 0 0;
+                
                     }
-
+                
                 }
 
             </style>
