@@ -803,6 +803,143 @@
 
 }
 
+/* =========================================================
+   ROW ACTION BUTTONS
+========================================================= */
+
+.production-action-btn{
+
+    min-height: 34px;
+
+    padding: 0 11px;
+
+    border:
+        1px solid #cde6d8;
+
+    border-radius: 9px;
+
+    background: #edf8f2;
+
+    color: #047a46;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    font-family: Poppins, sans-serif;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+
+}
+
+
+.production-action-btn:hover{
+
+    transform:
+        translateY(-1px);
+
+    background: #e2f4ea;
+
+    border-color: #a9d8bd;
+
+    box-shadow:
+        0 5px 14px rgba(
+            4,
+            122,
+            70,
+            .10
+        );
+
+}
+
+
+.production-action-btn svg{
+
+    width: 15px;
+
+    height: 15px;
+
+}
+
+
+.production-action-btn:disabled{
+
+    opacity: .65;
+
+    cursor:
+        not-allowed;
+
+    transform: none;
+
+}
+
+
+.production-action-btn.is-loading{
+
+    min-width: 108px;
+
+}
+
+
+/* =========================================================
+   COMPLETED FLOW STEP
+========================================================= */
+
+.production-flow-step.completed{
+
+    color: #047a46;
+
+}
+
+
+.production-flow-step.completed span{
+
+    background: #e8f6ef;
+
+    color: #047a46;
+
+}
+
+
+/* =========================================================
+   FLOW CURRENT / COMPLETED CHECK
+========================================================= */
+
+.production-flow-step.completed span::after{
+
+    content: "✓";
+
+}
+
+
+.production-flow-step.completed span{
+
+    font-size: 0;
+
+}
+
+
+.production-flow-step.completed span::after{
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+}
 
 /* =========================================================
    STATE
