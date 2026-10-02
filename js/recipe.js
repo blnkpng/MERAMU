@@ -252,44 +252,109 @@
 
 
     function getCurrentVersion(
-        recipe
+    recipe
+) {
+
+    const versions =
+        Array.isArray(
+            recipe?.recipe_versions
+        )
+            ? recipe.recipe_versions
+            : [];
+
+
+    if (
+        !versions.length
     ) {
 
-        const versions =
-            Array.isArray(
-                recipe?.recipe_versions
-            )
-                ? recipe.recipe_versions
-                : [];
+        return null;
+
+    }
+
+
+    /*
+    =====================================================
+    CURRENT VERSION
+    -----------------------------------------------------
+    PRIORITAS:
+    1. recipes.current_version_number
+    2. fallback ke version terbesar
+    =====================================================
+    */
+
+    const currentVersionNumber =
+        Number(
+            recipe?.current_version_number
+        );
+
+
+    /*
+    -----------------------------------------------------
+    1. CARI BERDASARKAN current_version_number
+    -----------------------------------------------------
+    */
+
+    if (
+        Number.isFinite(
+            currentVersionNumber
+        ) &&
+        currentVersionNumber > 0
+    ) {
+
+        const currentVersion =
+            versions.find(
+                version =>
+                    Number(
+                        version.version_number
+                    ) ===
+                    currentVersionNumber
+            );
 
 
         if (
-            !versions.length
+            currentVersion
         ) {
 
-            return null;
+            return currentVersion;
 
         }
 
-
-        return [
-            ...versions
-        ]
-            .sort(
-                (
-                    a,
-                    b
-                ) =>
-                    Number(
-                        b.version_number || 0
-                    )
-                    -
-                    Number(
-                        a.version_number || 0
-                    )
-            )[0];
-
     }
+
+
+    /*
+    -----------------------------------------------------
+    2. FALLBACK
+    -----------------------------------------------------
+
+    Jika current_version_number:
+    - kosong
+    - null
+    - invalid
+    - menunjuk version yang tidak ada
+
+    maka ambil version terbesar.
+    -----------------------------------------------------
+    */
+
+    return [
+        ...versions
+    ]
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                Number(
+                    b.version_number || 0
+                )
+                -
+                Number(
+                    a.version_number || 0
+                )
+        )[0];
+
+}
 
 
     function getRecipeStatus(
@@ -2253,7 +2318,24 @@
             return;
 
         }
-
+         /*
+         ---------------------------------------------------------
+         LOAD CURRENT VERSION
+         ---------------------------------------------------------
+         */
+         
+         const versionData =
+             await loadRecipeVersionData(
+                 recipeId
+             );
+         
+         
+         const currentVersion =
+             versionData.currentVersion;
+         
+         
+         const currentIngredients =
+             versionData.ingredients || [];
 
         /*
         -----------------------------------------------------
@@ -2394,7 +2476,296 @@
                             "";
 
                     }
+                  /*
+                  =========================================================
+                  LOAD CURRENT VERSION INTO READONLY FORM
+                  =========================================================
+                  */
+                  
+                  const yieldInput =
+                      document.getElementById(
+                          "recipeYield"
+                      );
+                  
+                  
+                  const yieldUnit =
+                      document.getElementById(
+                          "recipeYieldUnit"
+                      );
+                  
+                  
+                  const fermentation =
+                      document.getElementById(
+                          "fermentationRequired"
+                      );
+                  
+                  
+                  const f1 =
+                      document.getElementById(
+                          "f1TargetDays"
+                      );
+                  
+                  
+                  const f2 =
+                      document.getElementById(
+                          "f2TargetDays"
+                      );
+                  
+                  
+                  const shelfLife =
+                      document.getElementById(
+                          "recipeShelfLife"
+                      );
+                  
+                  
+                  const notes =
+                      document.getElementById(
+                          "recipeNotes"
+                      );
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  YIELD
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      yieldInput
+                  ) {
+                  
+                      yieldInput.value =
+                          currentVersion
+                              ?.yield_quantity ??
+                          "";
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  YIELD UNIT
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      yieldUnit
+                  ) {
+                  
+                      yieldUnit.value =
+                          currentVersion
+                              ?.yield_unit_id ||
+                          "";
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  FERMENTATION
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      fermentation
+                  ) {
+                  
+                      fermentation.checked =
+                          Boolean(
+                              currentVersion
+                                  ?.fermentation_required
+                          );
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  F1
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      f1
+                  ) {
+                  
+                      f1.value =
+                          currentVersion
+                              ?.f1_target_days ??
+                          "";
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  F2
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      f2
+                  ) {
+                  
+                      f2.value =
+                          currentVersion
+                              ?.f2_target_days ??
+                          "";
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  SHELF LIFE
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      shelfLife
+                  ) {
+                  
+                      shelfLife.value =
+                          currentVersion
+                              ?.shelf_life_days ??
+                          "";
+                  
+                  }
+                  
+                  
+                  /*
+                  ---------------------------------------------------------
+                  NOTES
+                  ---------------------------------------------------------
+                  */
+                  
+                  if (
+                      notes
+                  ) {
+                  
+                      notes.value =
+                          currentVersion
+                              ?.notes ||
+                          "";
+                  
+                  }
 
+                   /*
+                  =========================================================
+                  LOAD CURRENT VERSION INGREDIENTS
+                  =========================================================
+                  */
+                  
+                  const ingredientContainer =
+                      document.getElementById(
+                          "recipeIngredients"
+                      );
+                  
+                  
+                  if (
+                      ingredientContainer
+                  ) {
+                  
+                      ingredientContainer.innerHTML =
+                          "";
+                  
+                      ingredientRows =
+                          0;
+                  
+                  
+                      if (
+                          currentIngredients.length
+                      ) {
+                  
+                          currentIngredients.forEach(
+                              item => {
+                  
+                                  addIngredientRow();
+                  
+                  
+                                  const rows =
+                                      ingredientContainer
+                                          .querySelectorAll(
+                                              ".recipe-ingredient-row"
+                                          );
+                  
+                  
+                                  const row =
+                                      rows[
+                                          rows.length - 1
+                                      ];
+                  
+                  
+                                  if (
+                                      !row
+                                  ) {
+                  
+                                      return;
+                  
+                                  }
+                  
+                  
+                                  const ingredientSelect =
+                                      row.querySelector(
+                                          ".recipe-ingredient-select"
+                                      );
+                  
+                  
+                                  const quantityInput =
+                                      row.querySelector(
+                                          ".recipe-ingredient-qty"
+                                      );
+                  
+                  
+                                  const unitSelect =
+                                      row.querySelector(
+                                          ".recipe-ingredient-unit"
+                                      );
+                  
+                  
+                                  if (
+                                      ingredientSelect
+                                  ) {
+                  
+                                      ingredientSelect.value =
+                                          item.ingredient_id ||
+                                          "";
+                  
+                                  }
+                  
+                  
+                                  if (
+                                      quantityInput
+                                  ) {
+                  
+                                      quantityInput.value =
+                                          item.quantity ??
+                                          "";
+                  
+                                  }
+                  
+                  
+                                  if (
+                                      unitSelect
+                                  ) {
+                  
+                                      unitSelect.value =
+                                          item.unit_id ||
+                                          "";
+                  
+                                  }
+                  
+                              }
+                          );
+                  
+                      }
+                      else {
+                  
+                          addIngredientRow();
+                  
+                      }
+                  
+                  }
 
                     /*
                     -------------------------------------------------
@@ -3891,13 +4262,88 @@
                     }
 
 
-                    const version =
-                        Array.isArray(
-                            versions
-                        ) &&
-                        versions.length
-                            ? versions[0]
-                            : null;
+               /*
+               =========================================================
+               CURRENT VERSION
+               ---------------------------------------------------------
+               Prioritas:
+               
+               1. recipes.current_version_number
+               2. fallback ke version terbesar
+               =========================================================
+               */
+               
+               let version =
+                   null;
+               
+               
+               const currentVersionNumber =
+                   Number(
+                       recipe?.current_version_number
+                   );
+               
+               
+               /*
+               ---------------------------------------------------------
+               1. CURRENT VERSION NUMBER
+               ---------------------------------------------------------
+               */
+               
+               if (
+                   Number.isFinite(
+                       currentVersionNumber
+                   ) &&
+                   currentVersionNumber > 0
+               ) {
+               
+                   version =
+                       (
+                           versions || []
+                       ).find(
+                           item =>
+                               Number(
+                                   item.version_number
+                               ) ===
+                               currentVersionNumber
+                       ) ||
+                       null;
+               
+               }
+               
+               
+               /*
+               ---------------------------------------------------------
+               2. FALLBACK
+               ---------------------------------------------------------
+               */
+               
+               if (
+                   !version &&
+                   Array.isArray(
+                       versions
+                   ) &&
+                   versions.length
+               ) {
+               
+                   version =
+                       [
+                           ...versions
+                       ]
+                           .sort(
+                               (
+                                   a,
+                                   b
+                               ) =>
+                                   Number(
+                                       b.version_number || 0
+                                   )
+                                   -
+                                   Number(
+                                       a.version_number || 0
+                                   )
+                           )[0];
+               
+               }
 
 
                     /*
