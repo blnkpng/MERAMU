@@ -74,13 +74,28 @@ function closeMobileSidebar(){
 
 /* =========================================================
    SIDEBAR TOGGLE
+   ---------------------------------------------------------
+   DESKTOP  : > 1024px
+               Toggle collapsed 280px <-> 88px
+
+   TABLET   : 769px - 1024px
+               Drawer 280px
+
+   MOBILE   : <= 768px
+               Drawer 280px
 ========================================================= */
 
 function toggleSidebar(){
 
-    const sidebar = getSidebar();
-    const overlay = getOverlay();
-    const appShell = getAppShell();
+    const sidebar =
+        getSidebar();
+
+    const overlay =
+        getOverlay();
+
+    const appShell =
+        getAppShell();
+
 
     if(!sidebar){
 
@@ -92,14 +107,18 @@ function toggleSidebar(){
     }
 
 
-    /* -----------------------------------------------------
-       MOBILE
-    ----------------------------------------------------- */
+    /* =====================================================
+       TABLET + MOBILE
+       <= 1024px
+    ===================================================== */
 
-    if(window.innerWidth <= 768){
+    if(window.innerWidth <= 1024){
 
         const isOpen =
-            sidebar.classList.contains("show");
+            sidebar.classList.contains(
+                "show"
+            );
+
 
         if(isOpen){
 
@@ -111,13 +130,21 @@ function toggleSidebar(){
 
         }
 
+
+        console.log(
+            "MERAMU: Drawer sidebar toggle",
+            !isOpen
+        );
+
+
         return;
     }
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
        DESKTOP
-    ----------------------------------------------------- */
+       > 1024px
+    ===================================================== */
 
     if(appShell){
 
@@ -125,12 +152,14 @@ function toggleSidebar(){
             "sidebar-collapsed"
         );
 
+
         console.log(
             "MERAMU: Desktop sidebar toggle",
             appShell.classList.contains(
                 "sidebar-collapsed"
             )
         );
+
     }
 
 }
@@ -454,9 +483,14 @@ document.addEventListener(
 
 
 /* =========================================================
-   MOBILE TOPBAR FALLBACK
-   Jika tombol pertama pada mobile topbar
-   belum mempunyai ID, tetap bisa membuka sidebar.
+   MOBILE / TABLET TOPBAR FALLBACK
+   ---------------------------------------------------------
+   Jika tombol pertama pada topbar belum mempunyai ID,
+   tetap bisa membuka sidebar.
+
+   Berlaku untuk:
+   - Tablet <= 1024px
+   - Mobile <= 768px
 ========================================================= */
 
 document.addEventListener(
@@ -477,9 +511,9 @@ document.addEventListener(
         }
 
 
-        /* Hanya mobile */
+        /* Hanya tablet + mobile */
 
-        if(window.innerWidth > 768){
+        if(window.innerWidth > 1024){
             return;
         }
 
@@ -541,11 +575,11 @@ window.addEventListener(
     function(){
 
         /* -------------------------------------------------
-           Saat kembali ke desktop,
-           tutup state mobile.
+           Saat kembali ke desktop (>1024px),
+           tutup state drawer.
         ------------------------------------------------- */
 
-        if(window.innerWidth > 768){
+        if(window.innerWidth > 1024){
 
             closeMobileSidebar();
 
