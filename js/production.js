@@ -681,6 +681,31 @@ function bindProductionEvents(){
 
     }
 
+   const startF1FromDetail =
+    document.getElementById(
+        "startF1FromDetailBtn"
+    );
+
+if(startF1FromDetail){
+
+    startF1FromDetail.addEventListener(
+        "click",
+        () => {
+
+            if(
+                activeDetailBatch?.id
+            ){
+
+                startBatchF1(
+                    activeDetailBatch.id
+                );
+
+            }
+
+        }
+    );
+
+}
 
     document.addEventListener(
         "keydown",
@@ -2162,6 +2187,46 @@ function createProductionRow(
         `status-${escapeHtml(status)}`;
 
 
+    /*
+     * MULAI F1 hanya boleh dilakukan
+     * pada batch yang masih berada
+     * di stage Production dan status
+     * bukan cancelled / completed.
+     */
+
+    const canStartF1 =
+        stage === "production" &&
+        status !== "cancelled" &&
+        status !== "completed";
+
+
+    const startF1Button =
+        canStartF1
+            ? `
+                <button
+                    type="button"
+                    class="production-action-btn production-action-btn-f1"
+                    title="Mulai F1"
+                    aria-label="Mulai F1"
+                    data-production-action="start-f1"
+                    data-id="${escapeHtml(
+                        batch.id
+                    )}"
+                >
+
+                    <i
+                        data-lucide="play-circle"
+                    ></i>
+
+                    <span>
+                        Mulai F1
+                    </span>
+
+                </button>
+              `
+            : "";
+
+
     return `
 
         <tr>
@@ -2331,6 +2396,9 @@ function createProductionRow(
 
                     </button>
 
+
+                    ${startF1Button}
+
                 </div>
 
             </td>
@@ -2340,7 +2408,6 @@ function createProductionRow(
     `;
 
 }
-
 
 /* =========================================================
    TABLE ACTION DELEGATION
@@ -2371,36 +2438,442 @@ document.addEventListener(
             button.dataset.id;
 
 
+        const batch =
+            productionBatches.find(
+                item =>
+                    String(
+                        item.id
+                    ) ===
+                    String(
+                        id
+                    )
+            );
+
+
+        if(!batch){
+
+            return;
+
+        }
+
+
+        /*
+         * DETAIL
+         */
+
         if(
             action ===
             "detail"
         ){
 
-            const batch =
-                productionBatches.find(
-                    item =>
-                        String(
-                            item.id
-                        ) ===
-                        String(
-                            id
-                        )
-                );
+            openBatchDetail(
+                batch
+            );
+
+            return;
+
+        }
 
 
-            if(batch){
+        /*
+         * START F1
+         */
 
-                openBatchDetail(
-                    batch
-                );
+        if(
+            action ===
+            "start-f1"
+        ){
 
-            }
+            startBatchF1(
+                batch.id
+            );
 
         }
 
     }
 );
+/* =========================================================
+   START F1
+========================================================= */
 
+async function startBatchF1(
+    batchId
+){
+
+    if(!batchId){
+
+        return;
+
+    }
+
+
+    /*
+     * Cari batch dari state lokal terlebih dahulu.
+     */
+
+    const batch =
+        productionBatches.find(
+            item =>
+                String(
+                    item.id
+                ) ===
+                String(
+                    batchId
+                )
+        );
+
+
+    if(!batch){
+
+        alert(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    const currentStage =
+        String(
+            batch.current_stage ||
+            ""
+        )
+            .toLowerCase();
+
+
+    const currentStatus =
+        String(
+            batch.status ||
+            ""
+        )
+            .toLowerCase();
+
+
+    /*
+     * SECURITY / BUSINESS VALIDATION
+     *
+     * Hanya Production yang boleh
+     * dipindahkan ke F1.
+     */
+
+    if(
+        currentStage !==
+        "production"
+    ){
+
+        alert(
+            `Batch ${batch.batch_code || ""} ` +
+            `tidak dapat dimulai F1 karena ` +
+            `stage saat ini adalah ${formatStage(
+                currentStage
+            )}.`
+        );
+
+        return;
+
+    }
+
+
+    if(
+        currentStatus ===
+        "cancelled"
+    ){
+
+        alert(
+            "Batch yang dibatalkan tidak dapat dimulai F1."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        currentStatus ===
+        "completed"
+    ){
+
+        alert(
+            "Batch yang sudah selesai tidak dapat dimulai F1."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * Konfirmasi operator.
+     */
+
+    const confirmed =
+        window.confirm(
+            `Mulai F1 untuk batch ${batch.batch_code || "-"}?\n\n` +
+            `Product: ${batch.products?.name || "-"}\n` +
+            `Recipe: ${batch.recipes?.name || "-"}\n` +
+            `Version: ${
+                batch.recipe_versions?.version_number
+                    ? `V${batch.recipe_versions.version_number}`
+                    : "-"
+            }\n\n` +
+            `Stage akan berubah dari Production menjadi F1.`
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    /*
+     * Ambil Supabase.
+     */
+
+    let supabase;
+
+
+    try{
+
+        supabase =
+            await waitForProductionSupabase();
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Start F1 Supabase Error:",
+            error
+        );
+
+        alert(
+            getErrorMessage(
+                error
+            )
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * Cari tombol yang sedang digunakan.
+     * Semua tombol Start F1 menggunakan
+     * data-id yang sama dengan batch UUID.
+     */
+
+    const actionButtons =
+        document.querySelectorAll(
+            `[data-production-action="start-f1"][data-id="${CSS.escape(
+                String(batchId)
+            )}"]`
+        );
+
+
+    actionButtons.forEach(
+        button => {
+
+            button.disabled =
+                true;
+
+            button.classList.add(
+                "is-loading"
+            );
+
+            button.innerHTML =
+                `
+                    <span
+                        class="production-button-loader"
+                    ></span>
+
+                    <span>
+                        Memulai F1...
+                    </span>
+                `;
+
+        }
+    );
+
+
+    try{
+
+        /*
+         * PENTING:
+         *
+         * HANYA batch yang dipilih
+         * yang di-update.
+         *
+         * Tidak menyentuh Recipe.
+         * Tidak menyentuh Recipe Version.
+         * Tidak menyentuh batch lain.
+         */
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "batches"
+            )
+
+            .update({
+                current_stage:
+                    "f1"
+            })
+
+            .eq(
+                "id",
+                batchId
+            )
+
+            .eq(
+                "current_stage",
+                "production"
+            )
+
+            .select(`
+                id,
+                batch_code,
+                current_stage,
+                status
+            `)
+            .single();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        if(!data){
+
+            throw new Error(
+                "Batch tidak ditemukan atau stage sudah berubah."
+            );
+
+        }
+
+
+        /*
+         * Update state lokal supaya UI
+         * langsung konsisten.
+         */
+
+        const localIndex =
+            productionBatches.findIndex(
+                item =>
+                    String(
+                        item.id
+                    ) ===
+                    String(
+                        batchId
+                    )
+            );
+
+
+        if(
+            localIndex >= 0
+        ){
+
+            productionBatches[
+                localIndex
+            ].current_stage =
+                data.current_stage;
+
+        }
+
+
+        /*
+         * Tutup detail jika sedang
+         * dibuka dari modal.
+         */
+
+        if(
+            activeDetailBatch &&
+            String(
+                activeDetailBatch.id
+            ) ===
+            String(
+                batchId
+            )
+        ){
+
+            activeDetailBatch =
+                productionBatches[
+                    localIndex
+                ] || null;
+
+        }
+
+
+        /*
+         * Render ulang tabel.
+         */
+
+        renderProduction();
+
+
+        /*
+         * Jika modal detail masih terbuka,
+         * refresh isi detail.
+         */
+
+        if(
+            activeDetailBatch
+        ){
+
+            openBatchDetail(
+                activeDetailBatch
+            );
+
+        }
+
+
+        /*
+         * Feedback.
+         */
+
+        console.log(
+            "MERAMU: Batch berhasil dimulai F1",
+            data
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Start F1 Error:",
+            error
+        );
+
+
+        alert(
+            `Gagal memulai F1.\n\n${
+                getErrorMessage(
+                    error
+                )
+            }`
+        );
+
+
+        /*
+         * Kalau gagal, render ulang
+         * supaya tombol kembali normal.
+         */
+
+        renderProduction();
+
+    }
+
+}
 
 /* =========================================================
    DETAIL
@@ -2508,6 +2981,71 @@ function openBatchDetail(
     );
 
 
+    /*
+     * Update Production Flow
+     */
+
+    updateProductionFlow(
+        batch.current_stage
+    );
+
+
+    /*
+     * Update tombol Mulai F1
+     */
+
+    const startF1Button =
+        document.getElementById(
+            "startF1FromDetailBtn"
+        );
+
+
+    const stage =
+        String(
+            batch.current_stage ||
+            "production"
+        )
+            .toLowerCase();
+
+
+    const status =
+        String(
+            batch.status ||
+            "active"
+        )
+            .toLowerCase();
+
+
+    const canStartF1 =
+        stage === "production" &&
+        status !== "cancelled" &&
+        status !== "completed";
+
+
+    if(startF1Button){
+
+        startF1Button.classList.toggle(
+            "hidden",
+            !canStartF1
+        );
+
+        startF1Button.disabled =
+            false;
+
+        startF1Button.innerHTML =
+            `
+                <i
+                    data-lucide="play-circle"
+                ></i>
+
+                <span>
+                    Mulai F1
+                </span>
+            `;
+
+    }
+
+
     const modal =
         document.getElementById(
             "batchDetailModal"
@@ -2532,30 +3070,92 @@ function openBatchDetail(
 
 }
 
+/* =========================================================
+   PRODUCTION FLOW
+========================================================= */
 
-function closeBatchDetailModal(){
+function updateProductionFlow(
+    currentStage
+){
 
-    const modal =
-        document.getElementById(
-            "batchDetailModal"
+    const stages = [
+        "production",
+        "f1",
+        "f2",
+        "harvest",
+        "finished"
+    ];
+
+
+    const normalizedStage =
+        String(
+            currentStage ||
+            "production"
+        )
+            .toLowerCase();
+
+
+    const currentIndex =
+        stages.indexOf(
+            normalizedStage
         );
 
 
-    modal?.classList.add(
-        "hidden"
+    const flowSteps =
+        document.querySelectorAll(
+            "#batchDetailModal .production-flow-step"
+        );
+
+
+    if(!flowSteps.length){
+
+        return;
+
+    }
+
+
+    flowSteps.forEach(
+        (
+            step,
+            index
+        ) => {
+
+            step.classList.remove(
+                "active"
+            );
+
+            step.classList.remove(
+                "completed"
+            );
+
+
+            if(
+                currentIndex >= 0 &&
+                index < currentIndex
+            ){
+
+                step.classList.add(
+                    "completed"
+                );
+
+            }
+
+
+            if(
+                currentIndex >= 0 &&
+                index === currentIndex
+            ){
+
+                step.classList.add(
+                    "active"
+                );
+
+            }
+
+        }
     );
-
-
-    document.body.classList.remove(
-        "production-modal-open"
-    );
-
-
-    activeDetailBatch =
-        null;
 
 }
-
 
 /* =========================================================
    LOADING
