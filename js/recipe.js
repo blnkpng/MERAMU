@@ -4813,8 +4813,10 @@
    H4 TIDAK membuat Production.
 
    H4 hanya:
+   - membaca recipe master
    - membaca version terakhir
-   - membuat version baru
+   - membaca seluruh master ingredient
+   - membaca seluruh master unit
    - copy ingredient dari version sebelumnya
    - memungkinkan formula version baru diedit
    - menyimpan version baru
@@ -4829,24 +4831,210 @@
 ===================================================== */
 
 let activeVersionRecipe = null;
+
 let activeVersionSource = null;
+
 let versionIngredientRows = 0;
+
+
+/* =====================================================
+   H4 — MASTER DATA
+   -----------------------------------------------------
+   IMPORTANT
+
+   H4 membutuhkan:
+   1. seluruh Ingredients
+   2. seluruh Units
+
+   Jangan menggunakan data ingredient dari version lama
+   sebagai sumber dropdown karena itu hanya berisi
+   ingredient yang dipakai pada version tersebut.
+===================================================== */
+
+async function loadRecipeVersionMasterData() {
+
+    return new Promise(
+        (
+            resolve,
+            reject
+        ) => {
+
+            waitForSupabase(
+                async supabase => {
+
+                    try {
+
+                        /*
+                        =========================================
+                        LOAD INGREDIENTS
+                        =========================================
+                        */
+
+                        const {
+                            data: ingredientData,
+                            error: ingredientError
+                        } = await supabase
+
+                            .from(
+                                "ingredients"
+                            )
+
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                default_unit_id,
+                                cost_per_unit,
+                                is_active
+                            `)
+
+                            .order(
+                                "name",
+                                {
+                                    ascending:
+                                        true
+                                }
+                            );
+
+
+                        if (
+                            ingredientError
+                        ) {
+
+                            throw ingredientError;
+
+                        }
+
+
+                        /*
+                        =========================================
+                        LOAD UNITS
+                        =========================================
+                        */
+
+                        const {
+                            data: unitData,
+                            error: unitError
+                        } = await supabase
+
+                            .from(
+                                "units"
+                            )
+
+                            .select(`
+                                id,
+                                code,
+                                name,
+                                category
+                            `)
+
+                            .order(
+                                "name",
+                                {
+                                    ascending:
+                                        true
+                                }
+                            );
+
+
+                        if (
+                            unitError
+                        ) {
+
+                            throw unitError;
+
+                        }
+
+
+                        /*
+                        =========================================
+                        STORE GLOBAL MASTER DATA
+                        =========================================
+                        */
+
+                        ingredients =
+                            Array.isArray(
+                                ingredientData
+                            )
+                                ? ingredientData
+                                : [];
+
+
+                        units =
+                            Array.isArray(
+                                unitData
+                            )
+                                ? unitData
+                                : [];
+
+
+                        console.log(
+                            "MERAMU H4 — Ingredients:",
+                            ingredients.length
+                        );
+
+
+                        console.log(
+                            "MERAMU H4 — Units:",
+                            units.length
+                        );
+
+
+                        resolve(
+                            true
+                        );
+
+                    }
+
+                    catch (
+                        error
+                    ) {
+
+                        console.error(
+                            "MERAMU H4 MASTER DATA ERROR:",
+                            error
+                        );
+
+
+                        reject(
+                            error
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
 
 
 /* =====================================================
    H4 — LOAD RECIPE + CURRENT VERSION
 ===================================================== */
 
-async function loadRecipeVersionData(recipeId) {
+async function loadRecipeVersionData(
+    recipeId
+) {
 
-    if (!recipeId) {
+    if (
+        !recipeId
+    ) {
+
         throw new Error(
             "Recipe ID tidak ditemukan."
         );
+
     }
 
+
     return new Promise(
-        (resolve, reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             waitForSupabase(
                 async supabase => {
@@ -4898,7 +5086,7 @@ async function loadRecipeVersionData(recipeId) {
 
                         /*
                         =========================================
-                        2. LOAD VERSION
+                        2. LOAD ALL VERSIONS
                         =========================================
                         */
 
@@ -4934,7 +5122,8 @@ async function loadRecipeVersionData(recipeId) {
                             .order(
                                 "version_number",
                                 {
-                                    ascending: false
+                                    ascending:
+                                        false
                                 }
                             );
 
@@ -4948,22 +5137,76 @@ async function loadRecipeVersionData(recipeId) {
                         }
 
 
-                        const currentVersion =
+                        /*
+                        =========================================
+                        3. DETERMINE CURRENT VERSION
+                        =========================================
+
+                        Prioritas:
+                        1. recipes.current_version_number
+                        2. version terbesar
+                        */
+
+                        let currentVersion =
+                            null;
+
+
+                        const currentVersionNumber =
+                            Number(
+                                recipe
+                                    ?.current_version_number
+                            );
+
+
+                        if (
+                            Number.isFinite(
+                                currentVersionNumber
+                            ) &&
+                            currentVersionNumber > 0
+                        ) {
+
+                            currentVersion =
+                                (
+                                    versions || []
+                                ).find(
+                                    version =>
+                                        Number(
+                                            version.version_number
+                                        ) ===
+                                        currentVersionNumber
+                                ) ||
+                                null;
+
+                        }
+
+
+                        /*
+                        Jika tidak ditemukan,
+                        fallback ke version terbesar.
+                        */
+
+                        if (
+                            !currentVersion &&
                             Array.isArray(
                                 versions
                             ) &&
                             versions.length
-                                ? versions[0]
-                                : null;
+                        ) {
+
+                            currentVersion =
+                                versions[0];
+
+                        }
 
 
                         /*
                         =========================================
-                        3. LOAD INGREDIENTS
+                        4. LOAD INGREDIENTS
                         =========================================
                         */
 
-                        let recipeIngredients = [];
+                        let recipeIngredients =
+                            [];
 
 
                         if (
@@ -5003,24 +5246,20 @@ async function loadRecipeVersionData(recipeId) {
 
 
                             recipeIngredients =
-                                data || [];
+                                Array.isArray(
+                                    data
+                                )
+                                    ? data
+                                    : [];
 
                         }
 
 
                         /*
                         =========================================
-                        4. LOAD MASTER INGREDIENT
+                        5. LOAD INGREDIENT DETAIL
                         =========================================
                         */
-
-                        let ingredientMap =
-                            new Map();
-
-
-                        let unitMap =
-                            new Map();
-
 
                         const ingredientIds =
                             [
@@ -5051,6 +5290,20 @@ async function loadRecipeVersionData(recipeId) {
                                 )
                             ];
 
+
+                        let ingredientMap =
+                            new Map();
+
+
+                        let unitMap =
+                            new Map();
+
+
+                        /*
+                        =========================================
+                        INGREDIENT DETAIL
+                        =========================================
+                        */
 
                         if (
                             ingredientIds.length
@@ -5108,6 +5361,12 @@ async function loadRecipeVersionData(recipeId) {
                         }
 
 
+                        /*
+                        =========================================
+                        UNIT DETAIL
+                        =========================================
+                        */
+
                         if (
                             unitIds.length
                         ) {
@@ -5162,6 +5421,12 @@ async function loadRecipeVersionData(recipeId) {
                         }
 
 
+                        /*
+                        =========================================
+                        ATTACH DETAIL
+                        =========================================
+                        */
+
                         recipeIngredients =
                             recipeIngredients.map(
                                 item => ({
@@ -5188,11 +5453,20 @@ async function loadRecipeVersionData(recipeId) {
                             );
 
 
+                        /*
+                        =========================================
+                        RETURN
+                        =========================================
+                        */
+
                         resolve({
 
                             recipe,
 
                             currentVersion,
+
+                            versions:
+                                versions || [],
 
                             ingredients:
                                 recipeIngredients
@@ -5200,6 +5474,7 @@ async function loadRecipeVersionData(recipeId) {
                         });
 
                     }
+
                     catch (
                         error
                     ) {
@@ -5208,6 +5483,7 @@ async function loadRecipeVersionData(recipeId) {
                             "LOAD RECIPE VERSION ERROR:",
                             error
                         );
+
 
                         reject(
                             error
@@ -5226,9 +5502,6 @@ async function loadRecipeVersionData(recipeId) {
 
 /* =====================================================
    H4 — CREATE VERSION MODAL
-   -----------------------------------------------------
-   Modal dibuat dari JS supaya H4 tidak membutuhkan
-   perubahan HTML tambahan.
 ===================================================== */
 
 function ensureRecipeVersionModal() {
@@ -5293,17 +5566,19 @@ function ensureRecipeVersionModal() {
                         RECIPE VERSION
                     </span>
 
+
                     <h2
                         id="recipeVersionModalTitle"
                     >
                         Buat Versi Baru
                     </h2>
 
+
                     <p
                         id="recipeVersionModalSubtitle"
                     >
-                        Buat revision formula tanpa mengubah
-                        version sebelumnya.
+                        Buat revision formula tanpa
+                        mengubah version sebelumnya.
                     </p>
 
                 </div>
@@ -5509,12 +5784,16 @@ function ensureRecipeVersionModal() {
 
 
                         <div
-                            class="recipe-field recipe-version-checkbox-field"
+                            class="
+                                recipe-field
+                                recipe-version-checkbox-field
+                            "
                         >
 
                             <label>
                                 Fermentation
                             </label>
+
 
                             <label
                                 class="recipe-version-check"
@@ -5549,8 +5828,11 @@ function ensureRecipeVersionModal() {
                                 F1 Target
                             </label>
 
+
                             <div
-                                class="recipe-version-input-suffix"
+                                class="
+                                    recipe-version-input-suffix
+                                "
                             >
 
                                 <input
@@ -5577,8 +5859,11 @@ function ensureRecipeVersionModal() {
                                 F2 Target
                             </label>
 
+
                             <div
-                                class="recipe-version-input-suffix"
+                                class="
+                                    recipe-version-input-suffix
+                                "
                             >
 
                                 <input
@@ -5607,10 +5892,13 @@ function ensureRecipeVersionModal() {
                             Notes Version
                         </label>
 
+
                         <textarea
                             id="versionNotes"
                             rows="3"
-                            placeholder="Catatan perubahan formula / proses..."
+                            placeholder="
+                                Catatan perubahan formula / proses...
+                            "
                         ></textarea>
 
                     </div>
@@ -5625,20 +5913,26 @@ function ensureRecipeVersionModal() {
                 >
 
                     <div
-                        class="recipe-version-section-header"
+                        class="
+                            recipe-version-section-header
+                        "
                     >
 
                         <div>
 
                             <span
-                                class="recipe-version-section-label"
+                                class="
+                                    recipe-version-section-label
+                                "
                             >
                                 Ingredients
                             </span>
 
+
                             <small>
-                                Formula disalin dari version sebelumnya.
-                                Silakan sesuaikan untuk version baru.
+                                Formula disalin dari version
+                                sebelumnya. Silakan sesuaikan
+                                untuk version baru.
                             </small>
 
                         </div>
@@ -5653,6 +5947,7 @@ function ensureRecipeVersionModal() {
                             <i
                                 data-lucide="plus"
                             ></i>
+
 
                             <span>
                                 Tambah Ingredient
@@ -5678,6 +5973,7 @@ function ensureRecipeVersionModal() {
                         <i
                             data-lucide="package-open"
                         ></i>
+
 
                         <span>
                             Belum ada ingredient.
@@ -5713,6 +6009,7 @@ function ensureRecipeVersionModal() {
                         data-lucide="git-branch"
                     ></i>
 
+
                     <span>
                         Simpan Version
                     </span>
@@ -5734,13 +6031,16 @@ function ensureRecipeVersionModal() {
     bindRecipeVersionModalEvents();
 
 
+    refreshIcons();
+
+
     return modal;
 
 }
 
 
 /* =====================================================
-   H4 — POPULATE UNIT
+   H4 — POPULATE YIELD UNIT
 ===================================================== */
 
 function populateVersionUnitSelect(
@@ -5808,7 +6108,9 @@ function populateVersionUnitSelect(
     ) {
 
         select.value =
-            selectedId;
+            String(
+                selectedId
+            );
 
     }
 
@@ -5862,7 +6164,9 @@ function addVersionIngredientRow(
     row.innerHTML = `
 
         <div
-            class="recipe-version-ingredient-number"
+            class="
+                recipe-version-ingredient-number
+            "
         >
             ${rowId}
         </div>
@@ -5876,6 +6180,7 @@ function addVersionIngredientRow(
                 Ingredient
             </label>
 
+
             <select
                 class="version-ingredient-select"
                 required
@@ -5884,6 +6189,7 @@ function addVersionIngredientRow(
                 <option value="">
                     Pilih bahan
                 </option>
+
 
                 ${
                     ingredients
@@ -5901,7 +6207,8 @@ function addVersionIngredientRow(
                                 >
 
                                     ${escapeHtml(
-                                        ingredient.name
+                                        ingredient.name ||
+                                        "Ingredient"
                                     )}
 
                                     ${
@@ -5909,6 +6216,12 @@ function addVersionIngredientRow(
                                             ? ` (${escapeHtml(
                                                 ingredient.code
                                             )})`
+                                            : ""
+                                    }
+
+                                    ${
+                                        ingredient.is_active === false
+                                            ? " — inactive"
                                             : ""
                                     }
 
@@ -5932,6 +6245,7 @@ function addVersionIngredientRow(
                 Quantity
             </label>
 
+
             <input
                 type="number"
                 class="version-ingredient-qty"
@@ -5952,6 +6266,7 @@ function addVersionIngredientRow(
                 Unit
             </label>
 
+
             <select
                 class="version-ingredient-unit"
                 required
@@ -5960,6 +6275,7 @@ function addVersionIngredientRow(
                 <option value="">
                     Unit
                 </option>
+
 
                 ${
                     units
@@ -6000,7 +6316,9 @@ function addVersionIngredientRow(
 
         <button
             type="button"
-            class="recipe-version-remove-ingredient"
+            class="
+                recipe-version-remove-ingredient
+            "
             title="Hapus ingredient"
         >
 
@@ -6030,6 +6348,12 @@ function addVersionIngredientRow(
         );
 
 
+    /*
+    =====================================================
+    AUTO DEFAULT UNIT
+    =====================================================
+    */
+
     ingredientSelect?.addEventListener(
         "change",
         () => {
@@ -6051,13 +6375,21 @@ function addVersionIngredientRow(
             ) {
 
                 unitSelect.value =
-                    defaultUnit;
+                    String(
+                        defaultUnit
+                    );
 
             }
 
         }
     );
 
+
+    /*
+    =====================================================
+    REMOVE
+    =====================================================
+    */
 
     row.querySelector(
         ".recipe-version-remove-ingredient"
@@ -6076,9 +6408,9 @@ function addVersionIngredientRow(
 
 
     /*
-    -----------------------------------------------------
+    =====================================================
     PREFILL
-    -----------------------------------------------------
+    =====================================================
     */
 
     if (
@@ -6090,23 +6422,25 @@ function addVersionIngredientRow(
         ) {
 
             ingredientSelect.value =
-                item.ingredient_id ||
-                "";
+                String(
+                    item.ingredient_id ||
+                    ""
+                );
 
         }
 
 
-        const qtyInput =
+        const quantityInput =
             row.querySelector(
                 ".version-ingredient-qty"
             );
 
 
         if (
-            qtyInput
+            quantityInput
         ) {
 
-            qtyInput.value =
+            quantityInput.value =
                 item.quantity ??
                 "";
 
@@ -6118,8 +6452,10 @@ function addVersionIngredientRow(
         ) {
 
             unitSelect.value =
-                item.unit_id ||
-                "";
+                String(
+                    item.unit_id ||
+                    ""
+                );
 
         }
 
@@ -6141,7 +6477,7 @@ function renumberVersionIngredientRows() {
 
     const rows =
         document.querySelectorAll(
-            ".recipe-version-ingredient-row"
+            "#versionIngredients .recipe-version-ingredient-row"
         );
 
 
@@ -6230,17 +6566,27 @@ function updateVersionFermentationVisibility() {
 
 
     if (
-        checkbox?.checked
+        !checkbox ||
+        !fields
     ) {
 
-        fields?.removeAttribute(
+        return;
+
+    }
+
+
+    if (
+        checkbox.checked
+    ) {
+
+        fields.removeAttribute(
             "hidden"
         );
 
     }
     else {
 
-        fields?.setAttribute(
+        fields.setAttribute(
             "hidden",
             ""
         );
@@ -6251,7 +6597,7 @@ function updateVersionFermentationVisibility() {
 
 
 /* =====================================================
-   H4 — SHOW ERROR
+   H4 — ERROR
 ===================================================== */
 
 function showRecipeVersionError(
@@ -6267,6 +6613,10 @@ function showRecipeVersionError(
     if (
         !box
     ) {
+
+        console.error(
+            message
+        );
 
         alert(
             message ||
@@ -6338,11 +6688,104 @@ async function handleNewRecipeVersion() {
     }
 
 
+    /*
+    =====================================================
+    CLEAR
+    =====================================================
+    */
+
     clearRecipeVersionError();
 
 
+    /*
+    =====================================================
+    LOAD MASTER DATA FIRST
+    =====================================================
+    */
+
+    try {
+
+        await loadRecipeVersionMasterData();
+
+    }
+    catch (
+        error
+    ) {
+
+        console.error(
+            "H4 MASTER DATA LOAD ERROR:",
+            error
+        );
+
+
+        showRecipeVersionError(
+            error?.message ||
+            "Gagal memuat master Ingredient dan Unit."
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+    =====================================================
+    VALIDATE MASTER DATA
+    =====================================================
+    */
+
+    if (
+        !Array.isArray(
+            ingredients
+        ) ||
+        !ingredients.length
+    ) {
+
+        showRecipeVersionError(
+            "Master Ingredient masih kosong."
+        );
+
+
+        return;
+
+    }
+
+
+    if (
+        !Array.isArray(
+            units
+        ) ||
+        !units.length
+    ) {
+
+        showRecipeVersionError(
+            "Master Unit masih kosong."
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+    =====================================================
+    CREATE MODAL
+    =====================================================
+    */
+
     const modal =
         ensureRecipeVersionModal();
+
+
+    if (
+        !modal
+    ) {
+
+        return;
+
+    }
 
 
     modal.hidden =
@@ -6353,6 +6796,12 @@ async function handleNewRecipeVersion() {
         "recipe-modal-open"
     );
 
+
+    /*
+    =====================================================
+    SAVE BUTTON
+    =====================================================
+    */
 
     const saveButton =
         document.getElementById(
@@ -6371,9 +6820,18 @@ async function handleNewRecipeVersion() {
 
 
     /*
-    -----------------------------------------------------
-    RESET
-    -----------------------------------------------------
+    =====================================================
+    RESET ERROR
+    =====================================================
+    */
+
+    clearRecipeVersionError();
+
+
+    /*
+    =====================================================
+    RESET ROW
+    =====================================================
     */
 
     versionIngredientRows =
@@ -6399,9 +6857,9 @@ async function handleNewRecipeVersion() {
     try {
 
         /*
-        =========================================
-        LOAD DATA
-        =========================================
+        ================================================
+        LOAD RECIPE DATA
+        ================================================
         */
 
         const data =
@@ -6409,6 +6867,12 @@ async function handleNewRecipeVersion() {
                 activeDetailRecipeId
             );
 
+
+        /*
+        ================================================
+        SAVE STATE
+        ================================================
+        */
 
         activeVersionRecipe =
             data.recipe;
@@ -6427,32 +6891,38 @@ async function handleNewRecipeVersion() {
 
 
         const sourceIngredients =
-            data.ingredients ||
-            [];
+            Array.isArray(
+                data.ingredients
+            )
+                ? data.ingredients
+                : [];
 
 
         /*
-        =========================================
+        ================================================
         VERSION NUMBER
-        =========================================
+        ================================================
         */
 
         const previousNumber =
             Number(
-                currentVersion?.version_number ||
-                recipe.current_version_number ||
+                currentVersion
+                    ?.version_number ||
+                recipe
+                    ?.current_version_number ||
                 0
             );
 
 
         const newNumber =
-            previousNumber + 1;
+            previousNumber +
+            1;
 
 
         /*
-        =========================================
+        ================================================
         MASTER INFO
-        =========================================
+        ================================================
         */
 
         const nameElement =
@@ -6484,7 +6954,7 @@ async function handleNewRecipeVersion() {
         ) {
 
             nameElement.textContent =
-                recipe.name ||
+                recipe?.name ||
                 "Recipe";
 
         }
@@ -6495,7 +6965,7 @@ async function handleNewRecipeVersion() {
         ) {
 
             codeElement.textContent =
-                recipe.code ||
+                recipe?.code ||
                 "—";
 
         }
@@ -6524,9 +6994,9 @@ async function handleNewRecipeVersion() {
 
 
         /*
-        =========================================
-        PREFILL PARAMETERS
-        =========================================
+        ================================================
+        FORM ELEMENT
+        ================================================
         */
 
         const yieldInput =
@@ -6571,6 +7041,12 @@ async function handleNewRecipeVersion() {
             );
 
 
+        /*
+        ================================================
+        YIELD
+        ================================================
+        */
+
         if (
             yieldInput
         ) {
@@ -6578,10 +7054,16 @@ async function handleNewRecipeVersion() {
             yieldInput.value =
                 currentVersion
                     ?.yield_quantity ??
-                "1";
+                "";
 
         }
 
+
+        /*
+        ================================================
+        YIELD UNIT
+        ================================================
+        */
 
         populateVersionUnitSelect(
             currentVersion
@@ -6589,6 +7071,12 @@ async function handleNewRecipeVersion() {
             ""
         );
 
+
+        /*
+        ================================================
+        FERMENTATION
+        ================================================
+        */
 
         if (
             fermentation
@@ -6603,6 +7091,12 @@ async function handleNewRecipeVersion() {
         }
 
 
+        /*
+        ================================================
+        F1
+        ================================================
+        */
+
         if (
             f1
         ) {
@@ -6614,6 +7108,12 @@ async function handleNewRecipeVersion() {
 
         }
 
+
+        /*
+        ================================================
+        F2
+        ================================================
+        */
 
         if (
             f2
@@ -6627,6 +7127,12 @@ async function handleNewRecipeVersion() {
         }
 
 
+        /*
+        ================================================
+        SHELF LIFE
+        ================================================
+        */
+
         if (
             shelf
         ) {
@@ -6639,6 +7145,12 @@ async function handleNewRecipeVersion() {
         }
 
 
+        /*
+        ================================================
+        NOTES
+        ================================================
+        */
+
         if (
             notes
         ) {
@@ -6649,13 +7161,19 @@ async function handleNewRecipeVersion() {
         }
 
 
+        /*
+        ================================================
+        FERMENTATION VISIBILITY
+        ================================================
+        */
+
         updateVersionFermentationVisibility();
 
 
         /*
-        =========================================
-        COPY INGREDIENTS
-        =========================================
+        ================================================
+        COPY FORMULA
+        ================================================
         */
 
         if (
@@ -6690,9 +7208,18 @@ async function handleNewRecipeVersion() {
 
 
         /*
-        =========================================
+        ================================================
+        EMPTY STATE
+        ================================================
+        */
+
+        updateVersionIngredientEmpty();
+
+
+        /*
+        ================================================
         ENABLE SAVE
-        =========================================
+        ================================================
         */
 
         if (
@@ -6705,9 +7232,40 @@ async function handleNewRecipeVersion() {
         }
 
 
+        /*
+        ================================================
+        ICON
+        ================================================
+        */
+
         refreshIcons();
 
+
+        console.log(
+            "MERAMU H4 READY",
+            {
+                recipe:
+                    recipe?.name,
+
+                previousVersion:
+                    previousNumber,
+
+                newVersion:
+                    newNumber,
+
+                masterIngredients:
+                    ingredients.length,
+
+                masterUnits:
+                    units.length,
+
+                copiedIngredients:
+                    sourceIngredients.length
+            }
+        );
+
     }
+
     catch (
         error
     ) {
@@ -6798,6 +7356,10 @@ function collectVersionIngredients() {
         [];
 
 
+    const duplicateIds =
+        new Set();
+
+
     rows.forEach(
         (
             row,
@@ -6826,6 +7388,12 @@ function collectVersionIngredients() {
                 "";
 
 
+            /*
+            ================================================
+            INGREDIENT
+            ================================================
+            */
+
             if (
                 !ingredientId
             ) {
@@ -6839,8 +7407,16 @@ function collectVersionIngredients() {
             }
 
 
+            /*
+            ================================================
+            QUANTITY
+            ================================================
+            */
+
             if (
-                !quantity ||
+                !Number.isFinite(
+                    quantity
+                ) ||
                 quantity <= 0
             ) {
 
@@ -6852,6 +7428,12 @@ function collectVersionIngredients() {
 
             }
 
+
+            /*
+            ================================================
+            UNIT
+            ================================================
+            */
 
             if (
                 !unitId
@@ -6866,12 +7448,49 @@ function collectVersionIngredients() {
             }
 
 
+            /*
+            ================================================
+            DUPLICATE
+            ================================================
+            */
+
+            if (
+                duplicateIds.has(
+                    String(
+                        ingredientId
+                    )
+                )
+            ) {
+
+                throw new Error(
+                    `Ingredient ${
+                        index + 1
+                    } duplikat. Satu ingredient cukup satu baris.`
+                );
+
+            }
+
+
+            duplicateIds.add(
+                String(
+                    ingredientId
+                )
+            );
+
+
+            /*
+            ================================================
+            PUSH
+            ================================================
+            */
+
             payload.push({
 
                 ingredient_id:
                     ingredientId,
 
-                quantity,
+                quantity:
+                    quantity,
 
                 unit_id:
                     unitId
@@ -6928,9 +7547,9 @@ async function saveRecipeVersion() {
     try {
 
         /*
-        =========================================
+        =================================================
         READ FORM
-        =========================================
+        =================================================
         */
 
         const yieldQuantity =
@@ -6993,13 +7612,15 @@ async function saveRecipeVersion() {
 
 
         /*
-        =========================================
+        =================================================
         VALIDATION
-        =========================================
+        =================================================
         */
 
         if (
-            !yieldQuantity ||
+            !Number.isFinite(
+                yieldQuantity
+            ) ||
             yieldQuantity <= 0
         ) {
 
@@ -7024,6 +7645,12 @@ async function saveRecipeVersion() {
         if (
             fermentationRequired &&
             (
+                !Number.isFinite(
+                    f1Target
+                ) ||
+                !Number.isFinite(
+                    f2Target
+                ) ||
                 f1Target < 0 ||
                 f2Target < 0
             )
@@ -7037,6 +7664,9 @@ async function saveRecipeVersion() {
 
 
         if (
+            !Number.isFinite(
+                shelfLife
+            ) ||
             shelfLife < 0
         ) {
 
@@ -7052,9 +7682,9 @@ async function saveRecipeVersion() {
 
 
         /*
-        =========================================
+        =================================================
         BUTTON LOADING
-        =========================================
+        =================================================
         */
 
         if (
@@ -7082,9 +7712,9 @@ async function saveRecipeVersion() {
 
 
         /*
-        =========================================
+        =================================================
         SUPABASE
-        =========================================
+        =================================================
         */
 
         await new Promise(
@@ -7096,16 +7726,21 @@ async function saveRecipeVersion() {
                 waitForSupabase(
                     async supabase => {
 
+                        let newVersionId =
+                            null;
+
+
                         try {
 
                             /*
-                            =================================
+                            =====================================
                             GET LATEST VERSION
-                            =================================
+                            =====================================
                             */
 
                             const {
-                                data: latestVersions,
+                                data:
+                                    latestVersions,
                                 error:
                                     latestError
                             } = await supabase
@@ -7114,12 +7749,10 @@ async function saveRecipeVersion() {
                                     "recipe_versions"
                                 )
 
-                                .select(
-                                    `
-                                        id,
-                                        version_number
-                                    `
-                                )
+                                .select(`
+                                    id,
+                                    version_number
+                                `)
 
                                 .eq(
                                     "recipe_id",
@@ -7153,20 +7786,46 @@ async function saveRecipeVersion() {
                                 null;
 
 
+                            /*
+                            =====================================
+                            NEW VERSION NUMBER
+                            =====================================
+                            */
+
                             const newVersionNumber =
                                 Number(
                                     latestVersion
                                         ?.version_number ||
                                     activeVersionRecipe
-                                        .current_version_number ||
+                                        ?.current_version_number ||
                                     0
                                 ) + 1;
 
 
                             /*
-                            =================================
-                            CREATE NEW VERSION
-                            =================================
+                            =====================================
+                            SAFETY CHECK
+                            =====================================
+                            */
+
+                            if (
+                                !Number.isInteger(
+                                    newVersionNumber
+                                ) ||
+                                newVersionNumber <= 0
+                            ) {
+
+                                throw new Error(
+                                    "Nomor Recipe Version tidak valid."
+                                );
+
+                            }
+
+
+                            /*
+                            =====================================
+                            CREATE VERSION
+                            =====================================
                             */
 
                             const {
@@ -7208,8 +7867,7 @@ async function saveRecipeVersion() {
                                             : 0,
 
                                     shelf_life_days:
-                                        shelfLife ||
-                                        0,
+                                        shelfLife || 0,
 
                                     notes:
                                         notes ||
@@ -7240,10 +7898,25 @@ async function saveRecipeVersion() {
                             }
 
 
+                            if (
+                                !newVersion?.id
+                            ) {
+
+                                throw new Error(
+                                    "Recipe Version berhasil dibuat tetapi ID tidak ditemukan."
+                                );
+
+                            }
+
+
+                            newVersionId =
+                                newVersion.id;
+
+
                             /*
-                            =================================
-                            CREATE INGREDIENTS
-                            =================================
+                            =====================================
+                            CREATE INGREDIENT ROWS
+                            =====================================
                             */
 
                             const ingredientRows =
@@ -7285,9 +7958,9 @@ async function saveRecipeVersion() {
                             ) {
 
                                 /*
-                                ---------------------------------
+                                =================================
                                 BEST EFFORT ROLLBACK
-                                ---------------------------------
+                                =================================
                                 */
 
                                 try {
@@ -7311,7 +7984,7 @@ async function saveRecipeVersion() {
                                 ) {
 
                                     console.error(
-                                        "Version rollback error:",
+                                        "Recipe Version rollback error:",
                                         rollbackError
                                     );
 
@@ -7324,9 +7997,9 @@ async function saveRecipeVersion() {
 
 
                             /*
-                            =================================
+                            =====================================
                             UPDATE MASTER CURRENT VERSION
-                            =================================
+                            =====================================
                             */
 
                             const {
@@ -7356,20 +8029,17 @@ async function saveRecipeVersion() {
                             ) {
 
                                 /*
-                                ---------------------------------
+                                =================================
                                 IMPORTANT
-                                ---------------------------------
 
-                                Version + ingredients sudah
+                                Version dan ingredient sudah
                                 tersimpan.
 
-                                Jangan menghapus version hanya
-                                karena current_version gagal
-                                update.
+                                Jangan delete version karena
+                                formula baru sudah valid.
 
-                                Kita laporkan error supaya
-                                data tidak hilang.
-                                ---------------------------------
+                                Error dilaporkan.
+                                =================================
                                 */
 
                                 throw recipeUpdateError;
@@ -7378,9 +8048,9 @@ async function saveRecipeVersion() {
 
 
                             /*
-                            =================================
+                            =====================================
                             SUCCESS
-                            =================================
+                            =====================================
                             */
 
                             resolve(
@@ -7391,6 +8061,12 @@ async function saveRecipeVersion() {
                         catch (
                             error
                         ) {
+
+                            console.error(
+                                "CREATE RECIPE VERSION ERROR:",
+                                error
+                            );
+
 
                             reject(
                                 error
@@ -7406,27 +8082,31 @@ async function saveRecipeVersion() {
 
 
         /*
-        =========================================
+        =================================================
         CLOSE
-        =========================================
+        =================================================
         */
 
         closeRecipeVersionModal();
 
 
         /*
-        =========================================
+        =================================================
         REFRESH LIST
-        =========================================
+        =================================================
         */
 
         await loadRecipes();
 
 
         /*
-        =========================================
+        =================================================
         REFRESH DETAIL
-        =========================================
+
+        IMPORTANT:
+        openRecipeDetail() akan membaca activeDetailRecipeId
+        yang masih ada.
+        =================================================
         */
 
         if (
@@ -7440,17 +8120,24 @@ async function saveRecipeVersion() {
         }
 
 
+        /*
+        =================================================
+        SUCCESS MESSAGE
+        =================================================
+        */
+
         showSuccessMessage(
             "Recipe Version berhasil dibuat."
         );
 
     }
+
     catch (
         error
     ) {
 
         console.error(
-            "CREATE RECIPE VERSION ERROR:",
+            "SAVE RECIPE VERSION ERROR:",
             error
         );
 
@@ -7461,6 +8148,7 @@ async function saveRecipeVersion() {
         );
 
     }
+
     finally {
 
         if (
@@ -7498,9 +8186,9 @@ async function saveRecipeVersion() {
 function bindRecipeVersionModalEvents() {
 
     /*
-    -----------------------------------------------------
+    =====================================================
     CLOSE
-    -----------------------------------------------------
+    =====================================================
     */
 
     document
@@ -7520,9 +8208,9 @@ function bindRecipeVersionModalEvents() {
 
 
     /*
-    -----------------------------------------------------
+    =====================================================
     SAVE
-    -----------------------------------------------------
+    =====================================================
     */
 
     document
@@ -7536,9 +8224,9 @@ function bindRecipeVersionModalEvents() {
 
 
     /*
-    -----------------------------------------------------
+    =====================================================
     ADD INGREDIENT
-    -----------------------------------------------------
+    =====================================================
     */
 
     document
@@ -7556,9 +8244,9 @@ function bindRecipeVersionModalEvents() {
 
 
     /*
-    -----------------------------------------------------
+    =====================================================
     FERMENTATION
-    -----------------------------------------------------
+    =====================================================
     */
 
     document
@@ -7572,9 +8260,9 @@ function bindRecipeVersionModalEvents() {
 
 
     /*
-    -----------------------------------------------------
+    =====================================================
     ESCAPE
-    -----------------------------------------------------
+    =====================================================
     */
 
     document.addEventListener(
