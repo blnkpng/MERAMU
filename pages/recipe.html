@@ -57,7 +57,274 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
 
+<style id="recipe-page-polish">
 
+/* =========================================================
+   RECIPE FORM NOTE
+   Information banner between Master Recipe and Version
+========================================================= */
+
+.recipe-form-note {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: flex-start !important;
+
+    gap: 12px !important;
+
+    margin: 0 0 20px !important;
+
+    padding: 13px 15px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #DCE9E2 !important;
+
+    border-radius: 12px !important;
+
+    background: #F7FBF8 !important;
+
+    color: #17231D !important;
+
+}
+
+
+/* Icon */
+
+.recipe-form-note > i,
+.recipe-form-note > svg {
+
+    width: 18px !important;
+
+    height: 18px !important;
+
+    min-width: 18px !important;
+
+    margin-top: 2px !important;
+
+    color: #046738 !important;
+
+}
+
+
+/* Text wrapper */
+
+.recipe-form-note > div {
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 3px !important;
+
+}
+
+
+/* Title */
+
+.recipe-form-note strong {
+
+    margin: 0 !important;
+
+    color: #18231D !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.45 !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* Description */
+
+.recipe-form-note p {
+
+    margin: 0 !important;
+
+    color: #718078 !important;
+
+    font-size: 10.5px !important;
+
+    line-height: 1.6 !important;
+
+    font-weight: 400 !important;
+
+}
+
+
+/* =========================================================
+   RECIPE DETAIL FOOTER
+========================================================= */
+
+.recipe-detail-dialog .recipe-modal-footer {
+
+    width: 100% !important;
+
+    min-height: 72px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    gap: 10px !important;
+
+    padding: 12px 20px !important;
+
+    border-top: 1px solid #E7ECE9 !important;
+
+    background: #FFFFFF !important;
+
+}
+
+
+/* All detail footer buttons */
+
+.recipe-detail-dialog .recipe-modal-footer .page-btn {
+
+    height: 44px !important;
+
+    min-height: 44px !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    padding: 0 18px !important;
+
+    border-radius: 12px !important;
+
+    font-family: "Poppins", sans-serif !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+
+}
+
+
+/* Tutup */
+
+.recipe-detail-dialog
+#closeRecipeDetailBottom {
+
+    min-width: 140px !important;
+
+}
+
+
+/* Edit Recipe */
+
+.recipe-detail-dialog
+#editRecipeFromDetail {
+
+    min-width: 160px !important;
+
+}
+
+
+/* Buat Versi Baru */
+
+.recipe-detail-dialog
+#newRecipeVersionFromDetail {
+
+    min-width: 180px !important;
+
+}
+
+
+/* Footer icons */
+
+.recipe-detail-dialog
+.recipe-modal-footer .page-btn svg {
+
+    width: 16px !important;
+
+    height: 16px !important;
+
+    flex: 0 0 16px !important;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .recipe-form-note {
+
+        padding: 12px !important;
+
+        gap: 10px !important;
+
+    }
+
+
+    .recipe-form-note strong {
+
+        font-size: 11px !important;
+
+    }
+
+
+    .recipe-form-note p {
+
+        font-size: 10px !important;
+
+    }
+
+
+    .recipe-detail-dialog
+    .recipe-modal-footer {
+
+        padding: 10px 14px !important;
+
+        gap: 8px !important;
+
+        flex-wrap: wrap !important;
+
+    }
+
+
+    .recipe-detail-dialog
+    .recipe-modal-footer .page-btn {
+
+        flex: 1 1 0 !important;
+
+        min-width: 0 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        padding: 0 12px !important;
+
+    }
+
+}
+
+</style>
 
 
 
@@ -569,7 +836,7 @@
                  RECIPE VERSION INFO
             ========================= -->
             <div class="recipe-form-note">
-                <i data-lucide="git-branch"></i>
+                <i data-lucide="info"></i>
             
                 <div>
                     <strong>
