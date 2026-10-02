@@ -445,10 +445,10 @@
 
 /* =========================================================
    DESKTOP TOPBAR
-   ≥ 769px
+   > 1024px
 ========================================================= */
 
-@media (min-width:769px){
+@media (min-width:1025px){
 
     .topbar-mobile{
         display:none !important;
@@ -458,7 +458,6 @@
         display:none !important;
     }
 }
-
 
 /* =========================================================
    BATCH DETAIL
