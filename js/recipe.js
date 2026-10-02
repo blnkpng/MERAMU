@@ -9597,7 +9597,32 @@ async function deleteRecipe(
                 "click",
                 handleEditRecipe
             );
+/*
+-----------------------------------------------------
+DETAIL → DELETE
+-----------------------------------------------------
+*/
 
+document
+    .getElementById(
+        "deleteRecipeFromDetail"
+    )
+    ?.addEventListener(
+        "click",
+        () => {
+
+            if (
+                activeDetailRecipeId
+            ) {
+
+                deleteRecipe(
+                    activeDetailRecipeId
+                );
+
+            }
+
+        }
+    );
 
         /*
         -----------------------------------------------------
