@@ -1061,6 +1061,22 @@
                             ></i>
 
                         </button>
+                        <button
+    type="button"
+    class="icon-detail-btn danger"
+    data-action="delete"
+    data-id="${escapeHtml(
+        recipe.id
+    )}"
+    title="Hapus recipe"
+    aria-label="Hapus recipe"
+>
+
+    <i
+        data-lucide="trash-2"
+    ></i>
+
+</button>
 
                     </div>
 
@@ -4216,27 +4232,29 @@
                     =========================================
                     */
 
-                    const {
-                        data: versions,
-                        error: versionError
-                    } = await supabase
-
-                        .from(
-                            "recipe_versions"
-                        )
-
-                        .select(`
-                            id,
-                            version_number,
-                            yield_quantity,
-                            yield_unit_id,
-                            fermentation_required,
-                            f1_target_days,
-                            f2_target_days,
-                            shelf_life_days,
-                            notes,
-                            status
-                        `)
+                  const {
+                      data: versions,
+                      error: versionError
+                  } = await supabase
+                  
+                      .from(
+                          "recipe_versions"
+                      )
+                  
+                      .select(`
+                          id,
+                          recipe_id,
+                          version_number,
+                          yield_quantity,
+                          yield_unit_id,
+                          fermentation_required,
+                          f1_target_days,
+                          f2_target_days,
+                          shelf_life_days,
+                          notes,
+                          status,
+                          effective_from
+                      `)
 
                         .eq(
                             "recipe_id",
@@ -4638,22 +4656,24 @@
                     7. RENDER DETAIL
                     =========================================
                     */
-
-                    renderRecipeDetail({
-
-                        recipe,
-
-                        product,
-
-                        version,
-
-                        yieldUnit,
-
-                        ingredients:
-                            recipeIngredients
-
-                    });
-
+                     
+                     renderRecipeDetail({
+                     
+                         recipe,
+                     
+                         product,
+                     
+                         version,
+                     
+                         yieldUnit,
+                     
+                         versions:
+                             versions || [],
+                     
+                         ingredients:
+                             recipeIngredients
+                     
+                     });
 
                     loading?.setAttribute(
                         "hidden",
@@ -4706,14 +4726,297 @@
         data
     ) {
 
-        const {
-            recipe,
-            product,
-            version,
-            yieldUnit,
-            ingredients:
-                recipeIngredients
-        } = data;
+         const {
+             recipe,
+             product,
+             version,
+             yieldUnit,
+             versions:
+                 recipeVersions,
+             ingredients:
+                 recipeIngredients
+         } = data;
+
+       /* =====================================================
+            H3 — VERSION HISTORY
+         ===================================================== */
+         
+         function renderRecipeVersionHistory(
+             versions,
+             currentVersion
+         ) {
+         
+             const container =
+                 document.getElementById(
+                     "recipeVersionHistory"
+                 );
+         
+         
+             if (
+                 !container
+             ) {
+         
+                 return;
+         
+             }
+         
+         
+             const list =
+                 Array.isArray(
+                     versions
+                 )
+                     ? [
+                         ...versions
+                     ]
+                         .sort(
+                             (
+                                 a,
+                                 b
+                             ) =>
+                                 Number(
+                                     b.version_number || 0
+                                 ) -
+                                 Number(
+                                     a.version_number || 0
+                                 )
+                         )
+                     : [];
+         
+         
+             if (
+                 !list.length
+             ) {
+         
+                 container.innerHTML = `
+         
+                     <div
+                         class="recipe-version-history-empty"
+                     >
+         
+                         <i
+                             data-lucide="git-branch"
+                         ></i>
+         
+                         <span>
+                             Belum ada Version History.
+                         </span>
+         
+                     </div>
+         
+                 `;
+         
+                 refreshIcons();
+         
+                 return;
+         
+             }
+         
+         
+             container.innerHTML =
+                 list
+                     .map(
+                         version => {
+         
+                             const isCurrent =
+                                 currentVersion &&
+                                 String(
+                                     currentVersion.id
+                                 ) ===
+                                 String(
+                                     version.id
+                                 );
+         
+         
+                             const fermentation =
+                                 version.fermentation_required
+                                     ? `F1 ${formatNumber(
+                                         version.f1_target_days
+                                     )} hari · F2 ${formatNumber(
+                                         version.f2_target_days
+                                     )} hari`
+                                     : "Tidak ada fermentasi";
+         
+         
+                             const effectiveDate =
+                                 version.effective_from
+                                     ? new Intl.DateTimeFormat(
+                                         "id-ID",
+                                         {
+                                             day:
+                                                 "2-digit",
+                                             month:
+                                                 "short",
+                                             year:
+                                                 "numeric"
+                                         }
+                                     ).format(
+                                         new Date(
+                                             version.effective_from
+                                         )
+                                     )
+                                     : "Tanggal tidak tersedia";
+         
+         
+                             return `
+         
+                                 <article
+                                     class="
+                                         recipe-version-history-item
+                                         ${
+                                             isCurrent
+                                                 ? "is-current"
+                                                 : ""
+                                         }
+                                     "
+                                 >
+         
+                                     <div
+                                         class="
+                                             recipe-version-history-icon
+                                         "
+                                     >
+         
+                                         <i
+                                             data-lucide="${
+                                                 isCurrent
+                                                     ? "check-circle-2"
+                                                     : "git-branch"
+                                             }"
+                                         ></i>
+         
+                                     </div>
+         
+         
+                                     <div
+                                         class="
+                                             recipe-version-history-content
+                                         "
+                                     >
+         
+                                         <div
+                                             class="
+                                                 recipe-version-history-top
+                                             "
+                                         >
+         
+                                             <div>
+         
+                                                 <strong>
+                                                     v${escapeHtml(
+                                                         version.version_number
+                                                     )}
+                                                 </strong>
+         
+                                                 ${
+                                                     isCurrent
+                                                         ? `
+                                                             <span
+                                                                 class="
+                                                                     recipe-version-current-badge
+                                                                 "
+                                                             >
+                                                                 Current
+                                                             </span>
+                                                           `
+                                                         : ""
+                                                 }
+         
+                                             </div>
+         
+         
+                                             <span
+                                                 class="
+                                                     recipe-version-history-date
+                                                 "
+                                             >
+                                                 ${escapeHtml(
+                                                     effectiveDate
+                                                 )}
+                                             </span>
+         
+                                         </div>
+         
+         
+                                         <div
+                                             class="
+                                                 recipe-version-history-meta
+                                             "
+                                         >
+         
+                                             <span>
+         
+                                                 <i
+                                                     data-lucide="flask-conical"
+                                                 ></i>
+         
+                                                 Yield
+                                                 ${formatNumber(
+                                                     version.yield_quantity
+                                                 )}
+         
+                                             </span>
+         
+         
+                                             <span>
+         
+                                                 <i
+                                                     data-lucide="timer"
+                                                 ></i>
+         
+                                                 ${escapeHtml(
+                                                     fermentation
+                                                 )}
+         
+                                             </span>
+         
+         
+                                             <span>
+         
+                                                 <i
+                                                     data-lucide="clock-3"
+                                                 ></i>
+         
+                                                 Shelf Life
+                                                 ${formatNumber(
+                                                     version.shelf_life_days
+                                                 )}
+                                                 hari
+         
+                                             </span>
+         
+                                         </div>
+         
+         
+                                         ${
+                                             version.notes
+                                                 ? `
+                                                     <p
+                                                         class="
+                                                             recipe-version-history-notes
+                                                         "
+                                                     >
+                                                         ${escapeHtml(
+                                                             version.notes
+                                                         )}
+                                                     </p>
+                                                   `
+                                                 : ""
+                                         }
+         
+                                     </div>
+         
+                                 </article>
+         
+                             `;
+         
+                         }
+                     )
+                     .join("");
+         
+         
+             refreshIcons();
+         
+         }
 
 
         /*
@@ -4944,6 +5247,16 @@
             recipeIngredients
         );
 
+       /* 
+-----------------------------------------------------
+VERSION HISTORY
+-----------------------------------------------------
+*/
+
+renderRecipeVersionHistory(
+    recipeVersions,
+    version
+);
     }
 
 
@@ -8743,6 +9056,195 @@ function bindRecipeVersionModalEvents() {
     );
 
 }
+   /* =====================================================
+   DELETE RECIPE
+===================================================== */
+
+async function deleteRecipe(
+    recipeId
+) {
+
+    if (
+        !recipeId
+    ) {
+
+        return;
+
+    }
+
+
+    const recipe =
+        recipes.find(
+            item =>
+                String(
+                    item.id
+                ) ===
+                String(
+                    recipeId
+                )
+        );
+
+
+    if (
+        !recipe
+    ) {
+
+        return;
+
+    }
+
+
+    const recipeName =
+        recipe.name ||
+        "Recipe ini";
+
+
+    const confirmed =
+        window.confirm(
+            `Hapus recipe "${recipeName}"?\n\n` +
+            `PERINGATAN:\n` +
+            `Recipe master dan data Version yang terkait ` +
+            `akan ikut terhapus jika database menggunakan ` +
+            `ON DELETE CASCADE.\n\n` +
+            `Tindakan ini tidak dapat dibatalkan.\n\n` +
+            `Klik OK untuk menghapus.`
+        );
+
+
+    if (
+        !confirmed
+    ) {
+
+        return;
+
+    }
+
+
+    waitForSupabase(
+        async supabase => {
+
+            try {
+
+                /*
+                =========================================
+                DELETE MASTER RECIPE
+                =========================================
+
+                Sengaja hanya delete dari recipes.
+
+                Jangan delete recipe_versions /
+                recipe_ingredients satu per satu di sini.
+
+                Jika FK database menggunakan CASCADE,
+                child data akan ikut terhapus.
+
+                Jika tidak menggunakan CASCADE,
+                Supabase akan menolak delete dan data
+                tetap aman.
+                =========================================
+                */
+
+
+                const {
+                    error
+                } = await supabase
+
+                    .from(
+                        "recipes"
+                    )
+
+                    .delete()
+
+                    .eq(
+                        "id",
+                        recipeId
+                    );
+
+
+                if (
+                    error
+                ) {
+
+                    throw error;
+
+                }
+
+
+                /*
+                =========================================
+                CLOSE DETAIL
+                =========================================
+                */
+
+                if (
+                    String(
+                        activeDetailRecipeId
+                    ) ===
+                    String(
+                        recipeId
+                    )
+                ) {
+
+                    closeRecipeDetail();
+
+                }
+
+
+                /*
+                =========================================
+                REFRESH
+                =========================================
+                */
+
+                await loadRecipes();
+
+
+                /*
+                =========================================
+                SUCCESS
+                =========================================
+                */
+
+                showSuccessMessage(
+                    `Recipe "${recipeName}" berhasil dihapus.`
+                );
+
+            }
+            catch (
+                error
+            ) {
+
+                console.error(
+                    "DELETE RECIPE ERROR:",
+                    error
+                );
+
+
+                /*
+                -----------------------------------------
+                FRIENDLY ERROR
+                -----------------------------------------
+                */
+
+                const message =
+                    error?.message ||
+                    "Recipe gagal dihapus.";
+
+
+                window.alert(
+                    "Recipe gagal dihapus.\n\n" +
+                    message +
+                    "\n\n" +
+                    "Jika recipe sudah dipakai oleh Batch / Production, " +
+                    "database mungkin sengaja mencegah penghapusan data tersebut."
+                );
+
+            }
+
+        }
+    );
+
+}
 
     /* =====================================================
        RECIPE ACTIONS
@@ -8811,6 +9313,13 @@ function bindRecipeVersionModalEvents() {
                     id
                 );
 
+                break;
+              case "delete":
+
+                deleteRecipe(
+                    id
+                );
+            
                 break;
 
 
