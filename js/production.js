@@ -3557,7 +3557,489 @@ async function loadBatchActualIngredients(
     return mergedRows;
 
 }
+/* =========================================================
+   SAVE ACTUAL INGREDIENTS
+========================================================= */
 
+async function saveBatchActualIngredients(){
+
+    /*
+     * =====================================================
+     * VALIDASI ACTIVE BATCH
+     * =====================================================
+     */
+
+    if(
+        !activeDetailBatch ||
+        !activeDetailBatch.id
+    ){
+
+        alert(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * GET SUPABASE
+     * =====================================================
+     */
+
+    const supabase =
+        await waitForProductionSupabase();
+
+
+    /*
+     * =====================================================
+     * GET FORM ROWS
+     * =====================================================
+     */
+
+    const rows =
+        document.querySelectorAll(
+            ".production-actual-ingredient-row"
+        );
+
+
+    if(!rows.length){
+
+        alert(
+            "Tidak ada bahan yang dapat disimpan."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * PREPARE PAYLOAD
+     * =====================================================
+     */
+
+    const payload = [];
+
+
+    for(
+    const row of rows
+){
+
+    const recipeIngredientId =
+        row.dataset.recipeIngredientId;
+
+
+    const ingredientId =
+        row.dataset.ingredientId;
+
+
+    const formulaQuantity =
+        row.dataset.formulaQuantity;
+
+
+    const formulaUnitId =
+        row.dataset.formulaUnitId;
+
+
+    const actualInput =
+        row.querySelector(
+            ".production-actual-quantity"
+        );
+
+
+    const notesInput =
+        row.querySelector(
+            ".production-actual-notes"
+        );
+
+
+    /*
+     * -------------------------------------------------
+     * ACTUAL QUANTITY
+     * -------------------------------------------------
+     */
+
+    const rawActual =
+        actualInput?.value
+            ?.trim() ||
+        "";
+
+
+    let actualQuantity =
+        null;
+
+
+    if(rawActual !== ""){
+
+        const normalized =
+            rawActual
+                .replace(
+                    /\s/g,
+                    ""
+                )
+                .replace(
+                    /,/g,
+                    "."
+                );
+
+
+        const parsed =
+            Number(
+                normalized
+            );
+
+
+        if(
+            !Number.isFinite(
+                parsed
+            ) ||
+            parsed < 0
+        ){
+
+            throw new Error(
+                "Quantity actual tidak valid."
+            );
+
+        }
+
+
+        actualQuantity =
+            parsed;
+
+    }
+
+
+    /*
+     * -------------------------------------------------
+     * NOTES
+     * -------------------------------------------------
+     */
+
+    const notes =
+        notesInput?.value
+            ?.trim() ||
+        null;
+
+
+    /*
+     * -------------------------------------------------
+     * PAYLOAD
+     * -------------------------------------------------
+     */
+
+    payload.push({
+
+        batch_id:
+            activeDetailBatch.id,
+
+        recipe_ingredient_id:
+            recipeIngredientId,
+
+        ingredient_id:
+            ingredientId,
+
+        formula_quantity:
+            Number(
+                formulaQuantity
+            ) || 0,
+
+        formula_unit_id:
+            formulaUnitId ||
+            null,
+
+        actual_quantity:
+            actualQuantity,
+
+        actual_unit_id:
+            formulaUnitId ||
+            null,
+
+        notes:
+            notes,
+
+        updated_at:
+            new Date().toISOString()
+
+    });
+
+}
+
+            /*
+             * -------------------------------------------------
+             * ACTUAL QUANTITY
+             * -------------------------------------------------
+             */
+
+            const rawActual =
+                actualInput?.value
+                    ?.trim() ||
+                "";
+
+
+            let actualQuantity =
+                null;
+
+
+            if(rawActual !== ""){
+
+                const normalized =
+                    rawActual
+                        .replace(
+                            /\s/g,
+                            ""
+                        )
+                        .replace(
+                            /,/g,
+                            "."
+                        );
+
+
+                const parsed =
+                    Number(
+                        normalized
+                    );
+
+
+                if(
+                    !Number.isFinite(
+                        parsed
+                    ) ||
+                    parsed < 0
+                ){
+
+                    throw new Error(
+                        "Quantity actual tidak valid."
+                    );
+
+                }
+
+
+                actualQuantity =
+                    parsed;
+
+            }
+
+
+            /*
+             * -------------------------------------------------
+             * NOTES
+             * -------------------------------------------------
+             */
+
+            const notes =
+                notesInput?.value
+                    ?.trim() ||
+                null;
+
+
+            /*
+             * -------------------------------------------------
+             * PAYLOAD
+             * -------------------------------------------------
+             */
+
+            payload.push({
+
+                batch_id:
+                    activeDetailBatch.id,
+
+                recipe_ingredient_id:
+                    recipeIngredientId,
+
+                ingredient_id:
+                    ingredientId,
+
+                formula_quantity:
+                    Number(
+                        formulaQuantity
+                    ) || 0,
+
+                formula_unit_id:
+                    formulaUnitId ||
+                    null,
+
+                actual_quantity:
+                    actualQuantity,
+
+                /*
+                 * Untuk tahap ini actual unit
+                 * mengikuti unit formula.
+                 */
+
+                actual_unit_id:
+                    formulaUnitId ||
+                    null,
+
+                notes:
+                    notes,
+
+                updated_at:
+                    new Date().toISOString()
+
+            });
+
+        }
+    );
+
+
+    /*
+     * =====================================================
+     * GET SAVE BUTTON
+     * =====================================================
+     */
+
+    const saveButton =
+        document.getElementById(
+            "saveActualIngredientsBtn"
+        );
+
+
+    const originalButtonHtml =
+        saveButton
+            ? saveButton.innerHTML
+            : "";
+
+
+    if(saveButton){
+
+        saveButton.disabled =
+            true;
+
+        saveButton.innerHTML = `
+            <span class="production-inline-spinner"></span>
+            Menyimpan...
+        `;
+
+    }
+
+
+    try{
+
+        /*
+         * =================================================
+         * UPSERT
+         * =================================================
+         */
+
+        const {
+            error
+        } = await supabase
+
+            .from(
+                "batch_ingredients"
+            )
+
+            .upsert(
+                payload,
+                {
+                    onConflict:
+                        "batch_id,recipe_ingredient_id"
+                }
+            );
+
+
+        if(error){
+
+            console.error(
+                "Save batch ingredients error:",
+                error
+            );
+
+            throw error;
+
+        }
+
+
+        /*
+         * =================================================
+         * SUCCESS
+         * =================================================
+         */
+
+        if(saveButton){
+
+            saveButton.innerHTML = `
+                <i data-lucide="check"></i>
+                Tersimpan
+            `;
+
+        }
+
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+
+        /*
+         * Kembalikan tombol setelah beberapa saat.
+         */
+
+        setTimeout(
+            () => {
+
+                if(
+                    saveButton &&
+                    document.body.contains(
+                        saveButton
+                    )
+                ){
+
+                    saveButton.disabled =
+                        false;
+
+                    saveButton.innerHTML =
+                        originalButtonHtml;
+
+                    if(window.lucide){
+
+                        lucide.createIcons();
+
+                    }
+
+                }
+
+            },
+            1500
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU Save Actual Ingredients Error:",
+            error
+        );
+
+
+        if(saveButton){
+
+            saveButton.disabled =
+                false;
+
+            saveButton.innerHTML =
+                originalButtonHtml;
+
+        }
+
+
+        alert(
+            getErrorMessage(
+                error
+            ) ||
+            "Gagal menyimpan actual ingredients."
+        );
+
+    }
+
+}
 /* =========================================================
    RECIPE PREPARATION RENDER
 ========================================================= */
@@ -3572,16 +4054,24 @@ function renderBatchRecipePreparation(
             "detailPreparationLoading"
         );
 
+
     const errorBox =
         document.getElementById(
             "detailPreparationError"
         );
+
 
     const ingredientsContainer =
         document.getElementById(
             "detailPreparationIngredients"
         );
 
+
+    /*
+     * =====================================================
+     * RESET
+     * =====================================================
+     */
 
     if(loading){
 
@@ -3614,14 +4104,21 @@ function renderBatchRecipePreparation(
      * =====================================================
      */
 
-    if(!Array.isArray(rows) || !rows.length){
+    if(
+        !Array.isArray(rows) ||
+        !rows.length
+    ){
 
         ingredientsContainer.innerHTML = `
             <div class="production-preparation-empty">
+
                 <i data-lucide="package-open"></i>
 
                 <div>
-                    <strong>Formula belum tersedia</strong>
+
+                    <strong>
+                        Formula belum tersedia
+                    </strong>
 
                     <span>
                         Recipe Version V${escapeHtml(
@@ -3630,19 +4127,24 @@ function renderBatchRecipePreparation(
                         )}
                         belum memiliki bahan.
                     </span>
+
                 </div>
+
             </div>
         `;
+
 
         ingredientsContainer.classList.remove(
             "hidden"
         );
+
 
         if(window.lucide){
 
             lucide.createIcons();
 
         }
+
 
         return;
 
@@ -3651,7 +4153,7 @@ function renderBatchRecipePreparation(
 
     /*
      * =====================================================
-     * HEADER
+     * VERSION
      * =====================================================
      */
 
@@ -3663,7 +4165,261 @@ function renderBatchRecipePreparation(
 
     /*
      * =====================================================
-     * TABLE
+     * FORMULA TABLE
+     * =====================================================
+     */
+
+    const formulaRows =
+        rows
+            .map(
+                (
+                    item,
+                    index
+                ) => {
+
+                    const ingredient =
+                        item.ingredient ||
+                        {};
+
+                    const unit =
+                        item.unit ||
+                        {};
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        ingredient.name ||
+                                        "-"
+                                    )}
+                                </strong>
+
+                            </td>
+
+                            <td>
+
+                                <span class="production-ingredient-code">
+                                    ${escapeHtml(
+                                        ingredient.code ||
+                                        "-"
+                                    )}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        formatProductionNumber(
+                                            item.quantity
+                                        )
+                                    )}
+                                </strong>
+
+                            </td>
+
+                            <td>
+
+                                ${escapeHtml(
+                                    unit.code ||
+                                    unit.name ||
+                                    "-"
+                                )}
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    /*
+     * =====================================================
+     * ACTUAL ROWS
+     * =====================================================
+     */
+
+    const actualRows =
+        rows
+            .map(
+                (
+                    item,
+                    index
+                ) => {
+
+                    const ingredient =
+                        item.ingredient ||
+                        {};
+
+                    const unit =
+                        item.unit ||
+                        {};
+
+                    const actual =
+                        item.actual ||
+                        {};
+
+
+                    const actualValue =
+                        actual.actual_quantity !== null &&
+                        actual.actual_quantity !== undefined
+                            ? actual.actual_quantity
+                            : "";
+
+
+                    const notesValue =
+                        actual.notes ||
+                        "";
+
+
+                    return `
+
+                        <div
+                            class="production-actual-ingredient-row"
+                            data-recipe-ingredient-id="${escapeHtml(
+                                item.id ||
+                                ""
+                            )}"
+                            data-ingredient-id="${escapeHtml(
+                                item.ingredient_id ||
+                                ""
+                            )}"
+                            data-formula-quantity="${escapeHtml(
+                                item.quantity ??
+                                "0"
+                            )}"
+                            data-formula-unit-id="${escapeHtml(
+                                item.unit_id ||
+                                ""
+                            )}"
+                        >
+
+                            <div class="production-actual-ingredient-info">
+
+                                <div class="production-actual-ingredient-number">
+                                    ${index + 1}
+                                </div>
+
+
+                                <div class="production-actual-ingredient-name">
+
+                                    <strong>
+                                        ${escapeHtml(
+                                            ingredient.name ||
+                                            "-"
+                                        )}
+                                    </strong>
+
+                                    <span>
+                                        ${escapeHtml(
+                                            ingredient.code ||
+                                            "-"
+                                        )}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="production-actual-ingredient-formula">
+
+                                <span class="production-actual-label">
+                                    Formula
+                                </span>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        formatProductionNumber(
+                                            item.quantity
+                                        )
+                                    )}
+                                    ${escapeHtml(
+                                        unit.code ||
+                                        unit.name ||
+                                        ""
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="production-actual-ingredient-input">
+
+                                <label>
+                                    Actual
+                                </label>
+
+                                <div class="production-actual-input-group">
+
+                                    <input
+                                        type="number"
+                                        class="production-actual-quantity"
+                                        min="0"
+                                        step="any"
+                                        inputmode="decimal"
+                                        value="${escapeHtml(
+                                            actualValue
+                                        )}"
+                                        placeholder="0"
+                                    >
+
+                                    <span>
+                                        ${escapeHtml(
+                                            unit.code ||
+                                            unit.name ||
+                                            ""
+                                        )}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="production-actual-ingredient-notes">
+
+                                <label>
+                                    Catatan
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="production-actual-notes"
+                                    value="${escapeHtml(
+                                        notesValue
+                                    )}"
+                                    placeholder="Opsional"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    /*
+     * =====================================================
+     * FINAL HTML
      * =====================================================
      */
 
@@ -3685,6 +4441,15 @@ function renderBatchRecipePreparation(
 
             </div>
 
+        </div>
+
+
+        <!-- ===============================================
+             FORMULA
+        ================================================ -->
+
+        <div class="production-preparation-subtitle">
+            Formula Recipe
         </div>
 
 
@@ -3723,80 +4488,7 @@ function renderBatchRecipePreparation(
 
                 <tbody>
 
-                    ${rows
-                        .map(
-                            (
-                                item,
-                                index
-                            ) => {
-
-                                const ingredient =
-                                    item.ingredient ||
-                                    {};
-
-                                const unit =
-                                    item.unit ||
-                                    {};
-
-                                return `
-
-                                    <tr>
-
-                                        <td>
-                                            ${index + 1}
-                                        </td>
-
-                                        <td>
-
-                                            <strong>
-                                                ${escapeHtml(
-                                                    ingredient.name ||
-                                                    "-"
-                                                )}
-                                            </strong>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="production-ingredient-code">
-                                                ${escapeHtml(
-                                                    ingredient.code ||
-                                                    "-"
-                                                )}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <strong>
-                                                ${escapeHtml(
-                                                    formatProductionNumber(
-                                                        item.quantity
-                                                    )
-                                                )}
-                                            </strong>
-
-                                        </td>
-
-                                        <td>
-
-                                            ${escapeHtml(
-                                                unit.code ||
-                                                unit.name ||
-                                                "-"
-                                            )}
-
-                                        </td>
-
-                                    </tr>
-
-                                `;
-
-                            }
-                        )
-                        .join("")}
+                    ${formulaRows}
 
                 </tbody>
 
@@ -3804,13 +4496,103 @@ function renderBatchRecipePreparation(
 
         </div>
 
+
+        <!-- ===============================================
+             ACTUAL INGREDIENTS
+        ================================================ -->
+
+        <div class="production-preparation-actual">
+
+            <div class="production-preparation-actual-header">
+
+                <div>
+
+                    <strong>
+                        Actual Ingredients
+                    </strong>
+
+                    <span>
+                        Catat jumlah bahan yang benar-benar digunakan
+                        pada batch ini.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="production-actual-ingredients-list">
+
+                ${actualRows}
+
+            </div>
+
+
+            <div class="production-actual-actions">
+
+                <button
+                    type="button"
+                    class="production-btn production-btn-primary"
+                    id="saveActualIngredientsBtn"
+                >
+
+                    <i data-lucide="save"></i>
+
+                    <span>
+                        Simpan Actual Ingredients
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
     `;
 
+
+    /*
+     * =====================================================
+     * SHOW
+     * =====================================================
+     */
 
     ingredientsContainer.classList.remove(
         "hidden"
     );
 
+
+    /*
+     * =====================================================
+     * SAVE BUTTON EVENT
+     * =====================================================
+     */
+
+    const saveButton =
+        document.getElementById(
+            "saveActualIngredientsBtn"
+        );
+
+
+    if(saveButton){
+
+        saveButton.addEventListener(
+            "click",
+            async () => {
+
+                await saveBatchActualIngredients();
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * LUCIDE
+     * =====================================================
+     */
 
     if(window.lucide){
 
