@@ -22,6 +22,8 @@ let activeStatusFilter = "all";
 
 let activeDetailBatch = null;
 
+let activeDetailInitialQC = null;
+
 
 /* =========================================================
    DOM READY
@@ -708,6 +710,68 @@ function bindProductionEvents(){
 
     }
 
+       /* =====================================================
+       INITIAL QC EVENTS
+    ===================================================== */
+
+    const openInitialQCButton =
+        document.getElementById(
+            "openInitialQCBtn"
+        );
+
+    if(openInitialQCButton){
+
+        openInitialQCButton.addEventListener(
+            "click",
+            openInitialQCModal
+        );
+
+    }
+
+
+    const closeInitialQCButton =
+        document.getElementById(
+            "closeInitialQCBtn"
+        );
+
+    if(closeInitialQCButton){
+
+        closeInitialQCButton.addEventListener(
+            "click",
+            closeInitialQCModal
+        );
+
+    }
+
+
+    const cancelInitialQCButton =
+        document.getElementById(
+            "cancelInitialQCBtn"
+        );
+
+    if(cancelInitialQCButton){
+
+        cancelInitialQCButton.addEventListener(
+            "click",
+            closeInitialQCModal
+        );
+
+    }
+
+
+    const initialQCForm =
+        document.getElementById(
+            "initialQCForm"
+        );
+
+    if(initialQCForm){
+
+        initialQCForm.addEventListener(
+            "submit",
+            saveInitialQC
+        );
+
+    }
 
     document.addEventListener(
         "keydown",
@@ -2664,6 +2728,118 @@ async function startBatchF1(
 
     }
 
+       /* =====================================================
+       INITIAL QC GATE
+       Batch wajib memiliki Initial QC PASS
+       sebelum boleh masuk F1.
+    ===================================================== */
+
+    const {
+        data: latestInitialQC,
+        error: initialQCError
+    } = await supabase
+
+        .from(
+            "quality_checks"
+        )
+
+        .select(`
+            id,
+            batch_id,
+            checked_at,
+            stage,
+            decision
+        `)
+
+        .eq(
+            "batch_id",
+            batchId
+        )
+
+        .eq(
+            "stage",
+            "production"
+        )
+
+        .order(
+            "checked_at",
+            {
+                ascending: false
+            }
+        )
+
+        .limit(
+            1
+        )
+
+        .maybeSingle();
+
+
+    if(initialQCError){
+
+        alert(
+            `Gagal memeriksa Initial QC.\n\n${getErrorMessage(
+                initialQCError
+            )}`
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !latestInitialQC ||
+        String(
+            latestInitialQC.decision || ""
+        ).toLowerCase() !==
+        "passed"
+    ){
+
+        alert(
+            `Batch ${batch.batch_code || "-"} belum READY F1.\n\n` +
+            `Initial QC Production harus PASS — Siap F1 terlebih dahulu.`
+        );
+
+
+        /*
+         * Jika detail batch sedang terbuka,
+         * langsung buka modal Initial QC.
+         */
+
+        const detailBatch =
+            productionBatches.find(
+                item =>
+                    String(
+                        item.id
+                    ) ===
+                    String(
+                        batchId
+                    )
+            );
+
+
+        if(detailBatch){
+
+            openBatchDetail(
+                detailBatch
+            );
+
+            setTimeout(
+                () => {
+
+                    openInitialQCModal();
+
+                },
+                100
+            );
+
+        }
+
+        return;
+
+    }
+
 
     /*
      * Cari tombol yang sedang digunakan.
@@ -2907,6 +3083,923 @@ function closeBatchDetailModal(){
 
 }
 
+/* =========================================================
+   INITIAL QC
+========================================================= */
+
+async function loadBatchInitialQC(
+    batch
+){
+
+    const statusElement =
+        document.getElementById(
+            "detailInitialQCStatus"
+        );
+
+    const decisionElement =
+        document.getElementById(
+            "detailInitialQCDecision"
+        );
+
+    const metaElement =
+        document.getElementById(
+            "detailInitialQCMeta"
+        );
+
+
+    if(!batch){
+
+        return;
+
+    }
+
+
+    activeDetailInitialQC = null;
+
+
+    if(statusElement){
+
+        statusElement.textContent =
+            "Memuat...";
+
+    }
+
+
+    if(decisionElement){
+
+        decisionElement.textContent =
+            "—";
+
+    }
+
+
+    if(metaElement){
+
+        metaElement.textContent =
+            "Mengambil Initial QC terakhir...";
+
+    }
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                decision,
+                operator_name,
+                notes
+            `)
+
+            .eq(
+                "batch_id",
+                batch.id
+            )
+
+            .eq(
+                "stage",
+                "production"
+            )
+
+            .order(
+                "checked_at",
+                {
+                    ascending: false
+                }
+            )
+
+            .limit(
+                1
+            )
+
+            .maybeSingle();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        activeDetailInitialQC =
+            data || null;
+
+
+        renderInitialQCStatus(
+            data
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Load Initial QC Error:",
+            error
+        );
+
+
+        if(statusElement){
+
+            statusElement.textContent =
+                "Gagal memuat";
+
+        }
+
+
+        if(decisionElement){
+
+            decisionElement.textContent =
+                "ERROR";
+
+        }
+
+
+        if(metaElement){
+
+            metaElement.textContent =
+                getErrorMessage(
+                    error
+                );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER INITIAL QC STATUS
+========================================================= */
+
+function renderInitialQCStatus(
+    qc
+){
+
+    const statusElement =
+        document.getElementById(
+            "detailInitialQCStatus"
+        );
+
+    const decisionElement =
+        document.getElementById(
+            "detailInitialQCDecision"
+        );
+
+    const metaElement =
+        document.getElementById(
+            "detailInitialQCMeta"
+        );
+
+
+    if(!qc){
+
+        if(statusElement){
+
+            statusElement.textContent =
+                "Belum diperiksa";
+
+        }
+
+
+        if(decisionElement){
+
+            decisionElement.textContent =
+                "—";
+
+        }
+
+
+        if(metaElement){
+
+            metaElement.textContent =
+                "Initial QC belum dilakukan untuk batch ini.";
+
+        }
+
+        return;
+
+    }
+
+
+    const decision =
+        String(
+            qc.decision || ""
+        )
+            .toLowerCase();
+
+
+    const decisionLabels = {
+
+        passed:
+            "PASS",
+
+        not_ready:
+            "NOT READY",
+
+        hold:
+            "HOLD"
+
+    };
+
+
+    const decisionLabel =
+        decisionLabels[
+            decision
+        ] ||
+        decision ||
+        "—";
+
+
+    if(decisionElement){
+
+        decisionElement.textContent =
+            decisionLabel;
+
+    }
+
+
+    if(statusElement){
+
+        if(
+            decision ===
+            "passed"
+        ){
+
+            statusElement.textContent =
+                "PASS — SIAP F1";
+
+        }
+        else if(
+            decision ===
+            "hold"
+        ){
+
+            statusElement.textContent =
+                "HOLD";
+
+        }
+        else if(
+            decision ===
+            "not_ready"
+        ){
+
+            statusElement.textContent =
+                "BELUM READY F1";
+
+        }
+        else{
+
+            statusElement.textContent =
+                "Perlu diperiksa";
+
+        }
+
+    }
+
+
+    const checkedAt =
+        qc.checked_at
+            ? new Date(
+                qc.checked_at
+            )
+            : null;
+
+
+    const checkedAtLabel =
+        checkedAt &&
+        !Number.isNaN(
+            checkedAt.getTime()
+        )
+
+            ? new Intl.DateTimeFormat(
+                "id-ID",
+                {
+                    dateStyle:
+                        "medium",
+
+                    timeStyle:
+                        "short"
+                }
+            )
+                .format(
+                    checkedAt
+                )
+
+            : "-";
+
+
+    const operator =
+        qc.operator_name ||
+        "-";
+
+
+    if(metaElement){
+
+        metaElement.textContent =
+            `Diperiksa ${checkedAtLabel} • Operator: ${operator}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   OPEN INITIAL QC MODAL
+========================================================= */
+
+function openInitialQCModal(){
+
+    const batch =
+        activeDetailBatch;
+
+
+    if(!batch){
+
+        alert(
+            "Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(!modal){
+
+        return;
+
+    }
+
+
+    setInputValue(
+        "initialQCBatchId",
+        batch.id
+    );
+
+
+    setInputValue(
+        "initialQCBatchCode",
+        batch.batch_code || ""
+    );
+
+
+    const checkedAt =
+        document.getElementById(
+            "initialQCCheckedAt"
+        );
+
+
+    if(checkedAt){
+
+        const now =
+            new Date();
+
+
+        const local =
+            new Date(
+                now.getTime() -
+                now.getTimezoneOffset() *
+                60000
+            )
+                .toISOString()
+                .slice(
+                    0,
+                    16
+                );
+
+
+        checkedAt.value =
+            local;
+
+    }
+
+
+    const decision =
+        document.getElementById(
+            "initialQCDecision"
+        );
+
+
+    if(decision){
+
+        decision.value =
+            activeDetailInitialQC
+                ?.decision ||
+            "";
+
+    }
+
+
+    setInputValue(
+        "initialQCPh",
+        activeDetailInitialQC
+            ?.ph ??
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCBrix",
+        activeDetailInitialQC
+            ?.brix ??
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCTemperature",
+        activeDetailInitialQC
+            ?.temperature_c ??
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCVolume",
+        activeDetailInitialQC
+            ?.volume ??
+        batch.planned_volume ??
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCOperator",
+        activeDetailInitialQC
+            ?.operator_name ||
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCNotes",
+        activeDetailInitialQC
+            ?.notes ||
+        ""
+    );
+
+
+    clearInitialQCError();
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "production-modal-open"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   INPUT HELPER
+========================================================= */
+
+function setInputValue(
+    id,
+    value
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if(element){
+
+        element.value =
+            value ??
+            "";
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE INITIAL QC MODAL
+========================================================= */
+
+function closeInitialQCModal(){
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    document.body.classList.remove(
+        "production-modal-open"
+    );
+
+}
+
+
+/* =========================================================
+   INITIAL QC ERROR
+========================================================= */
+
+function clearInitialQCError(){
+
+    document
+        .getElementById(
+            "initialQCError"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    const message =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(message){
+
+        message.textContent =
+            "";
+
+    }
+
+}
+
+
+function showInitialQCError(
+    message
+){
+
+    const box =
+        document.getElementById(
+            "initialQCError"
+        );
+
+    const messageElement =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(messageElement){
+
+        messageElement.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    box?.classList.remove(
+        "hidden"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   OPTIONAL NUMBER
+========================================================= */
+
+function getProductionOptionalNumber(
+    id
+){
+
+    const value =
+        document.getElementById(
+            id
+        )?.value;
+
+
+    if(
+        value === "" ||
+        value === null ||
+        value === undefined
+    ){
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    return Number.isFinite(
+        number
+    )
+        ? number
+        : null;
+
+}
+
+
+/* =========================================================
+   SAVE INITIAL QC
+========================================================= */
+
+async function saveInitialQC(
+    event
+){
+
+    event.preventDefault();
+
+    clearInitialQCError();
+
+
+    const batchId =
+        document.getElementById(
+            "initialQCBatchId"
+        )?.value;
+
+
+    const decision =
+        document.getElementById(
+            "initialQCDecision"
+        )?.value;
+
+
+    if(!batchId){
+
+        showInitialQCError(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    if(!decision){
+
+        showInitialQCError(
+            "Decision Initial QC wajib dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveInitialQCBtn"
+        );
+
+
+    const checkedAtRaw =
+        document.getElementById(
+            "initialQCCheckedAt"
+        )?.value;
+
+
+    let checkedAt =
+        new Date();
+
+
+    if(checkedAtRaw){
+
+        const parsed =
+            new Date(
+                checkedAtRaw
+            );
+
+
+        if(
+            !Number.isNaN(
+                parsed.getTime()
+            )
+        ){
+
+            checkedAt =
+                parsed;
+
+        }
+
+    }
+
+
+    const payload = {
+
+        batch_id:
+            batchId,
+
+        checked_at:
+            checkedAt.toISOString(),
+
+        stage:
+            "production",
+
+        ph:
+            getProductionOptionalNumber(
+                "initialQCPh"
+            ),
+
+        brix:
+            getProductionOptionalNumber(
+                "initialQCBrix"
+            ),
+
+        temperature_c:
+            getProductionOptionalNumber(
+                "initialQCTemperature"
+            ),
+
+        volume:
+            getProductionOptionalNumber(
+                "initialQCVolume"
+            ),
+
+        decision:
+            decision,
+
+        operator_name:
+            document
+                .getElementById(
+                    "initialQCOperator"
+                )
+                ?.value
+                ?.trim() ||
+            null,
+
+        notes:
+            document
+                .getElementById(
+                    "initialQCNotes"
+                )
+                ?.value
+                ?.trim() ||
+            null
+
+    };
+
+
+    setButtonLoading(
+        saveButton,
+        true,
+        "Menyimpan..."
+    );
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .insert(
+                payload
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                decision,
+                operator_name,
+                notes
+            `)
+
+            .single();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        activeDetailInitialQC =
+            data;
+
+
+        renderInitialQCStatus(
+            data
+        );
+
+
+        closeInitialQCModal();
+
+
+        console.log(
+            "MERAMU: Initial QC berhasil disimpan.",
+            data
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Save Initial QC Error:",
+            error
+        );
+
+
+        showInitialQCError(
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+    finally{
+
+        if(saveButton){
+
+            saveButton.disabled =
+                false;
+
+            saveButton.innerHTML =
+                `
+                    <i data-lucide="save"></i>
+                    <span>
+                        Simpan Initial QC
+                    </span>
+                `;
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    }
+
+}
 
 /* =========================================================
    DETAIL
@@ -2926,6 +4019,8 @@ function openBatchDetail(
     activeDetailBatch =
         batch;
 
+    activeDetailInitialQC =
+        null;
 
     setText(
         "batchDetailTitle",
@@ -3101,7 +4196,14 @@ function openBatchDetail(
 
     }
 
-}
+
+    /* =====================================================
+       LOAD INITIAL QC
+    ===================================================== */
+
+    loadBatchInitialQC(
+        batch
+    );
 
 
 /* =========================================================
