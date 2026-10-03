@@ -1705,25 +1705,15 @@ async function handleCreateBatch(
         }
 
 
-        if(data){
+await loadBatches(supabase);
 
-            productionBatches =
-                [
-                    data,
-                    ...productionBatches
-                ];
+closeCreateBatchModal();
 
-        }
+renderProduction();
 
-
-        closeCreateBatchModal();
-
-        renderProduction();
-
-
-        alert(
-            "Batch berhasil dibuat."
-        );
+alert(
+    "Batch berhasil dibuat."
+);
 
 
     }
