@@ -1,477 +1,297 @@
 /* =========================================================
-   MERAMU F2 → HARVEST
-   QC F2 PASS → READY HARVEST
+   MERAMU P5 — F2 → HARVEST
+   ---------------------------------------------------------
+   Lifecycle:
+   1. QC F2 PASS disimpan oleh batch-quality-check.js.
+   2. Event meramu:quality-check-saved diterima di sini.
+   3. Pastikan bottling sudah completed.
+   4. Update batches.current_stage = harvest.
+   5. Simpan f2_completed_at.
+   6. Refresh detail/timeline.
+
+   Tidak memakai RPC yang tidak ada di project ZIP.
 ========================================================= */
 
 (function(){
-
     "use strict";
 
+    function getElement(id){
+        return document.getElementById(id);
+    }
 
     function getBatchCode(){
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
+        const params = new URLSearchParams(
+            window.location.search
+        );
 
         return (
             params.get("id") ||
             params.get("batch") ||
-            "KB-022"
+            ""
         ).trim();
-
     }
 
+    async function waitForSupabase(){
+        for(let i = 0; i < 100; i++){
 
-    function getElement(id){
+            if(
+                window.supabaseClient &&
+                typeof window.supabaseClient.from === "function"
+            ){
+                return window.supabaseClient;
+            }
 
-        return document.getElementById(id);
+            if(
+                window.meramuSupabase &&
+                typeof window.meramuSupabase.from === "function"
+            ){
+                return window.meramuSupabase;
+            }
 
-    }
-
-
-    function getOptionalNumber(id){
-
-        const value =
-            getElement(id)?.value?.trim();
-
-        if(value === ""){
-
-            return null;
-
+            await new Promise(
+                resolve => setTimeout(resolve,100)
+            );
         }
 
-        const number =
-            Number(value);
-
-        return Number.isFinite(number)
-            ? number
-            : null;
-
+        throw new Error("Supabase belum siap.");
     }
 
-
     function normalizeDecision(value){
-
         const decision =
             String(value || "")
                 .toLowerCase()
                 .trim();
 
-        /*
-           Support dua versi UI:
-
-           pass   → passed
-           passed → passed
-        */
-
-        if(
+        return (
             decision === "pass" ||
             decision === "passed"
-        ){
+        )
+            ? "passed"
+            : decision;
+    }
 
-            return "passed";
+    async function getCurrentBatch(
+        supabase,
+        batchCode
+    ){
+        const {
+            data,
+            error
+        } = await supabase
+            .from("batches")
+            .select(`
+                id,
+                batch_code,
+                current_stage,
+                status,
+                f2_started_at,
+                f2_completed_at
+            `)
+            .eq("batch_code",batchCode)
+            .maybeSingle();
 
+        if(error){
+            throw error;
         }
 
-        return decision;
-
-    }
-
-
-    function normalizeStage(value){
-
-        return String(value || "")
-            .toLowerCase()
-            .replace(" fermentasi","")
-            .trim();
-
-    }
-
-
-    async function waitForSupabase(){
-
-        for(let attempt = 0; attempt < 50; attempt++){
-
-            if(window.supabaseClient){
-
-                return window.supabaseClient;
-
-            }
-
-            await new Promise(
-                resolve =>
-                    setTimeout(resolve,100)
+        if(!data){
+            throw new Error(
+                `Batch ${batchCode} tidak ditemukan.`
             );
-
         }
 
-        throw new Error(
-            "Supabase belum siap."
-        );
-
+        return data;
     }
 
+    async function ensureBottlingCompleted(
+        supabase,
+        batchId
+    ){
+        const {
+            data,
+            error
+        } = await supabase
+            .from("batch_bottling")
+            .select(
+                "id,batch_id,bottling_status,actual_bottles,output_volume_l"
+            )
+            .eq("batch_id",batchId)
+            .eq("bottling_status","completed")
+            .maybeSingle();
 
-    async function handleF2Pass(event){
-
-        const form =
-            getElement("qualityCheckForm");
-
-        if(!form){
-
-            return;
-
+        if(error){
+            throw error;
         }
 
+        if(!data){
+            throw new Error(
+                "Bottling belum selesai. " +
+                "Simpan Actual Bottling terlebih dahulu sebelum QC F2 PASS."
+            );
+        }
+
+        if(
+            Number(data.actual_bottles || 0) <= 0 ||
+            Number(data.output_volume_l || 0) <= 0
+        ){
+            throw new Error(
+                "Data Bottling belum valid. " +
+                "Actual botol dan output volume harus lebih dari 0."
+            );
+        }
+
+        return data;
+    }
+
+    async function handleQualityCheckSaved(event){
+        const detail = event?.detail || {};
 
         const stage =
-            normalizeStage(
-                getElement("qcStage")?.value
-            );
-
+            String(
+                detail.qualityCheck?.stage || ""
+            )
+                .toLowerCase()
+                .trim();
 
         const decision =
             normalizeDecision(
-                getElement("qcDecision")?.value
+                detail.decision ||
+                detail.qualityCheck?.decision
             );
-
-
-        /*
-           Hanya intercept:
-
-           F2 + PASS
-
-           Selain itu biarkan
-           batch-quality-check.js
-           menangani sendiri.
-        */
 
         if(
             stage !== "f2" ||
             decision !== "passed"
         ){
-
             return;
-
         }
 
+        const batchCode =
+            String(
+                detail.batchCode ||
+                getBatchCode()
+            ).trim();
 
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-
-
-        if(!form.checkValidity()){
-
-            form.reportValidity();
-
+        if(!batchCode){
+            console.error(
+                "MERAMU P5: batch code tidak tersedia saat transisi F2 → Harvest."
+            );
             return;
-
         }
-
-
-        const saveButton =
-            getElement("saveQualityCheck");
-
-
-        const originalText =
-            saveButton
-                ?.textContent
-                ?.trim() ||
-            "Simpan QC";
-
-
-        if(saveButton){
-
-            saveButton.disabled = true;
-
-            saveButton.textContent =
-                "Memproses F2...";
-
-        }
-
 
         try{
-
             const supabase =
                 await waitForSupabase();
 
-
-            const batchCode =
-                getBatchCode();
-
-
-            /* =========================================
-               FIND BATCH
-            ========================================== */
-
-            const {
-                data: batch,
-                error: batchError
-            } = await supabase
-                .from("batches")
-                .select("id,batch_code,current_stage,status")
-                .eq(
-                    "batch_code",
+            const batch =
+                await getCurrentBatch(
+                    supabase,
                     batchCode
-                )
-                .maybeSingle();
-
-
-            if(batchError){
-
-                throw batchError;
-
-            }
-
-
-            if(!batch){
-
-                throw new Error(
-                    `Batch ${batchCode} tidak ditemukan.`
                 );
 
-            }
-
-
-            /* =========================================
-               VALIDATE F2
-            ========================================== */
-
+            /*
+             * Safety gate:
+             * hanya F2 yang boleh masuk Harvest.
+             */
             if(
                 String(batch.current_stage || "")
                     .toLowerCase()
                     .trim() !== "f2"
             ){
-
-                throw new Error(
-                    `Batch ${batchCode} sudah bukan F2.`
+                console.warn(
+                    `MERAMU P5: ${batchCode} bukan lagi F2. Transisi dibatalkan.`
                 );
-
+                return;
             }
 
+            /*
+             * Safety gate:
+             * Bottling harus sudah completed.
+             */
+            await ensureBottlingCompleted(
+                supabase,
+                batch.id
+            );
 
-            /* =========================================
-               DATETIME
-            ========================================== */
-
-            const checkedAt =
-                getElement("qcCheckedAt")?.value;
-
-
-            const checkedAtIso =
-                checkedAt
-                    ? new Date(
-                        checkedAt
-                    ).toISOString()
-                    : new Date().toISOString();
-
-
-            /* =========================================
-               RPC
-            ========================================== */
+            const completedAt =
+                detail.qualityCheck?.checked_at ||
+                new Date().toISOString();
 
             const {
                 data: updatedBatch,
-                error: rpcError
-            } = await supabase.rpc(
-                "complete_meramu_f2_qc",
-                {
-
-                    p_batch_id:
-                        batch.id,
-
-                    p_checked_at:
-                        checkedAtIso,
-
-                    p_ph:
-                        getOptionalNumber(
-                            "qcPh"
-                        ),
-
-                    p_brix:
-                        getOptionalNumber(
-                            "qcBrix"
-                        ),
-
-                    p_temperature_c:
-                        getOptionalNumber(
-                            "qcTemperature"
-                        ),
-
-                    p_volume:
-                        getOptionalNumber(
-                            "qcVolume"
-                        ),
-
-                    p_aroma:
-                        getElement(
-                            "qcAroma"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_taste:
-                        getElement(
-                            "qcTaste"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_color:
-                        getElement(
-                            "qcColor"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_carbonation:
-                        getElement(
-                            "qcCarbonation"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_scoby_condition:
-                        getElement(
-                            "qcScobyCondition"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_operator_name:
-                        getElement(
-                            "qcOperator"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_reason:
-                        getElement(
-                            "qcReason"
-                        )?.value?.trim() ||
-                        null,
-
-                    p_notes:
-                        getElement(
-                            "qcNotes"
-                        )?.value?.trim() ||
-                        null
-
-                }
-            );
-
-
-            if(rpcError){
-
-                throw rpcError;
-
-            }
-
-
-            /* =========================================
-               CATAT F2 COMPLETED AT
-               RPC tetap menjadi sumber transisi stage.
-            ========================================== */
-
-            const {
-                error: completionMetaError
+                error: updateError
             } = await supabase
                 .from("batches")
                 .update({
-                    f2_completed_at: new Date().toISOString()
+                    current_stage: "harvest",
+                    status:
+                        batch.status === "cancelled"
+                            ? "cancelled"
+                            : "active",
+                    f2_completed_at: completedAt,
+                    updated_at: new Date().toISOString()
                 })
-                .eq("id", batch.id);
+                .eq("id",batch.id)
+                .eq("current_stage","f2")
+                .select(`
+                    id,
+                    batch_code,
+                    current_stage,
+                    status,
+                    f2_started_at,
+                    f2_completed_at
+                `)
+                .maybeSingle();
 
-            if(completionMetaError){
-                throw completionMetaError;
+            if(updateError){
+                throw updateError;
             }
 
-
-            console.log(
-                "MERAMU: F2 QC PASS berhasil.",
-                updatedBatch
-            );
-
-
-            /* =========================================
-               LOCAL DATA
-            ========================================== */
-
-            if(
-                window.batchDetailData &&
-                window.batchDetailData[
-                    batchCode
-                ]
-            ){
-
-                const localBatch =
-                    window.batchDetailData[
-                        batchCode
-                    ];
-
-                localBatch.stage =
-                    "harvest";
-
-                localBatch.currentStage =
-                    "harvest";
-
-                localBatch.status =
-                    "READY HARVEST";
-
-                localBatch.progress =
-                    100;
-
-                localBatch.harvestReadyAt =
-                    updatedBatch
-                        ?.harvest_ready_at ||
-                    checkedAtIso;
-
+            if(!updatedBatch){
+                throw new Error(
+                    "Batch gagal dipindahkan ke Harvest. " +
+                    "Stage mungkin sudah berubah."
+                );
             }
 
-
-            /* =========================================
-               CLOSE MODAL
-            ========================================== */
-
-            if(
-                typeof window.closeQualityCheck ===
-                "function"
-            ){
-
-                window.closeQualityCheck();
-
-            }
-
-
-            form.reset();
-
-
-            /* =========================================
-               REFRESH BATCH DETAIL
-            ========================================== */
-
+            /*
+             * Refresh semua komponen yang mengetahui stage batch.
+             */
             if(
                 typeof window.initBatchSupabase ===
                 "function"
             ){
-
                 await window.initBatchSupabase();
-
             }
-
 
             if(
                 typeof window.renderBatchDetail ===
                 "function"
             ){
-
                 window.renderBatchDetail();
-
             }
 
+            if(
+                typeof window.loadQualityCheckHistory ===
+                "function"
+            ){
+                window.loadQualityCheckHistory();
+            }
 
-            /*
-               Trigger event agar timeline,
-               history dan komponen lain
-               ikut refresh.
-            */
+            if(
+                typeof window.MERAMUF2Bottling?.load ===
+                "function"
+            ){
+                await window.MERAMUF2Bottling.load();
+            }
+
+            if(
+                window.MERAMURealtime &&
+                typeof window.MERAMURealtime.refresh ===
+                "function"
+            ){
+                window.MERAMURealtime.refresh();
+            }
 
             document.dispatchEvent(
                 new CustomEvent(
@@ -479,111 +299,59 @@
                     {
                         detail:{
                             batchCode,
-                            batch:
-                                updatedBatch
+                            batch: updatedBatch
                         }
                     }
                 )
             );
 
-
-            if(
-                window.MERAMURealtime &&
-                typeof window.MERAMURealtime.refresh ===
-                "function"
-            ){
-
-                window.MERAMURealtime.refresh();
-
-            }
-
-
             alert(
                 `QC F2 ${batchCode} PASS.\n\n` +
+                `Bottling sudah lengkap.\n` +
                 `Batch sekarang READY HARVEST.`
             );
 
-
-        }
-        catch(error){
-
+        }catch(error){
+            /*
+             * QC tetap sudah tercatat.
+             * Yang gagal hanya transisi stage.
+             * User dapat memperbaiki bottling lalu melakukan
+             * QC F2 PASS lagi.
+             */
             console.error(
-                "MERAMU: F2 → Harvest gagal.",
+                "MERAMU P5: F2 → Harvest gagal.",
                 error
             );
 
-
             alert(
-                "QC F2 gagal diproses.\n\n" +
-                (
-                    error?.message ||
-                    "Unknown error"
-                )
+                "QC F2 sudah tersimpan, tetapi batch belum dipindahkan ke Harvest.\n\n" +
+                (error?.message || error)
             );
-
         }
-        finally{
-
-            if(saveButton){
-
-                saveButton.disabled =
-                    false;
-
-                saveButton.textContent =
-                    originalText;
-
-            }
-
-        }
-
     }
-
 
     function init(){
-
-        /*
-           Capture phase sengaja digunakan
-           supaya F2 PASS ditangani di sini
-           sebelum handler QC umum.
-        */
-
         document.addEventListener(
-            "submit",
-            handleF2Pass,
-            true
+            "meramu:quality-check-saved",
+            handleQualityCheckSaved
         );
-
 
         console.log(
-            "✅ MERAMU F2 → Harvest Controller Loaded"
+            "✅ MERAMU P5 F2 → Harvest Controller Loaded"
         );
-
     }
 
-
     window.MERAMUF2Harvest = {
-
-        handle:
-            handleF2Pass
-
+        handle: handleQualityCheckSaved
     };
 
-
-    if(
-        document.readyState ===
-        "loading"
-    ){
-
+    if(document.readyState === "loading"){
         document.addEventListener(
             "DOMContentLoaded",
             init
         );
-
-    }
-    else{
-
+    }else{
         init();
-
     }
 
 })();

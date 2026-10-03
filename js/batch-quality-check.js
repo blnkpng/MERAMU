@@ -697,6 +697,62 @@
 
 
             /* -------------------------------------
+               P5 — F2 → HARVEST GATE
+
+               QC F2 PASS tidak boleh dilanjutkan
+               sebelum Actual Bottling selesai.
+            ------------------------------------- */
+
+            if(
+                String(stage).toLowerCase().trim() === "f2" &&
+                decision === "passed"
+            ){
+
+                const {
+                    data: bottling,
+                    error: bottlingError
+                } = await supabase
+                    .from("batch_bottling")
+                    .select(`
+                        id,
+                        batch_id,
+                        bottling_status,
+                        actual_bottles,
+                        output_volume_l
+                    `)
+                    .eq("batch_id",batch.id)
+                    .eq("bottling_status","completed")
+                    .maybeSingle();
+
+                if(bottlingError){
+
+                    throw bottlingError;
+
+                }
+
+                if(!bottling){
+
+                    throw new Error(
+                        "Bottling belum selesai. Simpan Actual Bottling terlebih dahulu sebelum QC F2 PASS."
+                    );
+
+                }
+
+                if(
+                    Number(bottling.actual_bottles || 0) <= 0 ||
+                    Number(bottling.output_volume_l || 0) <= 0
+                ){
+
+                    throw new Error(
+                        "Data Bottling belum valid. Actual botol dan output volume harus lebih dari 0."
+                    );
+
+                }
+
+            }
+
+
+            /* -------------------------------------
                CALCULATE NEXT TARGET
             ------------------------------------- */
 
