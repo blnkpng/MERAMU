@@ -1504,21 +1504,38 @@ async function loadTrace() {
             );
 
 
-            const response =
+            const p8Response =
                 await supabase.rpc(
-                    "get_meramu_public_trace",
+                    "get_meramu_p8_public_trace",
                     {
                         p_trace_code:
                             traceRequest.value
                     }
                 );
 
+            data = p8Response.data;
+            error = p8Response.error;
 
-            data =
-                response.data;
+            /*
+             * Backward compatibility: if this is an older
+             * finished record, keep using the existing public
+             * trace RPC.
+             */
+            if (!error && !data) {
 
-            error =
-                response.error;
+                const legacyResponse =
+                    await supabase.rpc(
+                        "get_meramu_public_trace",
+                        {
+                            p_trace_code:
+                                traceRequest.value
+                        }
+                    );
+
+                data = legacyResponse.data;
+                error = legacyResponse.error;
+
+            }
 
         }
 

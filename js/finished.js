@@ -24,6 +24,8 @@
 
     let finishedUnits = [];
 
+    let pendingAllocations = [];
+
 
     /* =====================================================
        DOM HELPER
@@ -186,6 +188,147 @@
 
 
     /* =====================================================
+       P8 — PENDING ALLOCATIONS
+    ===================================================== */
+
+    async function loadPendingAllocations() {
+
+        const supabase = getSupabaseClient();
+
+        const { data, error } = await supabase.rpc(
+            "get_meramu_p8_pending_allocations"
+        );
+
+        if (error) {
+            console.error("MERAMU P8 Pending Allocation Error:", error);
+            throw new Error(error.message || "Gagal mengambil allocation yang siap diproses.");
+        }
+
+        pendingAllocations = Array.isArray(data) ? data : [];
+        renderPendingAllocations();
+    }
+
+    function renderPendingAllocations() {
+
+        const container = $("finishedPendingAllocations");
+        const count = $("finishedPendingCount");
+
+        if (!container) return;
+
+        if (count) {
+            count.textContent = `${pendingAllocations.length} allocation`;
+        }
+
+        if (!pendingAllocations.length) {
+            container.innerHTML = `
+                <div class="finished-pending-empty">
+                    <i data-lucide="check-circle-2"></i>
+                    <strong>Semua allocation sudah diproses.</strong>
+                    <span>Tidak ada allocation yang menunggu Produk Jadi.</span>
+                </div>
+            `;
+            createIcons();
+            return;
+        }
+
+        container.innerHTML = pendingAllocations.map(item => `
+            <article class="finished-pending-card">
+                <div class="finished-pending-main">
+                    <div class="finished-pending-code">
+                        ${escapeHtml(item.allocation_code || "—")}
+                    </div>
+                    <div class="finished-pending-title">
+                        ${escapeHtml(item.product_name || "Produk")}
+                        <span>• ${escapeHtml(item.batch_code || "—")}</span>
+                    </div>
+                    <div class="finished-pending-meta">
+                        ${formatNumber(item.allocated_volume, 2)} L
+                        • ${formatNumber(item.planned_bottles, 0)} botol
+                        • ${formatNumber(item.bottle_size_ml, 0)} ml
+                        ${item.variant_name ? `• ${escapeHtml(item.variant_name)}` : ""}
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    class="finished-btn primary finished-create-btn"
+                    data-create-finished="${escapeHtml(item.id)}"
+                >
+                    <i data-lucide="package-check"></i>
+                    Buat Produk Jadi
+                </button>
+            </article>
+        `).join("");
+
+        createIcons();
+    }
+
+    async function createFinishedFromAllocation(allocationId) {
+
+        if (!allocationId) return;
+
+        const item = pendingAllocations.find(row => String(row.id) === String(allocationId));
+        if (!item) {
+            showToast("Allocation tidak ditemukan.");
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Buat Produk Jadi dari ${item.allocation_code}?\n\n` +
+            `${item.product_name || "Produk"} • ${item.batch_code}\n` +
+            `${formatNumber(item.planned_bottles, 0)} botol × ${formatNumber(item.bottle_size_ml, 0)} ml\n\n` +
+            `Setelah diproses, allocation akan ditandai COMPLETED dan batch masuk FINISHED.`
+        );
+
+        if (!confirmed) return;
+
+        const button = document.querySelector(`[data-create-finished="${CSS.escape(String(allocationId))}"]`);
+        if (button) {
+            button.disabled = true;
+            button.dataset.originalText = button.innerHTML;
+            button.textContent = "Memproses...";
+        }
+
+        try {
+            const { data, error } = await getSupabaseClient().rpc(
+                "create_meramu_p8_finished_from_allocation",
+                { p_allocation_id: allocationId }
+            );
+
+            if (error) throw error;
+
+            const created = Array.isArray(data) ? data[0] : data;
+            const code = created?.finished_code || "Finished Batch";
+
+            showToast(`${code} berhasil dibuat dari allocation ${item.allocation_code}.`);
+
+            await Promise.all([
+                loadPendingAllocations(),
+                loadFinishedBatches()
+            ]);
+
+            if (created?.id) {
+                const select = $("finishedBatchSelect");
+                if (select) {
+                    select.value = created.id;
+                    await selectFinishedBatch(created.id);
+                }
+            }
+
+        } catch (error) {
+            console.error("MERAMU P8 Create Finished:", error);
+            showToast(error?.message || "Gagal membuat Produk Jadi.");
+        } finally {
+            if (button) {
+                button.disabled = false;
+                if (button.dataset.originalText) {
+                    button.innerHTML = button.dataset.originalText;
+                }
+                createIcons();
+            }
+        }
+    }
+
+    /* =====================================================
        LOAD FINISHED BATCHES
        VIA RPC
     ===================================================== */
@@ -205,7 +348,7 @@
             data,
             error
         } = await supabase.rpc(
-            "get_meramu_finished_batches"
+            "get_meramu_p8_finished_batches"
         );
 
 
@@ -460,7 +603,7 @@
             data,
             error
         } = await supabase.rpc(
-            "get_meramu_finished_units",
+            "get_meramu_p8_finished_units",
             {
                 p_finished_batch_id:
                     finishedBatchId
@@ -537,7 +680,7 @@ async function updateFinishedStatus(
             data,
             error
         } = await supabase.rpc(
-            "update_meramu_finished_status",
+            "update_meramu_p8_finished_status",
             {
                 p_finished_batch_id:
                     selectedBatch.id,
@@ -790,7 +933,7 @@ async function updateFinishedUnitStatus(
             data,
             error
         } = await supabase.rpc(
-            "update_meramu_finished_unit_status",
+            "update_meramu_p8_finished_unit_status",
             {
                 p_finished_unit_id:
                     unitId,
@@ -3299,6 +3442,7 @@ function printThermalLabel(units) {
                             true;
 
 
+                        await loadPendingAllocations();
                         await loadFinishedBatches();
 
 
@@ -3373,6 +3517,21 @@ function printThermalLabel(units) {
        document.addEventListener(
             "click",
             async function (event) {
+
+                const createFinishedButton =
+                    event.target.closest(
+                        "[data-create-finished]"
+                    );
+
+                if (createFinishedButton) {
+
+                    await createFinishedFromAllocation(
+                        createFinishedButton.dataset.createFinished
+                    );
+
+                    return;
+
+                }
 
                 const copyButton =
                     event.target.closest(
@@ -3787,6 +3946,7 @@ await updateFinishedUnitStatus(
 
             bindEvents();
 
+            await loadPendingAllocations();
             await loadFinishedBatches();
 
         } catch (error) {
