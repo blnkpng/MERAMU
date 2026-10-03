@@ -4548,6 +4548,29 @@ function getErrorMessage(
 
 }
 
+/* =========================================================
+   TEXT HELPER
+========================================================= */
+
+function setText(
+    id,
+    value
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if(element){
+
+        element.textContent =
+            value ?? "-";
+
+    }
+
+}
 
 /* =========================================================
    ESCAPE HTML
