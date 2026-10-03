@@ -378,6 +378,8 @@ async function loadBatches(
             volume_unit_id,
             current_stage,
             status,
+            f1_started_at,
+            f1_completed_at,
             hpp_total,
             hpp_per_unit,
             notes,
@@ -1654,6 +1656,8 @@ async function handleCreateBatch(
                 volume_unit_id,
                 current_stage,
                 status,
+                f1_started_at,
+                f1_completed_at,
                 hpp_total,
                 hpp_per_unit,
                 notes,
@@ -2519,7 +2523,11 @@ async function startBatchF1(
 
             .update({
                 current_stage:
-                    "f1"
+                    "f1",
+                f1_started_at:
+                    new Date().toISOString(),
+                f1_completed_at:
+                    null
             })
 
             .eq(
@@ -2536,7 +2544,9 @@ async function startBatchF1(
                 id,
                 batch_code,
                 current_stage,
-                status
+                status,
+                f1_started_at,
+                f1_completed_at
             `)
 
             .single();
@@ -2629,6 +2639,70 @@ async function startBatchF1(
 
 }
 
+
+
+
+/* =========================================================
+   P4 — F1 TRACKING
+========================================================= */
+
+function formatF1DateTime(value){
+    if(!value) return "—";
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleString("id-ID", {
+        day:"2-digit", month:"short", year:"numeric",
+        hour:"2-digit", minute:"2-digit"
+    });
+}
+
+function updateProductionF1Detail(batch){
+    const statusEl = document.getElementById("detailF1Status");
+    const startedEl = document.getElementById("detailF1StartedAt");
+    const targetDaysEl = document.getElementById("detailF1TargetDays");
+    const targetDateEl = document.getElementById("detailF1TargetDate");
+    const progressTextEl = document.getElementById("detailF1ProgressText");
+    const progressBarEl = document.getElementById("detailF1ProgressBar");
+    const progressWrap = document.getElementById("detailF1ProgressWrap");
+    const monitorBtn = document.getElementById("openF1MonitoringBtn");
+
+    if(!statusEl) return;
+
+    const stage = String(batch?.current_stage || "").toLowerCase();
+    const started = batch?.f1_started_at || null;
+    const targetDays = Number(batch?.recipe_versions?.f1_target_days ?? batch?.f1_target_days ?? 0);
+
+    targetDaysEl.textContent = targetDays > 0 ? `${targetDays} hari` : "Belum diatur";
+    startedEl.textContent = formatF1DateTime(started);
+
+    if(stage !== "f1" || !started){
+        statusEl.textContent = stage === "f2" ? "Selesai — masuk F2" : "Belum dimulai";
+        targetDateEl.textContent = "—";
+        progressTextEl.textContent = "—";
+        progressBarEl.style.width = "0%";
+        progressWrap?.classList.toggle("hidden", stage !== "f1");
+        monitorBtn?.classList.toggle("hidden", stage !== "f1");
+        return;
+    }
+
+    const start = new Date(started);
+    const targetMs = targetDays > 0 ? targetDays * 86400000 : 0;
+    const target = targetMs ? new Date(start.getTime() + targetMs) : null;
+    const elapsedMs = Math.max(0, Date.now() - start.getTime());
+    const elapsedDays = targetMs ? Math.floor(elapsedMs / 86400000) + 1 : 1;
+    const percent = targetMs ? Math.min(100, Math.max(0, (elapsedMs / targetMs) * 100)) : 0;
+
+    statusEl.textContent = "F1 ACTIVE";
+    targetDateEl.textContent = target ? formatF1DateTime(target) : "—";
+    progressTextEl.textContent = targetDays > 0 ? `Hari ${Math.min(elapsedDays, targetDays)} / ${targetDays}` : `Hari ${elapsedDays}`;
+    progressBarEl.style.width = `${percent}%`;
+    progressWrap?.classList.remove("hidden");
+
+    if(monitorBtn){
+        monitorBtn.href = `batch-detail.html?id=${encodeURIComponent(batch.batch_code || batch.code || batch.id)}`;
+        monitorBtn.classList.remove("hidden");
+    }
+}
 
 /* =========================================================
    BATCH DETAIL
@@ -3397,6 +3471,8 @@ function showBatchRecipePreparationError(
 
     }
 
+
+    updateProductionF1Detail(batch);
 
     if(window.lucide){
 

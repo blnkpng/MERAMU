@@ -474,6 +474,27 @@
             }
 
 
+            /* ---------------------------------------------
+               CATAT F1 COMPLETED AT
+               Kolom ini hanya metadata lifecycle batch;
+               perpindahan stage tetap dilakukan oleh RPC.
+            --------------------------------------------- */
+
+            const {
+                error: completionMetaError
+            } = await supabase
+                .from("batches")
+                .update({
+                    f1_completed_at:
+                        new Date().toISOString()
+                })
+                .eq("id", batch.id);
+
+            if(completionMetaError){
+                throw completionMetaError;
+            }
+
+
             console.log(
                 "✅ MERAMU: F1 → F2 berhasil.",
                 data
