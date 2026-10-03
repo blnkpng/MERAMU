@@ -380,6 +380,8 @@ async function loadBatches(
             status,
             f1_started_at,
             f1_completed_at,
+            f2_started_at,
+            f2_completed_at,
             hpp_total,
             hpp_per_unit,
             notes,
@@ -1658,6 +1660,8 @@ async function handleCreateBatch(
                 status,
                 f1_started_at,
                 f1_completed_at,
+                f2_started_at,
+                f2_completed_at,
                 hpp_total,
                 hpp_per_unit,
                 notes,
@@ -2705,6 +2709,67 @@ function updateProductionF1Detail(batch){
 }
 
 /* =========================================================
+   P5 — F2 / BOTTLING TRACKING
+========================================================= */
+function formatF2DateTime(value){
+    if(!value) return "—";
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return "—";
+    return d.toLocaleString("id-ID", {
+        day:"2-digit", month:"short", year:"numeric",
+        hour:"2-digit", minute:"2-digit"
+    });
+}
+
+function updateProductionF2Detail(batch){
+    const statusEl = document.getElementById("detailF2Status");
+    const startedEl = document.getElementById("detailF2StartedAt");
+    const targetDaysEl = document.getElementById("detailF2TargetDays");
+    const targetDateEl = document.getElementById("detailF2TargetDate");
+    const progressTextEl = document.getElementById("detailF2ProgressText");
+    const progressBarEl = document.getElementById("detailF2ProgressBar");
+    const progressWrap = document.getElementById("detailF2ProgressWrap");
+    const monitorBtn = document.getElementById("openF2MonitoringBtn");
+
+    if(!statusEl) return;
+
+    const stage = String(batch?.current_stage || "").toLowerCase();
+    const started = batch?.f2_started_at || null;
+    const targetDays = Number(batch?.recipe_versions?.f2_target_days ?? batch?.f2_target_days ?? 0);
+
+    targetDaysEl.textContent = targetDays > 0 ? `${targetDays} hari` : "Belum diatur";
+    startedEl.textContent = formatF2DateTime(started);
+
+    if(stage !== "f2" || !started){
+        statusEl.textContent = stage === "harvest" ? "Selesai — siap Harvest" : "Belum dimulai";
+        targetDateEl.textContent = "—";
+        progressTextEl.textContent = "—";
+        progressBarEl.style.width = "0%";
+        progressWrap?.classList.toggle("hidden", stage !== "f2");
+        monitorBtn?.classList.toggle("hidden", stage !== "f2");
+        return;
+    }
+
+    const start = new Date(started);
+    const targetMs = targetDays > 0 ? targetDays * 86400000 : 0;
+    const target = targetMs ? new Date(start.getTime() + targetMs) : null;
+    const elapsedMs = Math.max(0, Date.now() - start.getTime());
+    const elapsedDays = targetMs ? Math.floor(elapsedMs / 86400000) + 1 : 1;
+    const percent = targetMs ? Math.min(100, Math.max(0, (elapsedMs / targetMs) * 100)) : 0;
+
+    statusEl.textContent = "F2 ACTIVE / BOTTLING";
+    targetDateEl.textContent = target ? formatF2DateTime(target) : "—";
+    progressTextEl.textContent = targetDays > 0 ? `Hari ${Math.min(elapsedDays, targetDays)} / ${targetDays}` : `Hari ${elapsedDays}`;
+    progressBarEl.style.width = `${percent}%`;
+    progressWrap?.classList.remove("hidden");
+
+    if(monitorBtn){
+        monitorBtn.href = `batch-detail.html?id=${encodeURIComponent(batch.batch_code || batch.code || batch.id)}`;
+        monitorBtn.classList.remove("hidden");
+    }
+}
+
+/* =========================================================
    BATCH DETAIL
 ========================================================= */
 
@@ -2842,6 +2907,10 @@ function openBatchDetail(
      * stage sudah berubah ke f1 tetapi card F1 tetap terlihat "Belum dimulai".
      */
     updateProductionF1Detail(
+        batch
+    );
+
+    updateProductionF2Detail(
         batch
     );
 

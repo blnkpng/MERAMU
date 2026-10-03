@@ -1745,6 +1745,21 @@
 .production-f1-monitor-btn svg{width:15px;height:15px}
 
 /* =========================================================
+   P5 — F2 / BOTTLING
+========================================================= */
+.production-f2-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.production-f2-stat{padding:14px;border:1px solid #e8edf2;border-radius:14px;background:#fbfcfd}
+.production-f2-stat span{display:block;margin-bottom:5px;color:#95a0b0;font-size:10px}
+.production-f2-stat strong{display:block;color:#273349;font-size:12px;overflow-wrap:anywhere}
+.production-f2-progress-wrap{margin-top:12px;padding:14px;border-radius:14px;background:#f8fafb}
+.production-f2-progress-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;color:#66758a;font-size:10px}
+.production-f2-progress-head strong{color:#047a46;font-size:11px}
+.production-f2-progress-track{height:7px;overflow:hidden;border-radius:999px;background:#e8edf2}
+.production-f2-progress-bar{width:0;height:100%;border-radius:999px;background:#047a46;transition:width .25s ease}
+.production-f2-monitor-btn{width:max-content;margin-top:12px;text-decoration:none}
+.production-f2-monitor-btn svg{width:15px;height:15px}
+
+/* =========================================================
    RESPONSIVE — TABLET
 ========================================================= */
 
@@ -1763,6 +1778,11 @@
 /* =========================================================
    RESPONSIVE — SMALL TABLET
 ========================================================= */
+
+@media (max-width: 800px){
+    .production-f1-grid,
+    .production-f2-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 
 @media (max-width: 800px){
 

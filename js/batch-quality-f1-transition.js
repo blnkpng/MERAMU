@@ -475,6 +475,26 @@
 
 
             /* ---------------------------------------------
+               CATAT F2 STARTED AT
+               Stage transition dilakukan oleh RPC.
+            --------------------------------------------- */
+
+            const {
+                error: f2StartMetaError
+            } = await supabase
+                .from("batches")
+                .update({
+                    f2_started_at: new Date().toISOString(),
+                    f2_completed_at: null
+                })
+                .eq("id", batch.id);
+
+            if(f2StartMetaError){
+                throw f2StartMetaError;
+            }
+
+
+            /* ---------------------------------------------
                CATAT F1 COMPLETED AT
                Kolom ini hanya metadata lifecycle batch;
                perpindahan stage tetap dilakukan oleh RPC.

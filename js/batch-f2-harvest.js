@@ -365,6 +365,25 @@
             }
 
 
+            /* =========================================
+               CATAT F2 COMPLETED AT
+               RPC tetap menjadi sumber transisi stage.
+            ========================================== */
+
+            const {
+                error: completionMetaError
+            } = await supabase
+                .from("batches")
+                .update({
+                    f2_completed_at: new Date().toISOString()
+                })
+                .eq("id", batch.id);
+
+            if(completionMetaError){
+                throw completionMetaError;
+            }
+
+
             console.log(
                 "MERAMU: F2 QC PASS berhasil.",
                 updatedBatch
