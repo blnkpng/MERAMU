@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panen • MERAMU</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/branding/favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/harvest.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <div id="appShell" class="app-shell">
+        <aside id="sidebar-container"></aside>
+
+        <main class="content">
+            <div id="topbar-container"></div>
+
+            <section class="harvest-page" id="harvestPage">
+                <div class="harvest-page-header">
+                    <div>
+                        <div class="harvest-eyebrow">
+                            <span></span>
+                            HARVEST / PANEN
+                        </div>
+                        <h1>Panen</h1>
+                        <p>Kelola batch yang sudah READY HARVEST dan catat hasil panen aktual.</p>
+                    </div>
+
+                    <button type="button" class="harvest-btn secondary" id="refreshHarvestBtn">
+                        <i data-lucide="refresh-cw"></i>
+                        Refresh
+                    </button>
+                </div>
+
+                <div class="harvest-summary-grid">
+                    <article class="harvest-kpi">
+                        <span>READY HARVEST</span>
+                        <strong id="readyCount">0</strong>
+                        <small>Batch menunggu Actual Harvest</small>
+                    </article>
+                    <article class="harvest-kpi">
+                        <span>SUDAH PANEN</span>
+                        <strong id="completedCount">0</strong>
+                        <small>Actual Harvest sudah dicatat</small>
+                    </article>
+                    <article class="harvest-kpi">
+                        <span>VOLUME PANEN</span>
+                        <strong id="harvestVolumeTotal">0 L</strong>
+                        <small>Total volume aktual tercatat</small>
+                    </article>
+                </div>
+
+                <div class="harvest-card">
+                    <div class="harvest-card-header">
+                        <div>
+                            <span class="harvest-card-kicker">BATCH PANEN</span>
+                            <h2>Daftar Harvest</h2>
+                            <p>Batch tetap berada di stage Harvest sampai proses berikutnya diproses.</p>
+                        </div>
+                        <span class="harvest-count" id="harvestCount">0 batch</span>
+                    </div>
+
+                    <div id="harvestState" class="harvest-state">Memuat data Harvest...</div>
+                    <div id="harvestList" class="harvest-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/component-loader.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/harvest.js"></script>
+</body>
+</html>

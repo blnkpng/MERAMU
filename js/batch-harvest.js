@@ -1050,6 +1050,13 @@
                                 Satuan: Liter (L)
                             </small>
 
+                            <small
+                                id="harvestVolumeSource"
+                                class="harvest-volume-source"
+                            >
+                                Sumber volume akan dihitung dari data batch.
+                            </small>
+
                         </div>
 
 
@@ -1437,6 +1444,10 @@
 
         try{
 
+            const supabase =
+                await waitForSupabase();
+
+
             const batch =
                 await getBatch();
 
@@ -1491,6 +1502,11 @@
                     "harvestVolume"
                 );
 
+            const volumeSource =
+                getElement(
+                    "harvestVolumeSource"
+                );
+
 
             const operatorInput =
                 getElement(
@@ -1524,10 +1540,60 @@
                 getLocalDateTimeValue();
 
 
-            volumeInput.value =
+            /*
+             * P6 source priority:
+             * 1. Completed F2 bottling output
+             * 2. Actual batch volume
+             * 3. Planned batch volume
+             */
+            let sourceVolume =
                 batch.actual_volume ??
                 batch.planned_volume ??
                 "";
+
+            let sourceLabel =
+                batch.actual_volume !== null &&
+                batch.actual_volume !== undefined
+                    ? "Actual volume batch"
+                    : "Planned volume batch";
+
+            try{
+
+                const { data: bottling, error: bottlingError } =
+                    await supabase
+                        .from("batch_bottling")
+                        .select("output_volume_l,bottling_status")
+                        .eq("batch_id", batch.id)
+                        .eq("bottling_status", "completed")
+                        .maybeSingle();
+
+                if(!bottlingError && bottling?.output_volume_l){
+
+                    sourceVolume = bottling.output_volume_l;
+                    sourceLabel = "Output Bottling F2";
+
+                }
+
+            }
+            catch(bottlingReadError){
+
+                console.warn(
+                    "MERAMU Harvest: gagal membaca output bottling, gunakan fallback batch volume.",
+                    bottlingReadError
+                );
+
+            }
+
+            volumeInput.value =
+                sourceVolume ??
+                "";
+
+            if(volumeSource){
+
+                volumeSource.textContent =
+                    `Sumber volume: ${sourceLabel}`;
+
+            }
 
 
             operatorInput.value =
@@ -1758,6 +1824,50 @@
             const actualAtIso =
                 actualAtDate.toISOString();
 
+
+            /*
+             * P6 safety gate:
+             * Actual Harvest hanya boleh disimpan jika
+             * batch masih di Harvest dan Bottling F2 sudah completed.
+             */
+            const {
+                data: completedBottling,
+                error: completedBottlingError
+            } = await supabase
+                .from("batch_bottling")
+                .select("id,output_volume_l,bottling_status")
+                .eq("batch_id", batch.id)
+                .eq("bottling_status", "completed")
+                .maybeSingle();
+
+            if(completedBottlingError){
+
+                throw completedBottlingError;
+
+            }
+
+            if(!completedBottling){
+
+                throw new Error(
+                    "Bottling F2 belum selesai. Actual Harvest belum dapat dicatat."
+                );
+
+            }
+
+            const bottlingOutput =
+                Number(completedBottling.output_volume_l);
+
+            if(
+                Number.isFinite(bottlingOutput) &&
+                bottlingOutput > 0 &&
+                volume > bottlingOutput + 0.0005
+            ){
+
+                throw new Error(
+                    `Volume panen (${volume} L) melebihi output Bottling F2 (${bottlingOutput} L).`
+                );
+
+            }
 
             const {
                 data,
