@@ -3837,95 +3837,66 @@ function updateProductionFlow(
    SUMMARY
 ========================================================= */
 
-function updateProductionSummary(
-    rows
-){
+function updateProductionSummary(){
 
     const total =
-        rows.length;
+        productionBatches.length;
 
 
     const active =
-        rows.filter(
+        productionBatches.filter(
             batch =>
                 String(
-                    batch.status ||
-                    ""
+                    batch.status || ""
                 ).toLowerCase() ===
                 "active"
         ).length;
 
 
-    const completed =
-        rows.filter(
+    const production =
+        productionBatches.filter(
             batch =>
                 String(
-                    batch.status ||
-                    ""
+                    batch.current_stage || ""
+                ).toLowerCase() ===
+                "production"
+        ).length;
+
+
+    const completed =
+        productionBatches.filter(
+            batch =>
+                String(
+                    batch.status || ""
                 ).toLowerCase() ===
                 "completed"
         ).length;
 
 
-    const cancelled =
-        rows.filter(
-            batch =>
-                String(
-                    batch.status ||
-                    ""
-                ).toLowerCase() ===
-                "cancelled"
-        ).length;
-
-
     setSummaryValue(
-        "productionTotalCount",
+        "summaryTotal",
         total
     );
 
 
     setSummaryValue(
-        "productionActiveCount",
+        "summaryActive",
         active
     );
 
 
     setSummaryValue(
-        "productionCompletedCount",
-        completed
+        "summaryProduction",
+        production
     );
 
 
     setSummaryValue(
-        "productionCancelledCount",
-        cancelled
+        "summaryCompleted",
+        completed
     );
 
 }
-
-
-function setSummaryValue(
-    id,
-    value
-){
-
-    const element =
-        document.getElementById(
-            id
-        );
-
-
-    if(element){
-
-        element.textContent =
-            String(
-                value
-            );
-
-    }
-
-}
-
 
 /* =========================================================
    LOADING
