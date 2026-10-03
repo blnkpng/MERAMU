@@ -2798,9 +2798,13 @@ function openBatchDetail(
     );
 
 
-    loadBatchInitialQC(
-        batch
-    );
+loadBatchRecipePreparation(
+    batch
+);
+
+loadBatchInitialQC(
+    batch
+);
 
 }
 
@@ -2839,6 +2843,807 @@ function closeBatchDetailModal(){
 
 }
 
+/* =========================================================
+   RECIPE PREPARATION LOAD
+========================================================= */
+
+async function loadBatchRecipePreparation(
+    batch
+){
+
+    const loading =
+        document.getElementById(
+            "detailPreparationLoading"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "detailPreparationError"
+        );
+
+    const errorMessage =
+        document.getElementById(
+            "detailPreparationErrorMessage"
+        );
+
+    const ingredientsContainer =
+        document.getElementById(
+            "detailPreparationIngredients"
+        );
+
+
+    /*
+     * RESET UI
+     */
+
+    if(loading){
+
+        loading.classList.remove(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            "Gagal memuat formula Recipe.";
+
+    }
+
+
+    if(ingredientsContainer){
+
+        ingredientsContainer.classList.add(
+            "hidden"
+        );
+
+        ingredientsContainer.innerHTML =
+            "";
+
+    }
+
+
+    /*
+     * VALIDASI
+     */
+
+    if(!batch?.id){
+
+        showBatchRecipePreparationError(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    if(!batch?.recipe_version_id){
+
+        showBatchRecipePreparationError(
+            "Recipe Version pada batch ini belum tersedia."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        /*
+         * =====================================================
+         * 1. LOAD RECIPE VERSION
+         * =====================================================
+         *
+         * Batch menyimpan recipe_version_id.
+         *
+         * Jadi Preparation harus membaca version
+         * yang benar-benar digunakan batch.
+         *
+         * Jangan mengambil current version dari Recipe Master.
+         */
+
+        const {
+            data: version,
+            error: versionError
+        } = await supabase
+
+            .from(
+                "recipe_versions"
+            )
+
+            .select(`
+                id,
+                recipe_id,
+                version_number,
+                yield_quantity,
+                yield_unit_id,
+                fermentation_required,
+                f1_target_days,
+                f2_target_days,
+                shelf_life_days,
+                notes,
+                status
+            `)
+
+            .eq(
+                "id",
+                batch.recipe_version_id
+            )
+
+            .maybeSingle();
+
+
+        if(versionError){
+
+            throw versionError;
+
+        }
+
+
+        if(!version){
+
+            throw new Error(
+                "Recipe Version tidak ditemukan."
+            );
+
+        }
+
+
+        /*
+         * =====================================================
+         * 2. LOAD RECIPE INGREDIENTS
+         * =====================================================
+         */
+
+        const {
+            data: recipeIngredients,
+            error: ingredientsError
+        } = await supabase
+
+            .from(
+                "recipe_ingredients"
+            )
+
+            .select(`
+                id,
+                recipe_version_id,
+                ingredient_id,
+                quantity,
+                unit_id
+            `)
+
+            .eq(
+                "recipe_version_id",
+                version.id
+            );
+
+
+        if(ingredientsError){
+
+            throw ingredientsError;
+
+        }
+
+
+        const rows =
+            Array.isArray(
+                recipeIngredients
+            )
+                ? recipeIngredients
+                : [];
+
+
+        /*
+         * =====================================================
+         * 3. EMPTY FORMULA
+         * =====================================================
+         */
+
+        if(!rows.length){
+
+            renderBatchRecipePreparation(
+                version,
+                []
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * =====================================================
+         * 4. COLLECT IDS
+         * =====================================================
+         */
+
+        const ingredientIds =
+            [
+                ...new Set(
+                    rows
+                        .map(
+                            item =>
+                                item.ingredient_id
+                        )
+                        .filter(
+                            Boolean
+                        )
+                )
+            ];
+
+
+        const unitIds =
+            [
+                ...new Set(
+                    rows
+                        .map(
+                            item =>
+                                item.unit_id
+                        )
+                        .filter(
+                            Boolean
+                        )
+                )
+            ];
+
+
+        /*
+         * =====================================================
+         * 5. LOAD INGREDIENT MASTER
+         * =====================================================
+         */
+
+        let ingredientMap =
+            new Map();
+
+
+        if(
+            ingredientIds.length
+        ){
+
+            const {
+                data,
+                error
+            } = await supabase
+
+                .from(
+                    "ingredients"
+                )
+
+                .select(`
+                    id,
+                    code,
+                    name,
+                    default_unit_id,
+                    cost_per_unit,
+                    is_active
+                `)
+
+                .in(
+                    "id",
+                    ingredientIds
+                );
+
+
+            if(error){
+
+                throw error;
+
+            }
+
+
+            (
+                data || []
+            )
+                .forEach(
+                    ingredient => {
+
+                        ingredientMap.set(
+                            String(
+                                ingredient.id
+                            ),
+                            ingredient
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+         * =====================================================
+         * 6. LOAD UNIT MASTER
+         * =====================================================
+         */
+
+        let unitMap =
+            new Map();
+
+
+        if(
+            unitIds.length
+        ){
+
+            const {
+                data,
+                error
+            } = await supabase
+
+                .from(
+                    "units"
+                )
+
+                .select(`
+                    id,
+                    code,
+                    name,
+                    category
+                `)
+
+                .in(
+                    "id",
+                    unitIds
+                );
+
+
+            if(error){
+
+                throw error;
+
+            }
+
+
+            (
+                data || []
+            )
+                .forEach(
+                    unit => {
+
+                        unitMap.set(
+                            String(
+                                unit.id
+                            ),
+                            unit
+                        );
+
+                    }
+                );
+
+        }
+
+
+        /*
+         * =====================================================
+         * 7. ATTACH MASTER DATA
+         * =====================================================
+         */
+
+        const preparedRows =
+            rows.map(
+                item => ({
+
+                    ...item,
+
+                    ingredient:
+                        ingredientMap.get(
+                            String(
+                                item.ingredient_id
+                            )
+                        ) ||
+                        null,
+
+                    unit:
+                        unitMap.get(
+                            String(
+                                item.unit_id
+                            )
+                        ) ||
+                        null
+
+                })
+            );
+
+
+        /*
+         * =====================================================
+         * 8. RENDER
+         * =====================================================
+         */
+
+        renderBatchRecipePreparation(
+            version,
+            preparedRows
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU Recipe Preparation Load Error:",
+            error
+        );
+
+
+        showBatchRecipePreparationError(
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+    finally{
+
+        /*
+         * PENTING:
+         * spinner HARUS selalu dihentikan.
+         */
+
+        if(loading){
+
+            loading.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RECIPE PREPARATION ERROR
+========================================================= */
+
+function showBatchRecipePreparationError(
+    message
+){
+
+    const loading =
+        document.getElementById(
+            "detailPreparationLoading"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "detailPreparationError"
+        );
+
+    const errorMessage =
+        document.getElementById(
+            "detailPreparationErrorMessage"
+        );
+
+    const ingredientsContainer =
+        document.getElementById(
+            "detailPreparationIngredients"
+        );
+
+
+    if(loading){
+
+        loading.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(ingredientsContainer){
+
+        ingredientsContainer.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Gagal memuat formula Recipe.";
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.remove(
+            "hidden"
+        );
+
+    }
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   RECIPE PREPARATION RENDER
+========================================================= */
+
+function renderBatchRecipePreparation(
+    version,
+    rows
+){
+
+    const loading =
+        document.getElementById(
+            "detailPreparationLoading"
+        );
+
+    const errorBox =
+        document.getElementById(
+            "detailPreparationError"
+        );
+
+    const ingredientsContainer =
+        document.getElementById(
+            "detailPreparationIngredients"
+        );
+
+
+    if(loading){
+
+        loading.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(!ingredientsContainer){
+
+        return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * EMPTY
+     * =====================================================
+     */
+
+    if(!Array.isArray(rows) || !rows.length){
+
+        ingredientsContainer.innerHTML = `
+            <div class="production-preparation-empty">
+                <i data-lucide="package-open"></i>
+
+                <div>
+                    <strong>Formula belum tersedia</strong>
+
+                    <span>
+                        Recipe Version V${escapeHtml(
+                            version?.version_number ??
+                            "-"
+                        )}
+                        belum memiliki bahan.
+                    </span>
+                </div>
+            </div>
+        `;
+
+        ingredientsContainer.classList.remove(
+            "hidden"
+        );
+
+        if(window.lucide){
+
+            lucide.createIcons();
+
+        }
+
+        return;
+
+    }
+
+
+    /*
+     * =====================================================
+     * HEADER
+     * =====================================================
+     */
+
+    const versionNumber =
+        version?.version_number
+            ? `V${version.version_number}`
+            : "-";
+
+
+    /*
+     * =====================================================
+     * TABLE
+     * =====================================================
+     */
+
+    ingredientsContainer.innerHTML = `
+
+        <div class="production-ingredients-header">
+
+            <div>
+
+                <strong>
+                    Formula ${escapeHtml(
+                        versionNumber
+                    )}
+                </strong>
+
+                <span>
+                    ${rows.length} bahan
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="production-ingredients-table-wrap">
+
+            <table class="production-ingredients-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Bahan
+                        </th>
+
+                        <th>
+                            Kode
+                        </th>
+
+                        <th>
+                            Quantity
+                        </th>
+
+                        <th>
+                            Unit
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    ${rows
+                        .map(
+                            (
+                                item,
+                                index
+                            ) => {
+
+                                const ingredient =
+                                    item.ingredient ||
+                                    {};
+
+                                const unit =
+                                    item.unit ||
+                                    {};
+
+                                return `
+
+                                    <tr>
+
+                                        <td>
+                                            ${index + 1}
+                                        </td>
+
+                                        <td>
+
+                                            <strong>
+                                                ${escapeHtml(
+                                                    ingredient.name ||
+                                                    "-"
+                                                )}
+                                            </strong>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="production-ingredient-code">
+                                                ${escapeHtml(
+                                                    ingredient.code ||
+                                                    "-"
+                                                )}
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+
+                                            <strong>
+                                                ${escapeHtml(
+                                                    formatProductionNumber(
+                                                        item.quantity
+                                                    )
+                                                )}
+                                            </strong>
+
+                                        </td>
+
+                                        <td>
+
+                                            ${escapeHtml(
+                                                unit.code ||
+                                                unit.name ||
+                                                "-"
+                                            )}
+
+                                        </td>
+
+                                    </tr>
+
+                                `;
+
+                            }
+                        )
+                        .join("")}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+
+    ingredientsContainer.classList.remove(
+        "hidden"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
 
 /* =========================================================
    INITIAL QC LOAD
