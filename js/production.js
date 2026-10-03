@@ -2836,6 +2836,15 @@ function openBatchDetail(
         batch.current_stage
     );
 
+    /*
+     * P4 — render status/progress F1 setiap kali Batch Detail dibuka.
+     * Sebelumnya renderer F1 belum dipanggil di jalur normal sehingga
+     * stage sudah berubah ke f1 tetapi card F1 tetap terlihat "Belum dimulai".
+     */
+    updateProductionF1Detail(
+        batch
+    );
+
 
     const startF1Button =
         document.getElementById(
@@ -3471,8 +3480,6 @@ function showBatchRecipePreparationError(
 
     }
 
-
-    updateProductionF1Detail(batch);
 
     if(window.lucide){
 
