@@ -710,7 +710,8 @@ function bindProductionEvents(){
 
     }
 
-       /* =====================================================
+
+    /* =====================================================
        INITIAL QC EVENTS
     ===================================================== */
 
@@ -827,7 +828,8 @@ function handleProductionKeydown(
 
     }
 
-       if(
+
+    if(
         initialQCModal &&
         !initialQCModal.classList.contains(
             "hidden"
@@ -839,6 +841,7 @@ function handleProductionKeydown(
         return;
 
     }
+
 
     if(
         detailModal &&
@@ -999,26 +1002,23 @@ function handleProductChange(){
         `;
 
 
-    versionSelect.innerHTML =
-        `
-        <option value="">
-            Pilih Recipe Version
-        </option>
-        `;
+    if(versionSelect){
 
+        versionSelect.innerHTML =
+            `
+            <option value="">
+                Pilih Recipe Version
+            </option>
+            `;
 
-    versionSelect.disabled =
-        true;
+        versionSelect.disabled = true;
+
+    }
 
 
     if(!productId){
 
-        recipeSelect.disabled =
-            true;
-
-        setVersionHint(
-            "Pilih Recipe terlebih dahulu."
-        );
+        recipeSelect.disabled = true;
 
         return;
 
@@ -1038,56 +1038,34 @@ function handleProductChange(){
             );
 
 
-    recipes.forEach(
-        recipe => {
+    recipes
+        .forEach(
+            recipe => {
 
-            const option =
-                document.createElement(
-                    "option"
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    recipe.id;
+
+
+                option.textContent =
+                    `${recipe.name} — ${recipe.code}`;
+
+
+                recipeSelect.appendChild(
+                    option
                 );
 
-
-            option.value =
-                recipe.id;
-
-
-            option.textContent =
-                `${recipe.name} — ${recipe.code}`;
-
-
-            recipeSelect.appendChild(
-                option
-            );
-
-        }
-    );
+            }
+        );
 
 
     recipeSelect.disabled =
         recipes.length === 0;
-
-
-    if(!recipes.length){
-
-        recipeSelect.innerHTML =
-            `
-            <option value="">
-                Tidak ada Recipe
-            </option>
-            `;
-
-        setVersionHint(
-            "Belum ada Recipe untuk Product ini."
-        );
-
-    }
-    else{
-
-        setVersionHint(
-            "Pilih Recipe untuk melihat version."
-        );
-
-    }
 
 }
 
@@ -1120,7 +1098,7 @@ async function handleRecipeChange(){
     versionSelect.innerHTML =
         `
         <option value="">
-            Memuat version...
+            Pilih Recipe Version
         </option>
         `;
 
@@ -1130,17 +1108,6 @@ async function handleRecipeChange(){
 
 
     if(!recipeId){
-
-        versionSelect.innerHTML =
-            `
-            <option value="">
-                Pilih Recipe Version
-            </option>
-            `;
-
-        setVersionHint(
-            "Pilih Recipe terlebih dahulu."
-        );
 
         return;
 
@@ -1173,8 +1140,7 @@ async function handleRecipeChange(){
                 f2_target_days,
                 shelf_life_days,
                 notes,
-                status,
-                effective_from
+                status
             `)
 
             .eq(
@@ -1203,14 +1169,6 @@ async function handleRecipeChange(){
                 : [];
 
 
-        versionSelect.innerHTML =
-            `
-            <option value="">
-                Pilih Recipe Version
-            </option>
-            `;
-
-
         productionRecipeVersions
             .forEach(
                 version => {
@@ -1225,26 +1183,8 @@ async function handleRecipeChange(){
                         version.id;
 
 
-                    const currentRecipe =
-                        productionRecipes.find(
-                            recipe =>
-                                recipe.id ===
-                                recipeId
-                        );
-
-
-                    const isCurrent =
-                        Number(
-                            currentRecipe
-                                ?.current_version_number
-                        ) ===
-                        Number(
-                            version.version_number
-                        );
-
-
                     option.textContent =
-                        `V${version.version_number}${isCurrent ? " — Current" : ""}`;
+                        `V${version.version_number}`;
 
 
                     versionSelect.appendChild(
@@ -1259,66 +1199,13 @@ async function handleRecipeChange(){
             productionRecipeVersions.length === 0;
 
 
-        if(
-            productionRecipeVersions.length
-        ){
-
-            const currentRecipe =
-                productionRecipes.find(
-                    recipe =>
-                        recipe.id ===
-                        recipeId
-                );
-
-
-            const currentVersion =
-                productionRecipeVersions.find(
-                    version =>
-                        Number(
-                            version.version_number
-                        ) ===
-                        Number(
-                            currentRecipe
-                                ?.current_version_number
-                        )
-                );
-
-
-            if(currentVersion){
-
-                versionSelect.value =
-                    currentVersion.id;
-
-                setVersionHint(
-                    `Current version: V${currentVersion.version_number}`
-                );
-
-            }
-            else{
-
-                setVersionHint(
-                    "Pilih Recipe Version yang digunakan."
-                );
-
-            }
-
-        }
-        else{
-
-            setVersionHint(
-                "Recipe ini belum memiliki version."
-            );
-
-        }
-
     }
     catch(error){
 
         console.error(
-            "Recipe Version Load Error:",
+            "MERAMU Recipe Version Load Error:",
             error
         );
-
 
         versionSelect.innerHTML =
             `
@@ -1327,42 +1214,13 @@ async function handleRecipeChange(){
             </option>
             `;
 
-
-        setVersionHint(
-            getErrorMessage(error)
-        );
-
     }
 
 }
 
 
 /* =========================================================
-   VERSION HINT
-========================================================= */
-
-function setVersionHint(
-    message
-){
-
-    const element =
-        document.getElementById(
-            "batchVersionHint"
-        );
-
-
-    if(element){
-
-        element.textContent =
-            message;
-
-    }
-
-}
-
-
-/* =========================================================
-   CREATE MODAL
+   CREATE BATCH MODAL
 ========================================================= */
 
 function openCreateBatchModal(){
@@ -1372,7 +1230,6 @@ function openCreateBatchModal(){
             "createBatchModal"
         );
 
-
     if(!modal){
 
         return;
@@ -1380,39 +1237,17 @@ function openCreateBatchModal(){
     }
 
 
-    clearCreateBatchError();
-
-    resetCreateBatchForm();
-
     modal.classList.remove(
         "hidden"
     );
 
 
     document.body.classList.add(
-        "production-modal-open"
+        "modal-open"
     );
 
 
-    setTimeout(
-        () => {
-
-            document
-                .getElementById(
-                    "batchProduct"
-                )
-                ?.focus();
-
-        },
-        50
-    );
-
-
-    if(window.lucide){
-
-        lucide.createIcons();
-
-    }
+    resetCreateBatchForm();
 
 }
 
@@ -1424,29 +1259,21 @@ function closeCreateBatchModal(){
             "createBatchModal"
         );
 
+    if(modal){
 
-    if(!modal){
-
-        return;
+        modal.classList.add(
+            "hidden"
+        );
 
     }
 
 
-    modal.classList.add(
-        "hidden"
-    );
-
-
     document.body.classList.remove(
-        "production-modal-open"
+        "modal-open"
     );
 
 }
 
-
-/* =========================================================
-   RESET FORM
-========================================================= */
 
 function resetCreateBatchForm(){
 
@@ -1454,7 +1281,6 @@ function resetCreateBatchForm(){
         document.getElementById(
             "createBatchForm"
         );
-
 
     if(form){
 
@@ -1468,17 +1294,7 @@ function resetCreateBatchForm(){
             "batchRecipe"
         );
 
-
-    const versionSelect =
-        document.getElementById(
-            "batchRecipeVersion"
-        );
-
-
     if(recipeSelect){
-
-        recipeSelect.disabled =
-            true;
 
         recipeSelect.innerHTML =
             `
@@ -1487,13 +1303,18 @@ function resetCreateBatchForm(){
             </option>
             `;
 
+        recipeSelect.disabled =
+            true;
+
     }
 
 
-    if(versionSelect){
+    const versionSelect =
+        document.getElementById(
+            "batchRecipeVersion"
+        );
 
-        versionSelect.disabled =
-            true;
+    if(versionSelect){
 
         versionSelect.innerHTML =
             `
@@ -1502,74 +1323,25 @@ function resetCreateBatchForm(){
             </option>
             `;
 
+        versionSelect.disabled =
+            true;
+
     }
 
 
-    populateProductSelect();
-
-    populateVolumeUnitSelect();
-
-    setVersionHint(
-        "Pilih Recipe terlebih dahulu."
-    );
-
-
-    setDefaultProductionDate();
-
-}
-
-
-/* =========================================================
-   UNIT SELECT
-========================================================= */
-
-function populateVolumeUnitSelect(){
-
-    const select =
+    const productionDate =
         document.getElementById(
-            "batchVolumeUnit"
+            "batchProductionDate"
         );
 
+    if(productionDate){
 
-    if(!select){
-
-        return;
+        setDefaultProductionDate();
 
     }
 
 
-    select.innerHTML =
-        `
-        <option value="">
-            Pilih Unit
-        </option>
-        `;
-
-
-    productionUnits
-        .forEach(
-            unit => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    unit.id;
-
-
-                option.textContent =
-                    `${unit.name} (${unit.code})`;
-
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
+    clearCreateBatchError();
 
 }
 
@@ -1583,6 +1355,7 @@ async function handleCreateBatch(
 ){
 
     event.preventDefault();
+
 
     clearCreateBatchError();
 
@@ -1611,7 +1384,7 @@ async function handleCreateBatch(
         )?.value;
 
 
-    const plannedVolumeRaw =
+    const plannedVolume =
         document.getElementById(
             "batchPlannedVolume"
         )?.value;
@@ -1627,8 +1400,7 @@ async function handleCreateBatch(
         document.getElementById(
             "batchNotes"
         )?.value
-            ?.trim() ||
-        null;
+        ?.trim() || null;
 
 
     if(!productId){
@@ -1667,7 +1439,7 @@ async function handleCreateBatch(
     if(!productionDate){
 
         showCreateBatchError(
-            "Production Date wajib diisi."
+            "Tanggal produksi wajib diisi."
         );
 
         return;
@@ -1676,38 +1448,20 @@ async function handleCreateBatch(
 
 
     if(
-        plannedVolumeRaw ===
-        "" ||
-        plannedVolumeRaw ===
-        null ||
-        plannedVolumeRaw ===
-        undefined
-    ){
-
-        showCreateBatchError(
-            "Planned Volume wajib diisi."
-        );
-
-        return;
-
-    }
-
-
-    const plannedVolume =
-        Number(
-            plannedVolumeRaw
-        );
-
-
-    if(
-        !Number.isFinite(
-            plannedVolume
+        plannedVolume === "" ||
+        plannedVolume === null ||
+        Number.isNaN(
+            Number(
+                plannedVolume
+            )
         ) ||
-        plannedVolume < 0
+        Number(
+            plannedVolume
+        ) <= 0
     ){
 
         showCreateBatchError(
-            "Planned Volume harus berupa angka 0 atau lebih."
+            "Planned volume harus lebih besar dari 0."
         );
 
         return;
@@ -1718,43 +1472,29 @@ async function handleCreateBatch(
     if(!volumeUnitId){
 
         showCreateBatchError(
-            "Volume Unit wajib dipilih."
+            "Satuan volume wajib dipilih."
         );
 
         return;
 
     }
 
-
-    /*
-     * Pastikan Recipe Version memang
-     * milik Recipe yang dipilih.
-     */
 
     const selectedVersion =
-        productionRecipeVersions.find(
-            version =>
-                String(
-                    version.id
-                ) ===
-                String(
-                    recipeVersionId
-                )
-        );
-
-
-    if(!selectedVersion){
-
-        showCreateBatchError(
-            "Recipe Version tidak valid atau bukan milik Recipe yang dipilih."
-        );
-
-        return;
-
-    }
+        productionRecipeVersions
+            .find(
+                version =>
+                    String(
+                        version.id
+                    ) ===
+                    String(
+                        recipeVersionId
+                    )
+            );
 
 
     if(
+        selectedVersion &&
         String(
             selectedVersion.recipe_id
         ) !==
@@ -1764,7 +1504,7 @@ async function handleCreateBatch(
     ){
 
         showCreateBatchError(
-            "Recipe Version tidak sesuai dengan Recipe."
+            "Recipe Version tidak sesuai dengan Recipe yang dipilih."
         );
 
         return;
@@ -1772,41 +1512,31 @@ async function handleCreateBatch(
     }
 
 
-    const saveButton =
-        document.getElementById(
-            "saveCreateBatchBtn"
+    const submitButton =
+        document.querySelector(
+            "#createBatchForm button[type='submit']"
         );
-
-
-    if(saveButton){
-
-        saveButton.disabled =
-            true;
-
-        saveButton.innerHTML =
-            `
-                <span class="production-button-loader"></span>
-                <span>Menyimpan...</span>
-            `;
-
-    }
 
 
     try{
 
+        if(submitButton){
+
+            submitButton.disabled =
+                true;
+
+            submitButton.innerHTML =
+                `
+                <span class="production-button-loader"></span>
+                <span>Menyimpan...</span>
+                `;
+
+        }
+
+
         const supabase =
             await waitForProductionSupabase();
 
-
-        /*
-         * IMPORTANT:
-         *
-         * batch_code TIDAK dikirim.
-         *
-         * Database trigger:
-         * generate_meramu_batch_code()
-         * akan membuatnya.
-         */
 
         const payload = {
 
@@ -1823,7 +1553,9 @@ async function handleCreateBatch(
                 productionDate,
 
             planned_volume:
-                plannedVolume,
+                Number(
+                    plannedVolume
+                ),
 
             volume_unit_id:
                 volumeUnitId,
@@ -1866,11 +1598,53 @@ async function handleCreateBatch(
                 recipe_id,
                 recipe_version_id,
                 production_date,
+                target_date,
+                expiry_date,
+                best_before_date,
                 planned_volume,
+                actual_volume,
                 volume_unit_id,
                 current_stage,
                 status,
-                notes
+                hpp_total,
+                hpp_per_unit,
+                notes,
+                created_at,
+                updated_at,
+
+                products (
+                    id,
+                    code,
+                    name,
+                    product_type
+                ),
+
+                recipes (
+                    id,
+                    code,
+                    name
+                ),
+
+                recipe_versions (
+                    id,
+                    recipe_id,
+                    version_number,
+                    yield_quantity,
+                    yield_unit_id,
+                    fermentation_required,
+                    f1_target_days,
+                    f2_target_days,
+                    shelf_life_days,
+                    notes,
+                    status
+                ),
+
+                units (
+                    id,
+                    code,
+                    name,
+                    category
+                )
             `)
 
             .single();
@@ -1883,49 +1657,34 @@ async function handleCreateBatch(
         }
 
 
-        if(!data){
+        if(data){
 
-            throw new Error(
-                "Batch berhasil dibuat tetapi data hasil insert tidak ditemukan."
-            );
+            productionBatches =
+                [
+                    data,
+                    ...productionBatches
+                ];
 
         }
 
 
         closeCreateBatchModal();
 
-
-        await loadProductionPage();
-
-
-        /*
-         * Buka detail batch baru.
-         */
-
-        const createdBatch =
-            productionBatches.find(
-                batch =>
-                    batch.id ===
-                    data.id
-            );
+        renderProduction();
 
 
-        if(createdBatch){
+        alert(
+            "Batch berhasil dibuat."
+        );
 
-            openBatchDetail(
-                createdBatch
-            );
-
-        }
 
     }
     catch(error){
 
         console.error(
-            "Create Production Batch Error:",
+            "MERAMU Create Batch Error:",
             error
         );
-
 
         showCreateBatchError(
             getErrorMessage(error)
@@ -1934,11 +1693,24 @@ async function handleCreateBatch(
     }
     finally{
 
-        setButtonLoading(
-            saveButton,
-            false,
-            "Buat Batch"
-        );
+        if(submitButton){
+
+            submitButton.disabled =
+                false;
+
+            submitButton.innerHTML =
+                `
+                <i data-lucide="plus"></i>
+                <span>Buat Batch</span>
+                `;
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
+
+        }
 
     }
 
@@ -1946,256 +1718,20 @@ async function handleCreateBatch(
 
 
 /* =========================================================
-   RENDER PRODUCTION
+   PRODUCTION RENDER
 ========================================================= */
 
 function renderProduction(){
-
-    const searchInput =
-        document.getElementById(
-            "productionSearch"
-        );
-
-
-    const query =
-        (
-            searchInput?.value ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
-
-
-    let filtered =
-        Array.isArray(
-            productionBatches
-        )
-            ? [
-                ...productionBatches
-            ]
-            : [];
-
-
-    /*
-     * STATUS FILTER
-     */
-
-    if(
-        activeStatusFilter !==
-        "all"
-    ){
-
-        filtered =
-            filtered.filter(
-                batch =>
-                    String(
-                        batch.status ||
-                        ""
-                    )
-                        .toLowerCase() ===
-                    activeStatusFilter
-            );
-
-    }
-
-
-    /*
-     * SEARCH
-     */
-
-    if(query){
-
-        filtered =
-            filtered.filter(
-                batch => {
-
-                    const batchCode =
-                        String(
-                            batch.batch_code ||
-                            ""
-                        )
-                            .toLowerCase();
-
-
-                    const productName =
-                        String(
-                            batch.products
-                                ?.name ||
-                            ""
-                        )
-                            .toLowerCase();
-
-
-                    const productCode =
-                        String(
-                            batch.products
-                                ?.code ||
-                            ""
-                        )
-                            .toLowerCase();
-
-
-                    const recipeName =
-                        String(
-                            batch.recipes
-                                ?.name ||
-                            ""
-                        )
-                            .toLowerCase();
-
-
-                    return (
-                        batchCode.includes(
-                            query
-                        ) ||
-                        productName.includes(
-                            query
-                        ) ||
-                        productCode.includes(
-                            query
-                        ) ||
-                        recipeName.includes(
-                            query
-                        )
-                    );
-
-                }
-            );
-
-    }
-
-
-    updateProductionSummary();
-
-
-    const tableWrap =
-        document.getElementById(
-            "productionTableWrap"
-        );
-
-
-    const emptyState =
-        document.getElementById(
-            "productionEmpty"
-        );
-
-
-    if(!filtered.length){
-
-        tableWrap?.classList.add(
-            "hidden"
-        );
-
-
-        emptyState?.classList.remove(
-            "hidden"
-        );
-
-
-        return;
-
-    }
-
-
-    emptyState?.classList.add(
-        "hidden"
-    );
-
-
-    tableWrap?.classList.remove(
-        "hidden"
-    );
-
-
-    renderProductionRows(
-        filtered
-    );
-
-}
-
-
-/* =========================================================
-   SUMMARY
-========================================================= */
-
-function updateProductionSummary(){
-
-    const total =
-        productionBatches.length;
-
-
-    const active =
-        productionBatches.filter(
-            batch =>
-                String(
-                    batch.status
-                )
-                    .toLowerCase() ===
-                "active"
-        ).length;
-
-
-    const production =
-        productionBatches.filter(
-            batch =>
-                String(
-                    batch.current_stage
-                )
-                    .toLowerCase() ===
-                "production"
-        ).length;
-
-
-    const completed =
-        productionBatches.filter(
-            batch =>
-                String(
-                    batch.status
-                )
-                    .toLowerCase() ===
-                "completed"
-        ).length;
-
-
-    setText(
-        "summaryTotal",
-        total
-    );
-
-
-    setText(
-        "summaryActive",
-        active
-    );
-
-
-    setText(
-        "summaryProduction",
-        production
-    );
-
-
-    setText(
-        "summaryCompleted",
-        completed
-    );
-
-}
-
-
-/* =========================================================
-   TABLE ROWS
-========================================================= */
-
-function renderProductionRows(
-    batches
-){
 
     const tbody =
         document.getElementById(
             "productionTableBody"
         );
 
+    const emptyState =
+        document.getElementById(
+            "productionEmptyState"
+        );
 
     if(!tbody){
 
@@ -2204,15 +1740,137 @@ function renderProductionRows(
     }
 
 
-    tbody.innerHTML =
-        batches
-            .map(
+    const searchInput =
+        document.getElementById(
+            "productionSearch"
+        );
+
+
+    const search =
+        searchInput?.value
+            ?.trim()
+            .toLowerCase() ||
+        "";
+
+
+    let rows =
+        Array.isArray(
+            productionBatches
+        )
+            ? [...productionBatches]
+            : [];
+
+
+    if(
+        activeStatusFilter &&
+        activeStatusFilter !==
+        "all"
+    ){
+
+        rows =
+            rows.filter(
                 batch =>
-                    createProductionRow(
-                        batch
-                    )
+                    String(
+                        batch.status ||
+                        ""
+                    ).toLowerCase() ===
+                    String(
+                        activeStatusFilter
+                    ).toLowerCase()
+            );
+
+    }
+
+
+    if(search){
+
+        rows =
+            rows.filter(
+                batch => {
+
+                    const productName =
+                        batch.products?.name ||
+                        "";
+
+                    const productCode =
+                        batch.products?.code ||
+                        "";
+
+                    const batchCode =
+                        batch.batch_code ||
+                        "";
+
+                    const recipeName =
+                        batch.recipes?.name ||
+                        "";
+
+                    const recipeCode =
+                        batch.recipes?.code ||
+                        "";
+
+
+                    const haystack =
+                        `
+                        ${batchCode}
+                        ${productName}
+                        ${productCode}
+                        ${recipeName}
+                        ${recipeCode}
+                        `
+                            .toLowerCase();
+
+
+                    return haystack.includes(
+                        search
+                    );
+
+                }
+            );
+
+    }
+
+
+    updateProductionSummary(
+        rows
+    );
+
+
+    if(!rows.length){
+
+        tbody.innerHTML =
+            "";
+
+        if(emptyState){
+
+            emptyState.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    if(emptyState){
+
+        emptyState.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    tbody.innerHTML =
+        rows
+            .map(
+                createProductionRow
             )
             .join("");
+
+
+    bindProductionActionEvents();
 
 
     if(window.lucide){
@@ -2225,7 +1883,7 @@ function renderProductionRows(
 
 
 /* =========================================================
-   ROW
+   PRODUCTION ROW
 ========================================================= */
 
 function createProductionRow(
@@ -2244,81 +1902,81 @@ function createProductionRow(
 
     const version =
         batch.recipe_versions ||
-        null;
+        {};
 
 
     const unit =
         batch.units ||
-        null;
+        {};
 
 
     const stage =
-        String(
-            batch.current_stage ||
-            "production"
-        )
-            .toLowerCase();
+        batch.current_stage ||
+        "production";
 
 
     const status =
-        String(
-            batch.status ||
-            "active"
-        )
-            .toLowerCase();
+        batch.status ||
+        "active";
 
 
-    const stageClass =
-        `stage-${escapeHtml(stage)}`;
+    const stageLabel =
+        getProductionStageLabel(
+            stage
+        );
 
 
-    const statusClass =
-        `status-${escapeHtml(status)}`;
+    const statusLabel =
+        getProductionStatusLabel(
+            status
+        );
 
 
-    /*
-     * MULAI F1 hanya boleh dilakukan
-     * pada batch yang masih berada
-     * di stage Production dan status
-     * bukan cancelled / completed.
-     */
+    const productionDate =
+        formatProductionDate(
+            batch.production_date
+        );
+
+
+    const plannedVolume =
+        formatProductionNumber(
+            batch.planned_volume
+        );
+
+
+    const actualVolume =
+        formatProductionNumber(
+            batch.actual_volume
+        );
+
+
+    const volumeUnit =
+        unit.code ||
+        unit.name ||
+        "";
+
+
+    const hppPerUnit =
+        formatProductionCurrency(
+            batch.hpp_per_unit
+        );
+
 
     const canStartF1 =
-        stage === "production" &&
-        status !== "cancelled" &&
-        status !== "completed";
-
-
-    const startF1Button =
-        canStartF1
-            ? `
-                <button
-                    type="button"
-                    class="production-action-btn production-action-btn-f1"
-                    title="Mulai F1"
-                    aria-label="Mulai F1"
-                    data-production-action="start-f1"
-                    data-id="${escapeHtml(
-                        batch.id
-                    )}"
-                >
-
-                    <i
-                        data-lucide="play-circle"
-                    ></i>
-
-                    <span>
-                        Mulai F1
-                    </span>
-
-                </button>
-              `
-            : "";
+        stage ===
+            "production" &&
+        status !==
+            "cancelled" &&
+        status !==
+            "completed";
 
 
     return `
-
-        <tr>
+        <tr
+            data-batch-id="${escapeHtml(
+                batch.id
+            )}"
+        >
 
             <td>
 
@@ -2331,10 +1989,10 @@ function createProductionRow(
 
                 </div>
 
-                <div class="production-batch-date">
+                <div class="production-row-meta">
 
-                    ${formatDate(
-                        batch.production_date
+                    ${escapeHtml(
+                        productionDate
                     )}
 
                 </div>
@@ -2353,7 +2011,7 @@ function createProductionRow(
 
                 </div>
 
-                <div class="production-product-code">
+                <div class="production-row-meta">
 
                     ${escapeHtml(
                         product.code ||
@@ -2376,52 +2034,20 @@ function createProductionRow(
 
                 </div>
 
-            </td>
-
-
-            <td>
-
-                ${
-                    version
-                        ? `
-                            <span class="production-version">
-                                V${escapeHtml(
-                                    version.version_number
-                                )}
-                            </span>
-                          `
-                        : `
-                            <span class="production-version">
-                                -
-                            </span>
-                          `
-                }
-
-            </td>
-
-
-            <td>
-
-                ${formatDate(
-                    batch.production_date
-                )}
-
-            </td>
-
-
-            <td>
-
-                <div class="production-volume">
-
-                    ${formatNumber(
-                        batch.planned_volume
-                    )}
+                <div class="production-row-meta">
 
                     ${escapeHtml(
-                        unit?.code ||
-                        unit?.name ||
-                        ""
+                        recipe.code ||
+                        "-"
                     )}
+
+                    ${
+                        version.version_number
+                            ? ` · V${escapeHtml(
+                                version.version_number
+                            )}`
+                            : ""
+                    }
 
                 </div>
 
@@ -2431,14 +2057,13 @@ function createProductionRow(
             <td>
 
                 <span
-                    class="
-                        production-stage-badge
-                        ${stageClass}
-                    "
+                    class="production-stage-badge production-stage-${escapeHtml(
+                        stage
+                    )}"
                 >
 
-                    ${formatStage(
-                        stage
+                    ${escapeHtml(
+                        stageLabel
                     )}
 
                 </span>
@@ -2449,14 +2074,13 @@ function createProductionRow(
             <td>
 
                 <span
-                    class="
-                        production-status-badge
-                        ${statusClass}
-                    "
+                    class="production-status-badge production-status-${escapeHtml(
+                        status
+                    )}"
                 >
 
-                    ${formatStatus(
-                        status
+                    ${escapeHtml(
+                        statusLabel
                     )}
 
                 </span>
@@ -2466,118 +2090,4032 @@ function createProductionRow(
 
             <td>
 
-                <div class="production-row-actions">
+                <div class="production-volume-main">
+
+                    ${escapeHtml(
+                        plannedVolume
+                    )}
+                    ${volumeUnit
+                        ? ` ${escapeHtml(
+                            volumeUnit
+                        )}`
+                        : ""
+                    }
+
+                </div>
+
+                <div class="production-row-meta">
+
+                    Aktual:
+                    ${escapeHtml(
+                        actualVolume
+                    )}
+                    ${volumeUnit
+                        ? ` ${escapeHtml(
+                            volumeUnit
+                        )}`
+                        : ""
+                    }
+
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <div class="production-hpp">
+
+                    ${escapeHtml(
+                        hppPerUnit
+                    )}
+
+                </div>
+
+            </td>
+
+
+            <td>
+
+                <div class="production-action-group">
 
                     <button
                         type="button"
-                        class="production-icon-btn"
-                        title="Lihat detail"
-                        aria-label="Lihat detail"
+                        class="production-action-btn"
                         data-production-action="detail"
-                        data-id="${escapeHtml(
+                        data-batch-id="${escapeHtml(
                             batch.id
                         )}"
+                        title="Detail Batch"
                     >
 
-                        <i
-                            data-lucide="eye"
-                        ></i>
+                        <i data-lucide="eye"></i>
 
                     </button>
 
 
-                    ${startF1Button}
+                    ${
+                        canStartF1
+                            ? `
+                                <button
+                                    type="button"
+                                    class="production-action-btn production-action-btn-f1"
+                                    data-production-action="start-f1"
+                                    data-batch-id="${escapeHtml(
+                                        batch.id
+                                    )}"
+                                    title="Mulai F1"
+                                >
+
+                                    <i data-lucide="play"></i>
+
+                                    <span>
+                                        Mulai F1
+                                    </span>
+
+                                </button>
+                            `
+                            : ""
+                    }
 
                 </div>
 
             </td>
 
         </tr>
-
     `;
 
 }
 
 
 /* =========================================================
-   TABLE ACTION DELEGATION
+   ACTION EVENTS
 ========================================================= */
 
-document.addEventListener(
-    "click",
-    event => {
+function bindProductionActionEvents(){
 
-        const button =
-            event.target.closest(
-                "[data-production-action]"
-            );
+    document
+        .querySelectorAll(
+            "[data-production-action]"
+        )
+        .forEach(
+            button => {
 
+                button.addEventListener(
+                    "click",
+                    () => {
 
-        if(!button){
+                        const action =
+                            button.dataset.productionAction;
 
-            return;
-
-        }
-
-
-        const action =
-            button.dataset.productionAction;
-
-
-        const id =
-            button.dataset.id;
+                        const batchId =
+                            button.dataset.batchId;
 
 
-        const batch =
-            productionBatches.find(
+                        const batch =
+                            productionBatches
+                                .find(
+                                    item =>
+                                        String(
+                                            item.id
+                                        ) ===
+                                        String(
+                                            batchId
+                                        )
+                                );
+
+
+                        if(!batch){
+
+                            return;
+
+                        }
+
+
+                        if(
+                            action ===
+                            "detail"
+                        ){
+
+                            openBatchDetail(
+                                batch
+                            );
+
+                            return;
+
+                        }
+
+
+                        if(
+                            action ===
+                            "start-f1"
+                        ){
+
+                            startBatchF1(
+                                batch.id
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   START F1
+========================================================= */
+
+async function startBatchF1(
+    batchId
+){
+
+    const batch =
+        productionBatches
+            .find(
                 item =>
                     String(
                         item.id
                     ) ===
                     String(
-                        id
+                        batchId
                     )
             );
 
 
-        if(!batch){
+    if(!batch){
 
-            return;
+        alert(
+            "Batch tidak ditemukan."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        batch.current_stage !==
+        "production"
+    ){
+
+        alert(
+            "Batch ini sudah tidak berada di tahap Production."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        batch.status ===
+        "cancelled"
+    ){
+
+        alert(
+            "Batch yang dibatalkan tidak dapat dimulai ke F1."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        batch.status ===
+        "completed"
+    ){
+
+        alert(
+            "Batch yang sudah selesai tidak dapat dimulai ke F1."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        window.confirm(
+            `Mulai F1 untuk batch ${batch.batch_code || ""}?`
+        );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        /*
+         * F1 hanya boleh dimulai jika
+         * Initial QC Production sudah PASS.
+         */
+
+        const {
+            data: latestQC,
+            error: qcError
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                decision,
+                operator_name,
+                notes
+            `)
+
+            .eq(
+                "batch_id",
+                batchId
+            )
+
+            .eq(
+                "stage",
+                "production"
+            )
+
+            .order(
+                "checked_at",
+                {
+                    ascending: false
+                }
+            )
+
+            .limit(
+                1 );
+
+
+        if(qcError){
+
+            throw qcError;
 
         }
 
 
-        /*
-         * DETAIL
-         */
+        const qc =
+            Array.isArray(
+                latestQC
+            ) &&
+            latestQC.length
+                ? latestQC[0]
+                : null;
+
+
+        const decision =
+            String(
+                qc?.decision ||
+                ""
+            )
+                .trim()
+                .toLowerCase();
+
 
         if(
-            action ===
-            "detail"
+            decision !==
+            "passed"
         ){
+
+            alert(
+                "Initial QC belum PASS. Silakan lakukan Initial QC terlebih dahulu sebelum memulai F1."
+            );
+
 
             openBatchDetail(
                 batch
             );
 
+
+            setTimeout(
+                () => {
+
+                    openInitialQCModal();
+
+                },
+                150
+            );
+
+
             return;
 
         }
 
 
-        /*
-         * START F1
-         */
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "batches"
+            )
+
+            .update({
+                current_stage:
+                    "f1"
+            })
+
+            .eq(
+                "id",
+                batchId
+            )
+
+            .eq(
+                "current_stage",
+                "production"
+            )
+
+            .select(`
+                id,
+                batch_code,
+                current_stage,
+                status
+            `)
+
+            .single();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        const index =
+            productionBatches
+                .findIndex(
+                    item =>
+                        String(
+                            item.id
+                        ) ===
+                        String(
+                            batchId
+                        )
+                );
+
+
+        if(index !== -1){
+
+            productionBatches[
+                index
+            ] = {
+
+                ...productionBatches[
+                    index
+                ],
+
+                ...data
+
+            };
+
+        }
+
+
+        renderProduction();
+
 
         if(
-            action ===
-            "start-f1"
+            activeDetailBatch &&
+            String(
+                activeDetailBatch.id
+            ) ===
+            String(
+                batchId
+            )
         ){
 
-            startBatchF1(
-                batch.id
+            activeDetailBatch = {
+                ...activeDetailBatch,
+                ...data
+            };
+
+
+            openBatchDetail(
+                activeDetailBatch
             );
 
+        }
+
+
+        alert(
+            `Batch ${batch.batch_code || ""} berhasil dimulai ke F1.`
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU Start F1 Error:",
+            error
+        );
+
+
+        alert(
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   BATCH DETAIL
+========================================================= */
+
+function openBatchDetail(
+    batch
+){
+
+    if(!batch){
+
+        return;
+
+    }
+
+
+    activeDetailBatch =
+        batch;
+
+
+    const title =
+        document.getElementById(
+            "batchDetailTitle"
+        );
+
+
+    if(title){
+
+        title.textContent =
+            batch.batch_code
+                ? `Detail Batch ${batch.batch_code}`
+                : "Detail Batch";
+
+    }
+
+
+    setDetailText(
+        "batchDetailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    setDetailText(
+        "detailBatchCode",
+        batch.batch_code ||
+        "-"
+    );
+
+
+    setDetailText(
+        "detailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    setDetailText(
+        "detailRecipe",
+        batch.recipes?.name ||
+        "-"
+    );
+
+
+    const versionText =
+        batch.recipe_versions?.version_number
+            ? `V${batch.recipe_versions.version_number}`
+            : "-";
+
+
+    setDetailText(
+        "detailRecipeVersion",
+        versionText
+    );
+
+
+    setDetailText(
+        "detailProductionDate",
+        formatProductionDate(
+            batch.production_date
+        )
+    );
+
+
+    const volumeText =
+        [
+            formatProductionNumber(
+                batch.planned_volume
+            ),
+            batch.units?.code ||
+            batch.units?.name ||
+            ""
+        ]
+            .filter(
+                Boolean
+            )
+            .join(" ");
+
+
+    setDetailText(
+        "detailPlannedVolume",
+        volumeText ||
+        "-"
+    );
+
+
+    setDetailText(
+        "detailCurrentStage",
+        getProductionStageLabel(
+            batch.current_stage
+        )
+    );
+
+
+    setDetailText(
+        "detailStatus",
+        getProductionStatusLabel(
+            batch.status
+        )
+    );
+
+
+    setDetailText(
+        "detailNotes",
+        batch.notes ||
+        "-"
+    );
+
+
+    updateProductionFlow(
+        batch.current_stage
+    );
+
+
+    const startF1Button =
+        document.getElementById(
+            "startF1FromDetailBtn"
+        );
+
+
+    const canStartF1 =
+        batch.current_stage ===
+            "production" &&
+        batch.status !==
+            "cancelled" &&
+        batch.status !==
+            "completed";
+
+
+    if(startF1Button){
+
+        startF1Button.classList.toggle(
+            "hidden",
+            !canStartF1
+        );
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.remove(
+            "hidden"
+        );
+
+    }
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+
+    loadBatchInitialQC(
+        batch
+    );
+
+}
+
+
+/* =========================================================
+   CLOSE BATCH DETAIL
+========================================================= */
+
+function closeBatchDetailModal(){
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+
+    activeDetailBatch =
+        null;
+
+    activeDetailInitialQC =
+        null;
+
+}
+
+
+/* =========================================================
+   INITIAL QC LOAD
+========================================================= */
+
+async function loadBatchInitialQC(
+    batch
+){
+
+    if(!batch?.id){
+
+        return;
+
+    }
+
+
+    renderInitialQCStatus(
+        null
+    );
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                decision,
+                operator_name,
+                notes
+            `)
+
+            .eq(
+                "batch_id",
+                batch.id
+            )
+
+            .eq(
+                "stage",
+                "production"
+            )
+
+            .order(
+                "checked_at",
+                {
+                    ascending: false
+                }
+            )
+
+            .limit(
+                1 );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        const qc =
+            Array.isArray(
+                data
+            ) &&
+            data.length
+                ? data[0]
+                : null;
+
+
+        activeDetailInitialQC =
+            qc;
+
+
+        renderInitialQCStatus(
+            qc
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU Initial QC Load Error:",
+            error
+        );
+
+
+        activeDetailInitialQC =
+            null;
+
+
+        renderInitialQCStatus(
+            null,
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL QC STATUS RENDER
+========================================================= */
+
+function renderInitialQCStatus(
+    qc,
+    errorMessage = ""
+){
+
+    const status =
+        document.getElementById(
+            "detailInitialQCStatus"
+        );
+
+
+    const decision =
+        document.getElementById(
+            "detailInitialQCDecision"
+        );
+
+
+    const meta =
+        document.getElementById(
+            "detailInitialQCMeta"
+        );
+
+
+    if(!qc){
+
+        if(status){
+
+            status.textContent =
+                errorMessage
+                    ? "Gagal memuat QC"
+                    : "Belum dilakukan";
+
+            status.className =
+                "production-qc-status-value " +
+                (
+                    errorMessage
+                        ? "is-error"
+                        : "is-empty"
+                );
+
+        }
+
+
+        if(decision){
+
+            decision.textContent =
+                "-";
+
+            decision.className =
+                "production-qc-decision-value";
+
+        }
+
+
+        if(meta){
+
+            meta.textContent =
+                errorMessage ||
+                "Initial QC Production belum tersedia.";
+
+        }
+
+
+        return;
+
+    }
+
+
+    const normalizedDecision =
+        String(
+            qc.decision ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    let decisionLabel =
+        qc.decision ||
+        "-";
+
+
+    if(
+        normalizedDecision ===
+        "passed"
+    ){
+
+        decisionLabel =
+            "PASS";
+
+    }
+    else if(
+        normalizedDecision ===
+        "not_ready"
+    ){
+
+        decisionLabel =
+            "NOT READY";
+
+    }
+    else if(
+        normalizedDecision ===
+        "hold"
+    ){
+
+        decisionLabel =
+            "HOLD";
+
+    }
+
+
+    if(status){
+
+        status.textContent =
+            "Sudah dilakukan";
+
+        status.className =
+            "production-qc-status-value is-done";
+
+    }
+
+
+    if(decision){
+
+        decision.textContent =
+            decisionLabel;
+
+
+        decision.className =
+            "production-qc-decision-value " +
+            (
+                normalizedDecision ===
+                "passed"
+                    ? "is-passed"
+                    : normalizedDecision ===
+                      "hold"
+                        ? "is-hold"
+                        : "is-not-ready"
+            );
+
+    }
+
+
+    if(meta){
+
+        const checkedAt =
+            qc.checked_at
+                ? formatProductionDateTime(
+                    qc.checked_at
+                )
+                : "-";
+
+
+        const operator =
+            qc.operator_name ||
+            "-";
+
+
+        meta.textContent =
+            `Checked ${checkedAt} · Operator ${operator}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   OPEN INITIAL QC MODAL
+========================================================= */
+
+function openInitialQCModal(){
+
+    if(!activeDetailBatch?.id){
+
+        alert(
+            "Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(!modal){
+
+        return;
+
+    }
+
+
+    const batchCodeInput =
+        document.getElementById(
+            "initialQCBatchCode"
+        );
+
+
+    const batchIdInput =
+        document.getElementById(
+            "initialQCBatchId"
+        );
+
+
+    if(batchCodeInput){
+
+        batchCodeInput.value =
+            activeDetailBatch.batch_code ||
+            "";
+
+    }
+
+
+    if(batchIdInput){
+
+        batchIdInput.value =
+            activeDetailBatch.id ||
+            "";
+
+    }
+
+
+    const checkedAtInput =
+        document.getElementById(
+            "initialQCCheckedAt"
+        );
+
+
+    if(checkedAtInput){
+
+        checkedAtInput.value =
+            toLocalDateTimeInputValue(
+                new Date()
+            );
+
+    }
+
+
+    const decisionInput =
+        document.getElementById(
+            "initialQCDecision"
+        );
+
+
+    if(decisionInput){
+
+        decisionInput.value =
+            activeDetailInitialQC?.decision ||
+            "";
+
+    }
+
+
+    setInputValue(
+        "initialQCPh",
+        activeDetailInitialQC?.ph
+    );
+
+
+    setInputValue(
+        "initialQCBrix",
+        activeDetailInitialQC?.brix
+    );
+
+
+    setInputValue(
+        "initialQCTemperature",
+        activeDetailInitialQC?.temperature_c
+    );
+
+
+    setInputValue(
+        "initialQCVolume",
+        activeDetailInitialQC?.volume
+    );
+
+
+    setInputValue(
+        "initialQCOperator",
+        activeDetailInitialQC?.operator_name ||
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCNotes",
+        activeDetailInitialQC?.notes ||
+        ""
+    );
+
+
+    clearInitialQCError();
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   INPUT HELPER
+========================================================= */
+
+function setInputValue(
+    id,
+    value
+){
+
+    const input =
+        document.getElementById(
+            id
+        );
+
+
+    if(!input){
+
+        return;
+
+    }
+
+
+    input.value =
+        value === null ||
+        value === undefined
+            ? ""
+            : value;
+
+}
+
+
+/* =========================================================
+   CLOSE INITIAL QC MODAL
+========================================================= */
+
+function closeInitialQCModal(){
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    const detailModal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(
+        detailModal &&
+        !detailModal.classList.contains(
+            "hidden"
+        )
+    ){
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+    }
+    else{
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+    }
+
+
+    clearInitialQCError();
+
+}
+
+
+/* =========================================================
+   INITIAL QC ERROR
+========================================================= */
+
+function clearInitialQCError(){
+
+    const errorBox =
+        document.getElementById(
+            "initialQCError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(errorBox){
+
+        errorBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            "";
+
+    }
+
+}
+
+
+function showInitialQCError(
+    message
+){
+
+    const errorBox =
+        document.getElementById(
+            "initialQCError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIAL QC OPTIONAL NUMBER
+========================================================= */
+
+function getProductionOptionalNumber(
+    id
+){
+
+    const input =
+        document.getElementById(
+            id
+        );
+
+
+    if(!input){
+
+        return null;
+
+    }
+
+
+    const value =
+        String(
+            input.value ??
+            ""
+        )
+            .trim();
+
+
+    if(value === ""){
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            number
+        )
+    ){
+
+        return null;
+
+    }
+
+
+    return number;
+
+}
+
+
+/* =========================================================
+   SAVE INITIAL QC
+========================================================= */
+
+async function saveInitialQC(
+    event
+){
+
+    event.preventDefault();
+
+
+    clearInitialQCError();
+
+
+    if(!activeDetailBatch?.id){
+
+        showInitialQCError(
+            "Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const batchId =
+        activeDetailBatch.id;
+
+
+    const checkedAtInput =
+        document.getElementById(
+            "initialQCCheckedAt"
+        );
+
+
+    const checkedAt =
+        checkedAtInput?.value
+            ? new Date(
+                checkedAtInput.value
+            ).toISOString()
+            : new Date().toISOString();
+
+
+    const decision =
+        document.getElementById(
+            "initialQCDecision"
+        )?.value
+        ?.trim();
+
+
+    const operatorName =
+        document.getElementById(
+            "initialQCOperator"
+        )?.value
+        ?.trim() ||
+        null;
+
+
+    const notes =
+        document.getElementById(
+            "initialQCNotes"
+        )?.value
+        ?.trim() ||
+        null;
+
+
+    if(!decision){
+
+        showInitialQCError(
+            "Decision Initial QC wajib dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveInitialQCBtn"
+        );
+
+
+    try{
+
+        if(saveButton){
+
+            saveButton.disabled =
+                true;
+
+            saveButton.innerHTML =
+                `
+                <span class="production-button-loader"></span>
+                <span>Menyimpan...</span>
+                `;
+
+        }
+
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const payload = {
+
+            batch_id:
+                batchId,
+
+            checked_at:
+                checkedAt,
+
+            stage:
+                "production",
+
+            ph:
+                getProductionOptionalNumber(
+                    "initialQCPh"
+                ),
+
+            brix:
+                getProductionOptionalNumber(
+                    "initialQCBrix"
+                ),
+
+            temperature_c:
+                getProductionOptionalNumber(
+                    "initialQCTemperature"
+                ),
+
+            volume:
+                getProductionOptionalNumber(
+                    "initialQCVolume"
+                ),
+
+            decision:
+                decision,
+
+            operator_name:
+                operatorName,
+
+            notes:
+                notes
+
+        };
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .insert(
+                payload
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                decision,
+                operator_name,
+                notes
+            `)
+
+            .single();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        activeDetailInitialQC =
+            data;
+
+
+        renderInitialQCStatus(
+            data
+        );
+
+
+        closeInitialQCModal();
+
+
+        alert(
+            "Initial QC berhasil disimpan."
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "MERAMU Save Initial QC Error:",
+            error
+        );
+
+
+        showInitialQCError(
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+    finally{
+
+        if(saveButton){
+
+            saveButton.disabled =
+                false;
+
+            saveButton.innerHTML =
+                `
+                <i data-lucide="save"></i>
+                <span>Simpan Initial QC</span>
+                `;
+
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PRODUCTION FLOW
+========================================================= */
+
+function updateProductionFlow(
+    currentStage
+){
+
+    const flowItems =
+        document.querySelectorAll(
+            "[data-production-flow]"
+        );
+
+
+    if(!flowItems.length){
+
+        return;
+
+    }
+
+
+    const stageOrder = [
+        "production",
+        "f1",
+        "f2",
+        "harvest",
+        "completed"
+    ];
+
+
+    const currentIndex =
+        stageOrder.indexOf(
+            currentStage
+        );
+
+
+    flowItems.forEach(
+        item => {
+
+            const stage =
+                item.dataset.productionFlow;
+
+
+            const stageIndex =
+                stageOrder.indexOf(
+                    stage
+                );
+
+
+            item.classList.remove(
+                "is-active",
+                "is-complete"
+            );
+
+
+            if(
+                currentIndex >= 0 &&
+                stageIndex >= 0
+            ){
+
+                if(
+                    stageIndex <
+                    currentIndex
+                ){
+
+                    item.classList.add(
+                        "is-complete"
+                    );
+
+                }
+
+
+                if(
+                    stageIndex ===
+                    currentIndex
+                ){
+
+                    item.classList.add(
+                        "is-active"
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateProductionSummary(
+    rows
+){
+
+    const total =
+        rows.length;
+
+
+    const active =
+        rows.filter(
+            batch =>
+                String(
+                    batch.status ||
+                    ""
+                ).toLowerCase() ===
+                "active"
+        ).length;
+
+
+    const completed =
+        rows.filter(
+            batch =>
+                String(
+                    batch.status ||
+                    ""
+                ).toLowerCase() ===
+                "completed"
+        ).length;
+
+
+    const cancelled =
+        rows.filter(
+            batch =>
+                String(
+                    batch.status ||
+                    ""
+                ).toLowerCase() ===
+                "cancelled"
+        ).length;
+
+
+    setSummaryValue(
+        "productionTotalCount",
+        total
+    );
+
+
+    setSummaryValue(
+        "productionActiveCount",
+        active
+    );
+
+
+    setSummaryValue(
+        "productionCompletedCount",
+        completed
+    );
+
+
+    setSummaryValue(
+        "productionCancelledCount",
+        cancelled
+    );
+
+}
+
+
+function setSummaryValue(
+    id,
+    value
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if(element){
+
+        element.textContent =
+            String(
+                value
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+function setProductionLoading(
+    loading
+){
+
+    const loadingElement =
+        document.getElementById(
+            "productionLoading"
+        );
+
+
+    const tableContainer =
+        document.getElementById(
+            "productionTableContainer"
+        );
+
+
+    if(loadingElement){
+
+        loadingElement.classList.toggle(
+            "hidden",
+            !loading
+        );
+
+    }
+
+
+    if(tableContainer){
+
+        tableContainer.classList.toggle(
+            "is-loading",
+            loading
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showProductionError(
+    message
+){
+
+    const errorElement =
+        document.getElementById(
+            "productionError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "productionErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    if(errorElement){
+
+        errorElement.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+function hideProductionError(){
+
+    const errorElement =
+        document.getElementById(
+            "productionError"
+        );
+
+
+    if(errorElement){
+
+        errorElement.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE ERROR
+========================================================= */
+
+function showCreateBatchError(
+    message
+){
+
+    const errorElement =
+        document.getElementById(
+            "createBatchError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "createBatchErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    if(errorElement){
+
+        errorElement.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+function clearCreateBatchError(){
+
+    const errorElement =
+        document.getElementById(
+            "createBatchError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "createBatchErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            "";
+
+    }
+
+
+    if(errorElement){
+
+        errorElement.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   TEXT HELPERS
+========================================================= */
+
+function setDetailText(
+    id,
+    value
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if(element){
+
+        element.textContent =
+            value === null ||
+            value === undefined ||
+            value === ""
+                ? "-"
+                : String(
+                    value
+                );
+
+    }
+
+}
+
+
+/* =========================================================
+   STAGE LABEL
+========================================================= */
+
+function getProductionStageLabel(
+    stage
+){
+
+    const labels = {
+
+        production:
+            "Production",
+
+        f1:
+            "F1",
+
+        f2:
+            "F2",
+
+        harvest:
+            "Harvest",
+
+        completed:
+            "Completed"
+
+    };
+
+
+    return (
+        labels[
+            String(
+                stage ||
+                ""
+            ).toLowerCase()
+        ] ||
+        stage ||
+        "-"
+    );
+
+}
+
+
+/* =========================================================
+   STATUS LABEL
+========================================================= */
+
+function getProductionStatusLabel(
+    status
+){
+
+    const labels = {
+
+        active:
+            "Active",
+
+        completed:
+            "Completed",
+
+        cancelled:
+            "Cancelled",
+
+        draft:
+            "Draft",
+
+        on_hold:
+            "On Hold"
+
+    };
+
+
+    return (
+        labels[
+            String(
+                status ||
+                ""
+            ).toLowerCase()
+        ] ||
+        status ||
+        "-"
+    );
+
+}
+
+
+/* =========================================================
+   DATE FORMAT
+========================================================= */
+
+function formatProductionDate(
+    value
+){
+
+    if(!value){
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return "-";
+
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            day:
+                "2-digit",
+
+            month:
+                "short",
+
+            year:
+                "numeric"
+        }
+    )
+        .format(
+            date
+        );
+
+}
+
+
+/* =========================================================
+   DATE TIME FORMAT
+========================================================= */
+
+function formatProductionDateTime(
+    value
+){
+
+    if(!value){
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return "-";
+
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            day:
+                "2-digit",
+
+            month:
+                "short",
+
+            year:
+                "numeric",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+        }
+    )
+        .format(
+            date
+        );
+
+}
+
+
+/* =========================================================
+   LOCAL DATETIME INPUT
+========================================================= */
+
+function toLocalDateTimeInputValue(
+    date
+){
+
+    if(!date){
+
+        return "";
+
+    }
+
+
+    const localDate =
+        new Date(
+            date
+        );
+
+
+    if(
+        Number.isNaN(
+            localDate.getTime()
+        )
+    ){
+
+        return "";
+
+    }
+
+
+    const year =
+        localDate.getFullYear();
+
+
+    const month =
+        String(
+            localDate.getMonth() + 1
+        )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+    const day =
+        String(
+            localDate.getDate()
+        )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+    const hours =
+        String(
+            localDate.getHours()
+        )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+    const minutes =
+        String(
+            localDate.getMinutes()
+        )
+            .padStart(
+                2,
+                "0"
+            );
+
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+
+}
+
+
+/* =========================================================
+   NUMBER FORMAT
+========================================================= */
+
+function formatProductionNumber(
+    value
+){
+
+    if(
+        value === null ||
+        value === undefined ||
+        value === ""
+    ){
+
+        return "-";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            number
+        )
+    ){
+
+        return "-";
+
+    }
+
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            maximumFractionDigits:
+                2
+        }
+    )
+        .format(
+            number
+        );
+
+}
+
+
+/* =========================================================
+   CURRENCY FORMAT
+========================================================= */
+
+function formatProductionCurrency(
+    value
+){
+
+    if(
+        value === null ||
+        value === undefined ||
+        value === ""
+    ){
+
+        return "Rp 0";
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            number
+        )
+    ){
+
+        return "Rp 0";
+
+    }
+
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style:
+                "currency",
+
+            currency:
+                "IDR",
+
+            maximumFractionDigits:
+                0
+        }
+    )
+        .format(
+            number
+        );
+
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+========================================================= */
+
+function getErrorMessage(
+    error
+){
+
+    if(!error){
+
+        return "Terjadi kesalahan.";
+
+    }
+
+
+    if(
+        typeof error ===
+        "string"
+    ){
+
+        return error;
+
+    }
+
+
+    if(
+        error.message
+    ){
+
+        return error.message;
+
+    }
+
+
+    if(
+        error.details
+    ){
+
+        return error.details;
+
+    }
+
+
+    if(
+        error.hint
+    ){
+
+        return error.hint;
+
+    }
+
+
+    try{
+
+        return JSON.stringify(
+            error
+        );
+
+    }
+    catch{
+
+        return "Terjadi kesalahan.";
+
+    }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(
+    value
+){
+
+    if(
+        value === null ||
+        value === undefined
+    ){
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+    /*
+     * Update active detail batch.
+     */
+
+    if(
+        activeDetailBatch &&
+        String(
+            activeDetailBatch.id
+        ) ===
+        String(
+            batchId
+        )
+    ){
+
+        activeDetailBatch.current_stage =
+            data.current_stage;
+
+    }
+
+
+    renderProduction();
+
+
+    if(
+        activeDetailBatch &&
+        String(
+            activeDetailBatch.id
+        ) ===
+        String(
+            batchId
+        )
+    ){
+
+        openBatchDetail(
+            activeDetailBatch
+        );
+
+    }
+
+
+    alert(
+        `Batch ${data.batch_code || batch.batch_code || "-"} berhasil dimulai F1.`
+    );
+
+
+}
+catch(error){
+
+    console.error(
+        "Start F1 Error:",
+        error
+    );
+
+
+    alert(
+        `Gagal memulai F1.\n\n${getErrorMessage(
+            error
+        )}`
+    );
+
+}
+finally{
+
+    actionButtons.forEach(
+        button => {
+
+            button.disabled =
+                false;
+
+            button.classList.remove(
+                "is-loading"
+            );
+
+            button.innerHTML =
+                `
+                    <i
+                        data-lucide="play-circle"
+                    ></i>
+
+                    <span>
+                        Mulai F1
+                    </span>
+                `;
+
+        }
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+}
+
+
+/* =========================================================
+   BATCH DETAIL
+========================================================= */
+
+function openBatchDetail(
+    batch
+){
+
+    if(!batch){
+
+        return;
+
+    }
+
+
+    activeDetailBatch =
+        batch;
+
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(!modal){
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    setText(
+        "batchDetailTitle",
+        batch.batch_code
+            ? `Detail Batch ${batch.batch_code}`
+            : "Detail Batch"
+    );
+
+
+    setText(
+        "batchDetailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    /* =====================================================
+       BASIC INFO
+    ===================================================== */
+
+    setText(
+        "detailBatchCode",
+        batch.batch_code ||
+        "-"
+    );
+
+
+    setText(
+        "detailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    setText(
+        "detailRecipe",
+        batch.recipes?.name ||
+        "-"
+    );
+
+
+    const versionNumber =
+        batch.recipe_versions
+            ?.version_number;
+
+
+    setText(
+        "detailRecipeVersion",
+        versionNumber
+            ? `V${versionNumber}`
+            : "-"
+    );
+
+
+    setText(
+        "detailProductionDate",
+        formatDate(
+            batch.production_date
+        )
+    );
+
+
+    const plannedVolume =
+        formatNumber(
+            batch.planned_volume
+        );
+
+
+    const volumeUnit =
+        batch.units?.code ||
+        batch.units?.name ||
+        "";
+
+
+    setText(
+        "detailPlannedVolume",
+        plannedVolume !== "-"
+            ? `${plannedVolume} ${volumeUnit}`
+            : "-"
+    );
+
+
+    setText(
+        "detailCurrentStage",
+        formatStage(
+            batch.current_stage
+        )
+    );
+
+
+    setText(
+        "detailStatus",
+        formatStatus(
+            batch.status
+        )
+    );
+
+
+    setText(
+        "detailNotes",
+        batch.notes ||
+        "-"
+    );
+
+
+    /* =====================================================
+       PRODUCTION FLOW
+    ===================================================== */
+
+    updateProductionFlow(
+        batch.current_stage
+    );
+
+
+    /* =====================================================
+       START F1 BUTTON
+    ===================================================== */
+
+    const startF1Button =
+        document.getElementById(
+            "startF1FromDetailBtn"
+        );
+
+
+    const stage =
+        String(
+            batch.current_stage ||
+            ""
+        )
+            .toLowerCase();
+
+
+    const status =
+        String(
+            batch.status ||
+            ""
+        )
+            .toLowerCase();
+
+
+    const canStartF1 =
+        stage ===
+            "production" &&
+        status !==
+            "cancelled" &&
+        status !==
+            "completed";
+
+
+    if(startF1Button){
+
+        startF1Button.classList.toggle(
+            "hidden",
+            !canStartF1
+        );
+
+
+        startF1Button.disabled =
+            false;
+
+
+        startF1Button.classList.remove(
+            "is-loading"
+        );
+
+
+        startF1Button.innerHTML =
+            `
+                <i
+                    data-lucide="play-circle"
+                ></i>
+
+                <span>
+                    Mulai F1
+                </span>
+            `;
+
+    }
+
+
+    /* =====================================================
+       OPEN MODAL
+    ===================================================== */
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "production-modal-open"
+    );
+
+
+    /* =====================================================
+       LOAD INITIAL QC
+    ===================================================== */
+
+    loadBatchInitialQC(
+        batch
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE BATCH DETAIL
+========================================================= */
+
+function closeBatchDetailModal(){
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    document.body.classList.remove(
+        "production-modal-open"
+    );
+
+
+    activeDetailBatch =
+        null;
+
+
+    activeDetailInitialQC =
+        null;
+
+}
+
+
+/* =========================================================
+   UPDATE PRODUCTION FLOW
+========================================================= */
+
+function updateProductionFlow(
+    currentStage
+){
+
+    const stage =
+        String(
+            currentStage ||
+            ""
+        )
+            .toLowerCase();
+
+
+    const flowItems =
+        document.querySelectorAll(
+            "[data-production-flow]"
+        );
+
+
+    if(!flowItems.length){
+
+        return;
+
+    }
+
+
+    const stageOrder = [
+        "production",
+        "f1",
+        "f2",
+        "harvest",
+        "completed"
+    ];
+
+
+    const currentIndex =
+        stageOrder.indexOf(
+            stage
+        );
+
+
+    flowItems.forEach(
+        item => {
+
+            const itemStage =
+                String(
+                    item.dataset.productionFlow ||
+                    ""
+                )
+                    .toLowerCase();
+
+
+            const itemIndex =
+                stageOrder.indexOf(
+                    itemStage
+                );
+
+
+            item.classList.remove(
+                "is-active",
+                "is-complete"
+            );
+
+
+            if(
+                currentIndex < 0 ||
+                itemIndex < 0
+            ){
+
+                return;
+
+            }
+
+
+            if(
+                itemIndex <
+                currentIndex
+            ){
+
+                item.classList.add(
+                    "is-complete"
+                );
+
+            }
+
+
+            if(
+                itemIndex ===
+                currentIndex
+            ){
+
+                item.classList.add(
+                    "is-active"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   INITIAL QC
+========================================================= */
+
+async function loadBatchInitialQC(
+    batch
+){
+
+    if(!batch?.id){
+
+        return;
+
+    }
+
+
+    const statusElement =
+        document.getElementById(
+            "detailInitialQCStatus"
+        );
+
+
+    const decisionElement =
+        document.getElementById(
+            "detailInitialQCDecision"
+        );
+
+
+    const metaElement =
+        document.getElementById(
+            "detailInitialQCMeta"
+        );
+
+
+    if(statusElement){
+
+        statusElement.textContent =
+            "Memuat...";
+
+        statusElement.className =
+            "production-qc-status-value";
+
+    }
+
+
+    if(decisionElement){
+
+        decisionElement.textContent =
+            "-";
+
+        decisionElement.className =
+            "production-qc-decision-value";
+
+    }
+
+
+    if(metaElement){
+
+        metaElement.textContent =
+            "Memuat Initial QC...";
+
+    }
+
+
+    activeDetailInitialQC =
+        null;
+
+
+    try{
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                aroma,
+                taste,
+                color,
+                carbonation,
+                scoby_condition,
+                decision,
+                reason,
+                operator_name,
+                notes
+            `)
+
+            .eq(
+                "batch_id",
+                batch.id
+            )
+
+            .eq(
+                "stage",
+                "production"
+            )
+
+            .order(
+                "checked_at",
+                {
+                    ascending: false
+                }
+            )
+
+            .limit(
+                1
+            );
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        const qc =
+            Array.isArray(
+                data
+            ) &&
+            data.length
+                ? data[0]
+                : null;
+
+
+        activeDetailInitialQC =
+            qc;
+
+
+        renderInitialQCStatus(
+            qc
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            "Load Initial QC Error:",
+            error
+        );
+
+
+        activeDetailInitialQC =
+            null;
+
+
+        if(statusElement){
+
+            statusElement.textContent =
+                "Gagal memuat";
+
+            statusElement.className =
+                "production-qc-status-value is-error";
+
+        }
+
+
+        if(metaElement){
+
+            metaElement.textContent =
+                getErrorMessage(
+                    error
+                );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER INITIAL QC STATUS
+========================================================= */
+
+function renderInitialQCStatus(
+    qc
+){
+
+    const statusElement =
+        document.getElementById(
+            "detailInitialQCStatus"
+        );
+
+
+    const decisionElement =
+        document.getElementById(
+            "detailInitialQCDecision"
+        );
+
+
+    const metaElement =
+        document.getElementById(
+            "detailInitialQCMeta"
+        );
+
+
+    if(!statusElement){
+
+        return;
+
+    }
+
+
+    if(!qc){
+
+        statusElement.textContent =
+            "Belum dilakukan";
+
+        statusElement.className =
+            "production-qc-status-value is-empty";
+
+
+        if(decisionElement){
+
+            decisionElement.textContent =
+                "-";
+
+            decisionElement.className =
+                "production-qc-decision-value";
+
+        }
+
+
+        if(metaElement){
+
+            metaElement.textContent =
+                "Initial QC Production belum tersedia.";
+
+        }
+
+
+        return;
+
+    }
+
+
+    const decision =
+        String(
+            qc.decision ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    statusElement.textContent =
+        "Sudah dilakukan";
+
+
+    statusElement.className =
+        "production-qc-status-value is-done";
+
+
+    if(decisionElement){
+
+        let decisionLabel =
+            qc.decision ||
+            "-";
+
+
+        if(
+            decision ===
+            "passed"
+        ){
+
+            decisionLabel =
+                "PASS";
+
+        }
+        else if(
+            decision ===
+            "not_ready"
+        ){
+
+            decisionLabel =
+                "NOT READY";
+
+        }
+        else if(
+            decision ===
+            "hold"
+        ){
+
+            decisionLabel =
+                "HOLD";
+
+        }
+
+
+        decisionElement.textContent =
+            decisionLabel;
+
+
+        decisionElement.className =
+            "production-qc-decision-value";
+
+
+        if(
+            decision ===
+            "passed"
+        ){
+
+            decisionElement.classList.add(
+                "is-passed"
+            );
+
+        }
+        else if(
+            decision ===
+            "hold"
+        ){
+
+            decisionElement.classList.add(
+                "is-hold"
+            );
+
+        }
+        else{
+
+            decisionElement.classList.add(
+                "is-not-ready"
+            );
+
+        }
+
+    }
+
+
+    if(metaElement){
+
+        const checkedAt =
+            qc.checked_at
+                ? formatDateTime(
+                    qc.checked_at
+                )
+                : "-";
+
+
+        const operator =
+            qc.operator_name ||
+            "-";
+
+
+        metaElement.textContent =
+            `Checked ${checkedAt} · Operator ${operator}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   OPEN INITIAL QC MODAL
+========================================================= */
+
+function openInitialQCModal(){
+
+    if(!activeDetailBatch?.id){
+
+        alert(
+            "Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(!modal){
+
+        return;
+
+    }
+
+
+    clearInitialQCError();
+
+
+    /* =====================================================
+       BATCH
+    ===================================================== */
+
+    setInputValue(
+        "initialQCBatchCode",
+        activeDetailBatch.batch_code ||
+        ""
+    );
+
+
+    setInputValue(
+        "initialQCBatchId",
+        activeDetailBatch.id ||
+        ""
+    );
+
+
+    /* =====================================================
+       CHECKED AT
+    ===================================================== */
+
+    setInputValue(
+        "initialQCCheckedAt",
+        activeDetailInitialQC?.checked_at
+            ? toLocalDateTimeInputValue(
+                new Date(
+                    activeDetailInitialQC.checked_at
+                )
+            )
+            : toLocalDateTimeInputValue(
+                new Date()
+            )
+    );
+
+
+    /* =====================================================
+       MEASUREMENT
+    ===================================================== */
+
+    setInputValue(
+        "initialQCPh",
+        activeDetailInitialQC?.ph
+    );
+
+
+    setInputValue(
+        "initialQCBrix",
+        activeDetailInitialQC?.brix
+    );
+
+
+    setInputValue(
+        "initialQCTemperature",
+        activeDetailInitialQC?.temperature_c
+    );
+
+
+    setInputValue(
+        "initialQCVolume",
+        activeDetailInitialQC?.volume
+    );
+
+
+    /* =====================================================
+       DECISION
+    ===================================================== */
+
+    setInputValue(
+        "initialQCDecision",
+        activeDetailInitialQC?.decision ||
+        ""
+    );
+
+
+    /* =====================================================
+       OPERATOR
+    ===================================================== */
+
+    setInputValue(
+        "initialQCOperator",
+        activeDetailInitialQC?.operator_name ||
+        ""
+    );
+
+
+    /* =====================================================
+       NOTES
+    ===================================================== */
+
+    setInputValue(
+        "initialQCNotes",
+        activeDetailInitialQC?.notes ||
+        ""
+    );
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "production-modal-open"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE INITIAL QC MODAL
+========================================================= */
+
+function closeInitialQCModal(){
+
+    const modal =
+        document.getElementById(
+            "initialQCModal"
+        );
+
+
+    if(modal){
+
+        modal.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    const detailModal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    if(
+        detailModal &&
+        !detailModal.classList.contains(
+            "hidden"
+        )
+    ){
+
+        document.body.classList.add(
+            "production-modal-open"
+        );
+
+    }
+    else{
+
+        document.body.classList.remove(
+            "production-modal-open"
+        );
+
+    }
+
+
+    clearInitialQCError();
+
+}
+
+
+/* =========================================================
+   INITIAL QC ERROR
+========================================================= */
+
+function clearInitialQCError(){
+
+    const errorBox =
+        document.getElementById(
+            "initialQCError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(errorBox){
+
+        errorBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            "";
+
+    }
+
+}
+
+
+function showInitialQCError(
+    message
+){
+
+    const errorBox =
+        document.getElementById(
+            "initialQCError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "initialQCErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE INITIAL QC
+========================================================= */
+
+async function saveInitialQC(
+    event
+){
+
+    event.preventDefault();
+
+
+    clearInitialQCError();
+
+
+    if(!activeDetailBatch?.id){
+
+        showInitialQCError(
+            "Batch belum dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const checkedAtValue =
+        document.getElementById(
+            "initialQCCheckedAt"
+        )?.value;
+
+
+    const checkedAt =
+        checkedAtValue
+            ? new Date(
+                checkedAtValue
+            ).toISOString()
+            : new Date().toISOString();
+
+
+    const ph =
+        getProductionOptionalNumber(
+            "initialQCPh"
+        );
+
+
+    const brix =
+        getProductionOptionalNumber(
+            "initialQCBrix"
+        );
+
+
+    const temperature =
+        getProductionOptionalNumber(
+            "initialQCTemperature"
+        );
+
+
+    const volume =
+        getProductionOptionalNumber(
+            "initialQCVolume"
+        );
+
+
+    const decision =
+        document.getElementById(
+            "initialQCDecision"
+        )?.value
+        ?.trim();
+
+
+    const operatorName =
+        document.getElementById(
+            "initialQCOperator"
+        )?.value
+        ?.trim() ||
+        null;
+
+
+    const notes =
+        document.getElementById(
+            "initialQCNotes"
+        )?.value
+        ?.trim() ||
+        null;
+
+
+    if(!decision){
+
+        showInitialQCError(
+            "Decision Initial QC wajib dipilih."
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveInitialQCBtn"
+        );
+
+
+    try{
+
+        if(saveButton){
+
+            saveButton.disabled =
+                true;
+
+            saveButton.innerHTML =
+                `
+                    <span
+                        class="production-button-loader"
+                    ></span>
+
+                    <span>
+                        Menyimpan...
+                    </span>
+                `;
+
+        }
+
+
+        const supabase =
+            await waitForProductionSupabase();
+
+
+        const payload = {
+
+            batch_id:
+                activeDetailBatch.id,
+
+            checked_at:
+                checkedAt,
+
+            stage:
+                "production",
+
+            ph:
+                ph,
+
+            brix:
+                brix,
+
+            temperature_c:
+                temperature,
+
+            volume:
+                volume,
+
+            decision:
+                decision,
+
+            operator_name:
+                operatorName,
+
+            notes:
+                notes
+
+        };
+
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from(
+                "quality_checks"
+            )
+
+            .insert(
+                payload
+            )
+
+            .select(`
+                id,
+                batch_id,
+                checked_at,
+                stage,
+                ph,
+                brix,
+                temperature_c,
+                volume,
+                aroma,
+                taste,
+                color,
+                carbonation,
+                scoby_condition,
+                decision,
+                reason,
+                operator_name,
+                notes
+            `)
+
+            .single();
+
+
+        if(error){
+
+            throw error;
+
+        }
+
+
+        activeDetailInitialQC =
+            data;
+
+
+        renderInitialQCStatus(
+            data
+        );
+
+
+        closeInitialQCModal();
+
+
+        alert(
+            "Initial QC berhasil disimpan."
+        );
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Save Initial QC Error:",
+            error
+        );
+
+
+        showInitialQCError(
+            getErrorMessage(
+                error
+            )
+        );
+
+    }
+    finally{
+
+        if(saveButton){
+
+            saveButton.disabled =
+                false;
+
+            saveButton.innerHTML =
+                `
+                    <i
+                        data-lucide="save"
+                    ></i>
+
+                    <span>
+                        Simpan Initial QC
+                    </span>
+                `;
+
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   OPTIONAL NUMBER
+========================================================= */
+
+function getProductionOptionalNumber(
+    id
+){
+
+    const input =
+        document.getElementById(
+            id
+        );
+
+
+    if(!input){
+
+        return null;
+
+    }
+
+
+    const value =
+        String(
+            input.value ??
+            ""
+        )
+            .trim();
+
+
+    if(value === ""){
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if(
+        !Number.isFinite(
+            number
+        )
+    ){
+
+        return null;
+
+    }
+
+
+    return number;
+
+}
+
+
+/* =========================================================
+   CREATE ERROR
+========================================================= */
+
+function showCreateBatchError(
+    message
+){
+
+    const errorBox =
+        document.getElementById(
+            "createBatchError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "createBatchErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            message ||
+            "Terjadi kesalahan.";
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.remove(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+function clearCreateBatchError(){
+
+    const errorBox =
+        document.getElementById(
+            "createBatchError"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "createBatchErrorMessage"
+        );
+
+
+    if(errorMessage){
+
+        errorMessage.textContent =
+            "";
+
+    }
+
+
+    if(errorBox){
+
+        errorBox.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
         }
 
     }
@@ -2751,7 +6289,8 @@ async function startBatchF1(
 
     }
 
-       /* =====================================================
+
+    /* =====================================================
        INITIAL QC GATE
        Batch wajib memiliki Initial QC PASS
        sebelum boleh masuk F1.
@@ -3104,7 +6643,11 @@ function closeBatchDetailModal(){
     activeDetailBatch =
         null;
 
+    activeDetailInitialQC =
+        null;
+
 }
+
 
 /* =========================================================
    INITIAL QC
@@ -3705,6 +7248,7 @@ function showInitialQCError(
             "initialQCError"
         );
 
+
     const messageElement =
         document.getElementById(
             "initialQCErrorMessage"
@@ -3914,11 +7458,18 @@ async function saveInitialQC(
     };
 
 
-    setButtonLoading(
-        saveButton,
-        true,
-        "Menyimpan..."
-    );
+    if(saveButton){
+
+        saveButton.disabled =
+            true;
+
+        saveButton.innerHTML =
+            `
+                <span class="production-button-loader"></span>
+                <span>Menyimpan...</span>
+            `;
+
+    }
 
 
     try{
@@ -4012,6 +7563,7 @@ async function saveInitialQC(
                     </span>
                 `;
 
+
             if(window.lucide){
 
                 lucide.createIcons();
@@ -4023,6 +7575,7 @@ async function saveInitialQC(
     }
 
 }
+
 
 /* =========================================================
    DETAIL
@@ -4044,6 +7597,7 @@ function openBatchDetail(
 
     activeDetailInitialQC =
         null;
+
 
     setText(
         "batchDetailTitle",
@@ -4227,6 +7781,240 @@ function openBatchDetail(
     loadBatchInitialQC(
         batch
     );
+
+}
+        if(saveButton){
+
+            saveButton.disabled =
+                false;
+
+            saveButton.innerHTML =
+                `
+                    <i data-lucide="save"></i>
+                    <span>
+                        Simpan Initial QC
+                    </span>
+                `;
+
+            if(window.lucide){
+
+                lucide.createIcons();
+
+            }
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   DETAIL
+========================================================= */
+
+function openBatchDetail(
+    batch
+){
+
+    if(!batch){
+
+        return;
+
+    }
+
+
+    activeDetailBatch =
+        batch;
+
+    activeDetailInitialQC =
+        null;
+
+
+    setText(
+        "batchDetailTitle",
+        batch.batch_code ||
+        "-"
+    );
+
+
+    setText(
+        "batchDetailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    setText(
+        "detailBatchCode",
+        batch.batch_code ||
+        "-"
+    );
+
+
+    setText(
+        "detailProduct",
+        batch.products?.name ||
+        "-"
+    );
+
+
+    setText(
+        "detailRecipe",
+        batch.recipes?.name ||
+        "-"
+    );
+
+
+    setText(
+        "detailRecipeVersion",
+        batch.recipe_versions
+            ?.version_number
+            ? `V${batch.recipe_versions.version_number}`
+            : "-"
+    );
+
+
+    setText(
+        "detailProductionDate",
+        formatDate(
+            batch.production_date
+        )
+    );
+
+
+    setText(
+        "detailPlannedVolume",
+        `${formatNumber(
+            batch.planned_volume
+        )} ${
+            batch.units?.name ||
+            batch.units?.code ||
+            ""
+        }`
+    );
+
+
+    setText(
+        "detailCurrentStage",
+        formatStage(
+            batch.current_stage
+        )
+    );
+
+
+    setText(
+        "detailStatus",
+        formatStatus(
+            batch.status
+        )
+    );
+
+
+    setText(
+        "detailNotes",
+        batch.notes ||
+        "Tidak ada catatan."
+    );
+
+
+    /*
+     * Update Production Flow
+     */
+
+    updateProductionFlow(
+        batch.current_stage
+    );
+
+
+    /*
+     * Update tombol Mulai F1
+     */
+
+    const startF1Button =
+        document.getElementById(
+            "startF1FromDetailBtn"
+        );
+
+
+    const stage =
+        String(
+            batch.current_stage ||
+            "production"
+        )
+            .toLowerCase();
+
+
+    const status =
+        String(
+            batch.status ||
+            "active"
+        )
+            .toLowerCase();
+
+
+    const canStartF1 =
+        stage === "production" &&
+        status !== "cancelled" &&
+        status !== "completed";
+
+
+    if(startF1Button){
+
+        startF1Button.classList.toggle(
+            "hidden",
+            !canStartF1
+        );
+
+        startF1Button.disabled =
+            false;
+
+        startF1Button.innerHTML =
+            `
+                <i
+                    data-lucide="play-circle"
+                ></i>
+
+                <span>
+                    Mulai F1
+                </span>
+            `;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "batchDetailModal"
+        );
+
+
+    modal?.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.classList.add(
+        "production-modal-open"
+    );
+
+
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+
+    /* =====================================================
+       LOAD INITIAL QC
+    ===================================================== */
+
+    loadBatchInitialQC(
+        batch
+    );
+
+}
 
 
 /* =========================================================
@@ -4598,9 +8386,59 @@ function formatDate(
     return new Intl.DateTimeFormat(
         "id-ID",
         {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
+            day:
+                "2-digit",
+
+            month:
+                "short",
+
+            year:
+                "numeric"
+        }
+    )
+        .format(
+            date
+        );
+
+}
+
+
+function formatDateTime(
+    value
+){
+
+    if(!value){
+
+        return "-";
+
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return "-";
+
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            dateStyle:
+                "medium",
+
+            timeStyle:
+                "short"
         }
     )
         .format(
@@ -4648,7 +8486,8 @@ function formatNumber(
     return new Intl.NumberFormat(
         "id-ID",
         {
-            maximumFractionDigits: 3
+            maximumFractionDigits:
+                3
         }
     )
         .format(
@@ -4690,7 +8529,9 @@ function formatStage(
     };
 
 
-    return map[stage] ||
+    return map[
+        stage
+    ] ||
         stage
             .replaceAll(
                 "_",
@@ -4734,7 +8575,9 @@ function formatStatus(
     };
 
 
-    return map[status] ||
+    return map[
+        status
+    ] ||
         status;
 
 }
@@ -4801,6 +8644,40 @@ function setText(
 }
 
 
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeHtml(
+    value
+){
+
+    return String(
+        value ??
+        ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
 /* =========================================================
    ESCAPE
 ========================================================= */
