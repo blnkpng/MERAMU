@@ -5002,6 +5002,26 @@
                                                    `
                                                  : ""
                                          }
+
+                                         <div
+                                             class="recipe-version-history-actions"
+                                         >
+
+                                             <button
+                                                 type="button"
+                                                 class="page-btn danger recipe-version-delete-button"
+                                                 data-delete-recipe-version="${escapeHtml(version.id)}"
+                                                 data-version-number="${escapeHtml(version.version_number)}"
+                                                 ${isCurrent ? "disabled" : ""}
+                                             >
+
+                                                 <i data-lucide="trash-2"></i>
+
+                                                 ${isCurrent ? "Current" : "Hapus Version"}
+
+                                             </button>
+
+                                         </div>
          
                                      </div>
          
@@ -9060,65 +9080,24 @@ function bindRecipeVersionModalEvents() {
    DELETE RECIPE
 ===================================================== */
 
-async function deleteRecipe(
-    recipeId
+async function deleteRecipeVersion(
+    versionId,
+    versionNumber
 ) {
 
-    if (
-        !recipeId
-    ) {
-
+    if (!versionId) {
         return;
-
     }
 
+    const recipeId = activeDetailRecipeId;
 
-    const recipe =
-        recipes.find(
-            item =>
-                String(
-                    item.id
-                ) ===
-                String(
-                    recipeId
-                )
-        );
-
-
-    if (
-        !recipe
-    ) {
-
+    if (!recipeId) {
+        window.alert("Recipe aktif tidak ditemukan.");
         return;
-
     }
 
-
-    const recipeName =
-        recipe.name ||
-        "Recipe ini";
-
-
-    const confirmed =
-        window.confirm(
-            `Hapus recipe "${recipeName}"?\n\n` +
-            `PERINGATAN:\n` +
-            `Recipe master dan data Version yang terkait ` +
-            `akan ikut terhapus jika database menggunakan ` +
-            `ON DELETE CASCADE.\n\n` +
-            `Tindakan ini tidak dapat dibatalkan.\n\n` +
-            `Klik OK untuk menghapus.`
-        );
-
-
-    if (
-        !confirmed
-    ) {
-
-        return;
-
-    }
-
+    const versionLabel =
+        `V${versionNumber || "?"}`;
 
     waitForSupabase(
         async supabase => {
@@ -9127,116 +9106,418 @@ async function deleteRecipe(
 
                 /*
                 =========================================
-                DELETE MASTER RECIPE
-                =========================================
-
-                Sengaja hanya delete dari recipes.
-
-                Jangan delete recipe_versions /
-                recipe_ingredients satu per satu di sini.
-
-                Jika FK database menggunakan CASCADE,
-                child data akan ikut terhapus.
-
-                Jika tidak menggunakan CASCADE,
-                Supabase akan menolak delete dan data
-                tetap aman.
+                1. LOAD VERSION
                 =========================================
                 */
-
 
                 const {
-                    error
+                    data: version,
+                    error: versionLoadError
                 } = await supabase
+                    .from("recipe_versions")
+                    .select(`
+                        id,
+                        recipe_id,
+                        version_number
+                    `)
+                    .eq("id", versionId)
+                    .eq("recipe_id", recipeId)
+                    .single();
 
-                    .from(
-                        "recipes"
-                    )
+                if (versionLoadError) {
+                    throw versionLoadError;
+                }
 
-                    .delete()
+                /*
+                =========================================
+                2. CURRENT VERSION CANNOT BE DELETED
+                =========================================
+                */
 
-                    .eq(
-                        "id",
-                        recipeId
+                const {
+                    data: recipe,
+                    error: recipeLoadError
+                } = await supabase
+                    .from("recipes")
+                    .select(`
+                        id,
+                        name,
+                        current_version_number
+                    `)
+                    .eq("id", recipeId)
+                    .single();
+
+                if (recipeLoadError) {
+                    throw recipeLoadError;
+                }
+
+                if (
+                    Number(recipe?.current_version_number) ===
+                    Number(version?.version_number)
+                ) {
+                    window.alert(
+                        `${versionLabel} tidak dapat dihapus karena merupakan Current Version.\n\n` +
+                        `Buat Version baru terlebih dahulu agar Version ini tidak lagi menjadi Current.`
+                    );
+                    return;
+                }
+
+                /*
+                =========================================
+                3. CHECK BATCH USAGE
+                =========================================
+                */
+
+                const {
+                    data: usedBatches,
+                    error: batchCheckError
+                } = await supabase
+                    .from("batches")
+                    .select(`
+                        id,
+                        batch_code
+                    `)
+                    .eq("recipe_version_id", versionId)
+                    .limit(20);
+
+                if (batchCheckError) {
+                    throw batchCheckError;
+                }
+
+                if (Array.isArray(usedBatches) && usedBatches.length) {
+
+                    const batchList = usedBatches
+                        .map(batch => batch.batch_code || batch.id)
+                        .join(", ");
+
+                    window.alert(
+                        `${versionLabel} tidak dapat dihapus.\n\n` +
+                        `Version ini sudah digunakan oleh Batch / Production:` +
+                        `\n${batchList}` +
+                        `${usedBatches.length >= 20 ? "\n...dan batch lainnya." : ""}\n\n` +
+                        `Histori produksi tetap dipertahankan.`
                     );
 
+                    return;
+                }
 
-                if (
+                /*
+                =========================================
+                4. CONFIRM
+                =========================================
+                */
+
+                const confirmed = window.confirm(
+                    `Hapus Recipe Version ${versionLabel}?\n\n` +
+                    `Version ini belum digunakan oleh Batch / Production.\n` +
+                    `Tindakan ini tidak dapat dibatalkan.`
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                /*
+                =========================================
+                5. DELETE VERSION INGREDIENTS FIRST
+                =========================================
+
+                Karena recipe_ingredients adalah child
+                langsung dari recipe_versions, hapus child
+                yang dimiliki Version ini terlebih dahulu.
+                =========================================
+                */
+
+                const {
+                    error: ingredientDeleteError
+                } = await supabase
+                    .from("recipe_ingredients")
+                    .delete()
+                    .eq("recipe_version_id", versionId);
+
+                if (ingredientDeleteError) {
+                    throw ingredientDeleteError;
+                }
+
+                /*
+                =========================================
+                6. DELETE VERSION
+                =========================================
+                */
+
+                const {
+                    error: deleteError
+                } = await supabase
+                    .from("recipe_versions")
+                    .delete()
+                    .eq("id", versionId)
+                    .eq("recipe_id", recipeId);
+
+                if (deleteError) {
+                    throw deleteError;
+                }
+
+                /*
+                =========================================
+                7. REFRESH DETAIL
+                =========================================
+                */
+
+                await openRecipeDetail(recipeId);
+
+                showSuccessMessage(
+                    `Recipe Version ${versionLabel} berhasil dihapus.`
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "DELETE RECIPE VERSION ERROR:",
                     error
-                ) {
+                );
 
-                    throw error;
+                window.alert(
+                    `Recipe Version ${versionLabel} gagal dihapus.\n\n` +
+                    `${error?.message || "Terjadi kesalahan saat menghapus Version."}`
+                );
 
-                }
+            }
 
+        }
+    );
+}
+
+
+async function deleteRecipe(
+    recipeId
+) {
+
+    if (!recipeId) {
+        return;
+    }
+
+    const recipe = recipes.find(
+        item => String(item.id) === String(recipeId)
+    );
+
+    if (!recipe) {
+        return;
+    }
+
+    const recipeName = recipe.name || "Recipe ini";
+
+    waitForSupabase(
+        async supabase => {
+
+            try {
 
                 /*
                 =========================================
-                CLOSE DETAIL
+                1. LOAD VERSION IDS
                 =========================================
                 */
+
+                const {
+                    data: versions,
+                    error: versionsError
+                } = await supabase
+                    .from("recipe_versions")
+                    .select(`
+                        id,
+                        version_number
+                    `)
+                    .eq("recipe_id", recipeId);
+
+                if (versionsError) {
+                    throw versionsError;
+                }
+
+                const versionIds = (versions || [])
+                    .map(item => item.id)
+                    .filter(Boolean);
+
+                /*
+                =========================================
+                2. CHECK BATCH -> RECIPE MASTER
+                =========================================
+                */
+
+                const {
+                    data: recipeBatches,
+                    error: recipeBatchError
+                } = await supabase
+                    .from("batches")
+                    .select(`
+                        id,
+                        batch_code
+                    `)
+                    .eq("recipe_id", recipeId)
+                    .limit(20);
+
+                if (recipeBatchError) {
+                    throw recipeBatchError;
+                }
+
+                /*
+                =========================================
+                3. CHECK BATCH -> RECIPE VERSION
+
+                Tetap dicek walaupun recipe_id kosong,
+                agar histori produksi tidak ikut terhapus.
+                =========================================
+                */
+
+                let versionBatches = [];
+
+                if (versionIds.length) {
+
+                    const {
+                        data,
+                        error
+                    } = await supabase
+                        .from("batches")
+                        .select(`
+                            id,
+                            batch_code,
+                            recipe_version_id
+                        `)
+                        .in("recipe_version_id", versionIds)
+                        .limit(20);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    versionBatches = data || [];
+                }
+
+                const allUsedBatches = [
+                    ...(recipeBatches || []),
+                    ...versionBatches
+                ].filter(
+                    (batch, index, array) =>
+                        array.findIndex(
+                            item => String(item.id) === String(batch.id)
+                        ) === index
+                );
+
+                if (allUsedBatches.length) {
+
+                    const batchList = allUsedBatches
+                        .map(batch => batch.batch_code || batch.id)
+                        .join(", ");
+
+                    window.alert(
+                        `Recipe "${recipeName}" tidak dapat dihapus.\n\n` +
+                        `Recipe ini sudah digunakan oleh Batch / Production:` +
+                        `\n${batchList}` +
+                        `${allUsedBatches.length >= 20 ? "\n...dan batch lainnya." : ""}\n\n` +
+                        `Histori produksi harus tetap aman.`
+                    );
+
+                    return;
+                }
+
+                /*
+                =========================================
+                4. CONFIRM AFTER SAFETY CHECK
+                =========================================
+                */
+
+                const confirmed = window.confirm(
+                    `Hapus recipe "${recipeName}"?\n\n` +
+                    `Recipe ini belum digunakan oleh Batch / Production.\n` +
+                    `Semua Version dan formula ingredient milik Recipe ini akan dihapus.\n\n` +
+                    `Tindakan ini tidak dapat dibatalkan.`
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                /*
+                =========================================
+                5. DELETE CHILD INGREDIENTS
+                =========================================
+                */
+
+                if (versionIds.length) {
+
+                    const {
+                        error: ingredientDeleteError
+                    } = await supabase
+                        .from("recipe_ingredients")
+                        .delete()
+                        .in("recipe_version_id", versionIds);
+
+                    if (ingredientDeleteError) {
+                        throw ingredientDeleteError;
+                    }
+                }
+
+                /*
+                =========================================
+                6. DELETE VERSIONS
+                =========================================
+                */
+
+                if (versionIds.length) {
+
+                    const {
+                        error: versionDeleteError
+                    } = await supabase
+                        .from("recipe_versions")
+                        .delete()
+                        .in("id", versionIds)
+                        .eq("recipe_id", recipeId);
+
+                    if (versionDeleteError) {
+                        throw versionDeleteError;
+                    }
+                }
+
+                /*
+                =========================================
+                7. DELETE MASTER
+                =========================================
+                */
+
+                const {
+                    error: recipeDeleteError
+                } = await supabase
+                    .from("recipes")
+                    .delete()
+                    .eq("id", recipeId);
+
+                if (recipeDeleteError) {
+                    throw recipeDeleteError;
+                }
 
                 if (
-                    String(
-                        activeDetailRecipeId
-                    ) ===
-                    String(
-                        recipeId
-                    )
+                    String(activeDetailRecipeId) === String(recipeId)
                 ) {
-
                     closeRecipeDetail();
-
                 }
-
-
-                /*
-                =========================================
-                REFRESH
-                =========================================
-                */
 
                 await loadRecipes();
-
-
-                /*
-                =========================================
-                SUCCESS
-                =========================================
-                */
 
                 showSuccessMessage(
                     `Recipe "${recipeName}" berhasil dihapus.`
                 );
 
             }
-            catch (
-                error
-            ) {
+            catch (error) {
 
                 console.error(
                     "DELETE RECIPE ERROR:",
                     error
                 );
 
-
-                /*
-                -----------------------------------------
-                FRIENDLY ERROR
-                -----------------------------------------
-                */
-
-                const message =
-                    error?.message ||
-                    "Recipe gagal dihapus.";
-
-
                 window.alert(
-                    "Recipe gagal dihapus.\n\n" +
-                    message +
-                    "\n\n" +
-                    "Jika recipe sudah dipakai oleh Batch / Production, " +
-                    "database mungkin sengaja mencegah penghapusan data tersebut."
+                    `Recipe "${recipeName}" gagal dihapus.\n\n` +
+                    `${error?.message || "Terjadi kesalahan saat menghapus Recipe."}\n\n` +
+                    `Jika data masih memiliki relasi database lain yang belum ditangani, data tidak dihapus secara paksa.`
                 );
 
             }
@@ -9623,6 +9904,39 @@ document
 
         }
     );
+
+        /*
+        -----------------------------------------------------
+        VERSION HISTORY → DELETE VERSION
+        -----------------------------------------------------
+        */
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                const button =
+                    event.target.closest(
+                        "[data-delete-recipe-version]"
+                    );
+
+                if (!button) {
+                    return;
+                }
+
+                const versionId =
+                    button.dataset.deleteRecipeVersion;
+
+                const versionNumber =
+                    button.dataset.versionNumber;
+
+                deleteRecipeVersion(
+                    versionId,
+                    versionNumber
+                );
+
+            }
+        );
 
         /*
         -----------------------------------------------------
