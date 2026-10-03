@@ -1,0 +1,14 @@
+/* =========================================================
+   MERAMU GLOBAL UI DENSITY
+   Desktop 100% is intentionally styled with the visual
+   density of approximately 90% browser zoom.
+   Mobile/tablet remain unchanged.
+========================================================= */
+
+@media (min-width:1025px){
+    .app-shell{
+        zoom:.9;
+        width:111.111111%;
+        min-height:111.111111vh;
+    }
+}
