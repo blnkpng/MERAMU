@@ -9184,7 +9184,10 @@ async function deleteRecipeVersion(
                     throw batchCheckError;
                 }
 
-                if (Array.isArray(usedBatches) && usedBatches.length) {
+                if (
+                    Array.isArray(usedBatches) &&
+                    usedBatches.length
+                ) {
 
                     const batchList = usedBatches
                         .map(batch => batch.batch_code || batch.id)
@@ -9203,13 +9206,56 @@ async function deleteRecipeVersion(
 
                 /*
                 =========================================
-                4. CONFIRM
+                4. CHECK ALLOCATION COMPONENT USAGE
+                =========================================
+
+                allocation_components adalah data histori / proses
+                Allocation yang memiliki FK ke recipe_versions.
+
+                Jangan mencoba DELETE dari browser karena tabel ini
+                memiliki permission/RLS yang tidak mengizinkan client
+                menghapus data tersebut.
+
+                Jika masih ada row, Version dianggap masih digunakan
+                dan harus dipertahankan.
+                =========================================
+                */
+
+                const {
+                    data: allocationComponents,
+                    error: allocationCheckError
+                } = await supabase
+                    .from("allocation_components")
+                    .select("recipe_version_id")
+                    .eq("recipe_version_id", versionId)
+                    .limit(1);
+
+                if (allocationCheckError) {
+                    throw allocationCheckError;
+                }
+
+                if (
+                    Array.isArray(allocationComponents) &&
+                    allocationComponents.length
+                ) {
+                    window.alert(
+                        `${versionLabel} tidak dapat dihapus.\n\n` +
+                        `Version ini masih digunakan oleh data Allocation / HPP. ` +
+                        `Data tersebut dipertahankan agar histori tetap aman.`
+                    );
+                    return;
+                }
+
+                /*
+                =========================================
+                5. CONFIRM
                 =========================================
                 */
 
                 const confirmed = window.confirm(
                     `Hapus Recipe Version ${versionLabel}?\n\n` +
-                    `Version ini belum digunakan oleh Batch / Production.\n` +
+                    `Version ini belum digunakan oleh Batch / Production ` +
+                    `dan belum memiliki data Allocation / HPP.\n` +
                     `Tindakan ini tidak dapat dibatalkan.`
                 );
 
@@ -9219,41 +9265,12 @@ async function deleteRecipeVersion(
 
                 /*
                 =========================================
-                5. DELETE VERSION ALLOCATION COMPONENTS FIRST
-                =========================================
-
-                allocation_components memiliki FK langsung
-                ke recipe_versions.
-
-                Jika row allocation masih tersimpan, Supabase
-                akan menolak penghapusan Version walaupun
-                Version tersebut belum pernah dipakai Batch.
-
-                Karena Version sudah lolos pemeriksaan Batch
-                di atas, allocation component milik Version ini
-                aman dibersihkan sebagai data turunan Version.
-                =========================================
-                */
-
-                const {
-                    error: allocationDeleteError
-                } = await supabase
-                    .from("allocation_components")
-                    .delete()
-                    .eq("recipe_version_id", versionId);
-
-                if (allocationDeleteError) {
-                    throw allocationDeleteError;
-                }
-
-                /*
-                =========================================
                 6. DELETE VERSION INGREDIENTS FIRST
                 =========================================
 
-                Karena recipe_ingredients adalah child
-                langsung dari recipe_versions, hapus child
-                yang dimiliki Version ini terlebih dahulu.
+                recipe_ingredients adalah child langsung dari
+                recipe_versions. Hanya child milik Version ini yang
+                dihapus setelah seluruh dependency historis lolos.
                 =========================================
                 */
 
