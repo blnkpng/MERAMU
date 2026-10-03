@@ -4134,39 +4134,91 @@ function renderBatchRecipePreparation(
      * =====================================================
      */
 
-    const actualRows =
-        rows
-            .map(
-                (
-                    item,
-                    index
-                ) => {
-
-                    const ingredient =
-                        item.ingredient ||
-                        {};
-
-                    const unit =
-                        item.unit ||
-                        {};
-
-                    const actual =
-                        item.actual ||
-                        {};
+const actual =
+    item.actual ||
+    {};
 
 
-                    const actualValue =
-                        actual.actual_quantity !== null &&
-                        actual.actual_quantity !== undefined
-                            ? actual.actual_quantity
-                            : "";
+const actualValue =
+    actual.actual_quantity !== null &&
+    actual.actual_quantity !== undefined
+        ? actual.actual_quantity
+        : "";
 
 
-                    const notesValue =
-                        actual.notes ||
-                        "";
+const notesValue =
+    actual.notes ||
+    "";
 
 
+/*
+ * =====================================================
+ * VARIANCE
+ * =====================================================
+ */
+
+let varianceValue =
+    null;
+
+
+let varianceClass =
+    "is-empty";
+
+
+if(actualValue !== ""){
+
+    const formulaNumber =
+        Number(
+            item.quantity
+        );
+
+
+    const actualNumber =
+        Number(
+            actualValue
+        );
+
+
+    if(
+        Number.isFinite(
+            formulaNumber
+        ) &&
+        Number.isFinite(
+            actualNumber
+        )
+    ){
+
+        varianceValue =
+            actualNumber -
+            formulaNumber;
+
+
+        if(
+            varianceValue > 0
+        ){
+
+            varianceClass =
+                "is-positive";
+
+        }
+        else if(
+            varianceValue < 0
+        ){
+
+            varianceClass =
+                "is-negative";
+
+        }
+        else{
+
+            varianceClass =
+                "is-zero";
+
+        }
+
+    }
+
+}
                     return `
 
                         <div
@@ -4237,7 +4289,31 @@ function renderBatchRecipePreparation(
                                 </strong>
 
                             </div>
-
+                           <div class="production-actual-ingredient-variance">
+                           
+                               <label>
+                                   Selisih
+                               </label>
+                           
+                               <strong
+                                   class="production-actual-variance-value ${varianceClass}"
+                               >
+                                   ${
+                                       varianceValue === null
+                                           ? "-"
+                                           : `${varianceValue > 0 ? "+" : ""}${escapeHtml(
+                                               formatProductionNumber(
+                                                   varianceValue
+                                               )
+                                           )} ${escapeHtml(
+                                               unit.code ||
+                                               unit.name ||
+                                               ""
+                                           )}`
+                                   }
+                               </strong>
+                           
+                           </div>
 
                             <div class="production-actual-ingredient-input">
 
