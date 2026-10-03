@@ -1761,23 +1761,6 @@ alert(
 
 function renderProduction(){
 
-    const tbody =
-        document.getElementById(
-            "productionTableBody"
-        );
-
-    const emptyState =
-        document.getElementById(
-            "productionEmptyState"
-        );
-
-    if(!tbody){
-
-        return;
-
-    }
-
-
     const searchInput =
         document.getElementById(
             "productionSearch"
@@ -1809,8 +1792,7 @@ function renderProduction(){
             rows.filter(
                 batch =>
                     String(
-                        batch.status ||
-                        ""
+                        batch.status || ""
                     ).toLowerCase() ===
                     String(
                         activeStatusFilter
@@ -1868,34 +1850,57 @@ function renderProduction(){
     }
 
 
-    updateProductionSummary(
-        rows
-    );
+    updateProductionSummary();
+
+
+    const tableWrap =
+        document.getElementById(
+            "productionTableWrap"
+        );
+
+
+    const emptyState =
+        document.getElementById(
+            "productionEmpty"
+        );
 
 
     if(!rows.length){
 
-        tbody.innerHTML =
-            "";
+        tableWrap?.classList.add(
+            "hidden"
+        );
 
-        if(emptyState){
 
-            emptyState.classList.remove(
-                "hidden"
-            );
+        emptyState?.classList.remove(
+            "hidden"
+        );
 
-        }
 
         return;
 
     }
 
 
-    if(emptyState){
+    emptyState?.classList.add(
+        "hidden"
+    );
 
-        emptyState.classList.add(
-            "hidden"
+
+    tableWrap?.classList.remove(
+        "hidden"
+    );
+
+
+    const tbody =
+        document.getElementById(
+            "productionTableBody"
         );
+
+
+    if(!tbody){
+
+        return;
 
     }
 
@@ -1919,7 +1924,6 @@ function renderProduction(){
 
 }
 
-
 /* =========================================================
    PRODUCTION ROW
 ========================================================= */
@@ -1932,81 +1936,35 @@ function createProductionRow(
         batch.products ||
         {};
 
-
     const recipe =
         batch.recipes ||
         {};
-
 
     const version =
         batch.recipe_versions ||
         {};
 
-
     const unit =
         batch.units ||
         {};
 
-
     const stage =
-        batch.current_stage ||
-        "production";
-
+        String(
+            batch.current_stage ||
+            "production"
+        ).toLowerCase();
 
     const status =
-        batch.status ||
-        "active";
-
-
-    const stageLabel =
-        getProductionStageLabel(
-            stage
-        );
-
-
-    const statusLabel =
-        getProductionStatusLabel(
-            status
-        );
-
-
-    const productionDate =
-        formatProductionDate(
-            batch.production_date
-        );
-
-
-    const plannedVolume =
-        formatProductionNumber(
-            batch.planned_volume
-        );
-
-
-    const actualVolume =
-        formatProductionNumber(
-            batch.actual_volume
-        );
-
-
-    const volumeUnit =
-        unit.code ||
-        unit.name ||
-        "";
-
-
-    const hppPerUnit =
-        formatProductionCurrency(
-            batch.hpp_per_unit
-        );
+        String(
+            batch.status ||
+            "active"
+        ).toLowerCase();
 
 
     const canStartF1 =
-        stage ===
-            "production" &&
-        status !==
-            "cancelled" &&
-        status !==
-            "completed";
+        stage === "production" &&
+        status !== "cancelled" &&
+        status !== "completed";
 
 
     return `
@@ -2015,6 +1973,8 @@ function createProductionRow(
                 batch.id
             )}"
         >
+
+            <!-- BATCH -->
 
             <td>
 
@@ -2030,13 +1990,17 @@ function createProductionRow(
                 <div class="production-row-meta">
 
                     ${escapeHtml(
-                        productionDate
+                        formatProductionDate(
+                            batch.production_date
+                        )
                     )}
 
                 </div>
 
             </td>
 
+
+            <!-- PRODUCT -->
 
             <td>
 
@@ -2061,6 +2025,8 @@ function createProductionRow(
             </td>
 
 
+            <!-- RECIPE -->
+
             <td>
 
                 <div class="production-recipe-name">
@@ -2079,10 +2045,78 @@ function createProductionRow(
                         "-"
                     )}
 
+                </div>
+
+            </td>
+
+
+            <!-- VERSION -->
+
+            <td>
+
+                <div class="production-row-meta">
+
                     ${
                         version.version_number
-                            ? ` · V${escapeHtml(
+                            ? `V${escapeHtml(
                                 version.version_number
+                            )}`
+                            : "-"
+                    }
+
+                </div>
+
+            </td>
+
+
+            <!-- PRODUCTION DATE -->
+
+            <td>
+
+                ${escapeHtml(
+                    formatProductionDate(
+                        batch.production_date
+                    )
+                )}
+
+            </td>
+
+
+            <!-- VOLUME -->
+
+            <td>
+
+                <div class="production-volume-main">
+
+                    ${escapeHtml(
+                        formatProductionNumber(
+                            batch.planned_volume
+                        )
+                    )}
+
+                    ${
+                        unit.code
+                            ? ` ${escapeHtml(
+                                unit.code
+                            )}`
+                            : ""
+                    }
+
+                </div>
+
+                <div class="production-row-meta">
+
+                    Aktual:
+                    ${escapeHtml(
+                        formatProductionNumber(
+                            batch.actual_volume
+                        )
+                    )}
+
+                    ${
+                        unit.code
+                            ? ` ${escapeHtml(
+                                unit.code
                             )}`
                             : ""
                     }
@@ -2091,6 +2125,8 @@ function createProductionRow(
 
             </td>
 
+
+            <!-- STAGE -->
 
             <td>
 
@@ -2101,13 +2137,17 @@ function createProductionRow(
                 >
 
                     ${escapeHtml(
-                        stageLabel
+                        getProductionStageLabel(
+                            stage
+                        )
                     )}
 
                 </span>
 
             </td>
 
+
+            <!-- STATUS -->
 
             <td>
 
@@ -2118,7 +2158,9 @@ function createProductionRow(
                 >
 
                     ${escapeHtml(
-                        statusLabel
+                        getProductionStatusLabel(
+                            status
+                        )
                     )}
 
                 </span>
@@ -2126,52 +2168,7 @@ function createProductionRow(
             </td>
 
 
-            <td>
-
-                <div class="production-volume-main">
-
-                    ${escapeHtml(
-                        plannedVolume
-                    )}
-                    ${volumeUnit
-                        ? ` ${escapeHtml(
-                            volumeUnit
-                        )}`
-                        : ""
-                    }
-
-                </div>
-
-                <div class="production-row-meta">
-
-                    Aktual:
-                    ${escapeHtml(
-                        actualVolume
-                    )}
-                    ${volumeUnit
-                        ? ` ${escapeHtml(
-                            volumeUnit
-                        )}`
-                        : ""
-                    }
-
-                </div>
-
-            </td>
-
-
-            <td>
-
-                <div class="production-hpp">
-
-                    ${escapeHtml(
-                        hppPerUnit
-                    )}
-
-                </div>
-
-            </td>
-
+            <!-- ACTION -->
 
             <td>
 
@@ -2212,7 +2209,7 @@ function createProductionRow(
                                     </span>
 
                                 </button>
-                            `
+                              `
                             : ""
                     }
 
