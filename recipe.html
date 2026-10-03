@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recipe Studio • MERAMU</title>
+
+    <link
+        rel="icon"
+        href="../assets/branding/favicon-32.png"
+    >
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/variables.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/components.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/responsive.css"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+<style id="recipe-page-polish">
+
+/* =========================================================
+   RECIPE FORM NOTE
+   Information banner between Master Recipe and Version
+========================================================= */
+
+.recipe-form-note {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: flex-start !important;
+
+    gap: 12px !important;
+
+    margin: 0 0 20px !important;
+
+    padding: 13px 15px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #DCE9E2 !important;
+
+    border-radius: 12px !important;
+
+    background: #F7FBF8 !important;
+
+    color: #17231D !important;
+
+}
+
+
+/* Icon */
+
+.recipe-form-note > i,
+.recipe-form-note > svg {
+
+    width: 18px !important;
+
+    height: 18px !important;
+
+    min-width: 18px !important;
+
+    margin-top: 2px !important;
+
+    color: #046738 !important;
+
+}
+
+
+/* Text wrapper */
+
+.recipe-form-note > div {
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 3px !important;
+
+}
+
+
+/* Title */
+
+.recipe-form-note strong {
+
+    margin: 0 !important;
+
+    color: #18231D !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.45 !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* Description */
+
+.recipe-form-note p {
+
+    margin: 0 !important;
+
+    color: #718078 !important;
+
+    font-size: 10.5px !important;
+
+    line-height: 1.6 !important;
+
+    font-weight: 400 !important;
+
+}
+
+
+/* =========================================================
+   RECIPE DETAIL FOOTER
+========================================================= */
+
+.recipe-detail-dialog .recipe-modal-footer {
+
+    width: 100% !important;
+
+    min-height: 72px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    gap: 10px !important;
+
+    padding: 12px 20px !important;
+
+    border-top: 1px solid #E7ECE9 !important;
+
+    background: #FFFFFF !important;
+
+}
+
+
+/* All detail footer buttons */
+
+.recipe-detail-dialog .recipe-modal-footer .page-btn {
+
+    height: 44px !important;
+
+    min-height: 44px !important;
+
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    padding: 0 18px !important;
+
+    border-radius: 12px !important;
+
+    font-family: "Poppins", sans-serif !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+
+}
+
+
+/* Tutup */
+
+.recipe-detail-dialog
+#closeRecipeDetailBottom {
+
+    min-width: 140px !important;
+
+}
+
+
+/* Edit Recipe */
+
+.recipe-detail-dialog
+#editRecipeFromDetail {
+
+    min-width: 160px !important;
+
+}
+
+
+/* Buat Versi Baru */
+
+.recipe-detail-dialog
+#newRecipeVersionFromDetail {
+
+    min-width: 180px !important;
+
+}
+
+
+/* Footer icons */
+
+.recipe-detail-dialog
+.recipe-modal-footer .page-btn svg {
+
+    width: 16px !important;
+
+    height: 16px !important;
+
+    flex: 0 0 16px !important;
+
+}
+
+
+/* =========================================================
+   VERSION HISTORY ACTIONS
+========================================================= */
+
+.recipe-version-history-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 10px;
+
+}
+
+.recipe-version-history-actions .recipe-version-delete-button {
+
+    min-height: 34px !important;
+
+    min-width: 132px !important;
+
+    padding: 7px 12px !important;
+
+    font-size: 13px !important;
+
+}
+
+.recipe-version-history-actions .recipe-version-delete-button:disabled {
+
+    opacity: .55;
+
+    cursor: not-allowed;
+
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .recipe-form-note {
+
+        padding: 12px !important;
+
+        gap: 10px !important;
+
+    }
+
+
+    .recipe-form-note strong {
+
+        font-size: 11px !important;
+
+    }
+
+
+    .recipe-form-note p {
+
+        font-size: 10px !important;
+
+    }
+
+
+    .recipe-detail-dialog
+    .recipe-modal-footer {
+
+        padding: 10px 14px !important;
+
+        gap: 8px !important;
+
+        flex-wrap: wrap !important;
+
+    }
+
+
+    .recipe-detail-dialog
+    .recipe-modal-footer .page-btn {
+
+        flex: 1 1 0 !important;
+
+        min-width: 0 !important;
+
+        height: 42px !important;
+
+        min-height: 42px !important;
+
+        padding: 0 12px !important;
+
+    }
+
+}
+
+</style>
+
+
+
+</head>
+
+
+<body>
+
+    <!-- SIDEBAR OVERLAY -->
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+    ></div>
+
+
+    <!-- APP SHELL -->
+
+    <div class="app-shell">
+
+
+        <!-- SIDEBAR -->
+
+        <div id="sidebar-container"></div>
+
+
+        <!-- CONTENT -->
+
+        <main class="content">
+
+
+            <!-- TOPBAR -->
+
+            <div id="topbar-container"></div>
+
+
+            <!-- PAGE -->
+
+            <section class="page-wrapper recipe-page">
+
+
+                <div class="recipe-page-content">
+
+
+                    <!-- PAGE HEADER -->
+
+                    <div class="page-header recipe-page-header">
+
+                        <div>
+
+                            <div class="section-eyebrow">
+
+                                <span class="live-dot"></span>
+
+                                MASTER DATA
+
+                            </div>
+
+
+                            <h1>
+                                Recipe Studio
+                            </h1>
+
+
+                            <p>
+                                Kelola formula, versi, yield,
+                                dan dasar perhitungan resep MERAMU.
+                            </p>
+
+                        </div>
+
+
+                        <div class="page-header-actions">
+
+                            <button
+                                type="button"
+                                class="page-btn primary"
+                                id="createRecipeButton"
+                            >
+
+                                <i data-lucide="plus"></i>
+
+                                Buat Resep
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECIPE NOTE -->
+
+                    <div class="recipe-info-banner">
+
+                        <div class="recipe-info-icon">
+
+                            <i data-lucide="book-open"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <strong>
+                                Recipe adalah master formula
+                            </strong>
+
+                            <span>
+                                Resep digunakan sebagai template
+                                oleh Production. Membuat resep
+                                tidak otomatis membuat batch produksi.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOOLBAR -->
+
+                    <div class="recipe-toolbar">
+
+                        <div class="recipe-search">
+
+                            <i data-lucide="search"></i>
+
+                            <input
+                                type="search"
+                                id="recipeSearch"
+                                placeholder="Cari nama atau kode resep..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <select
+                            id="recipeStatusFilter"
+                            class="recipe-filter"
+                        >
+
+                            <option value="all">
+                                Semua Status
+                            </option>
+
+                            <option value="active">
+                                Active
+                            </option>
+
+                            <option value="archived">
+                                Archived
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SUMMARY -->
+
+                    <div class="recipe-summary">
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Total Recipe
+                            </span>
+
+                            <strong id="recipeTotal">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Active
+                            </span>
+
+                            <strong id="recipeActive">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="recipe-summary-item">
+
+                            <span>
+                                Versions
+                            </span>
+
+                            <strong id="recipeVersions">
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOADING -->
+
+                    <div
+                        id="recipeLoading"
+                        class="recipe-state"
+                    >
+
+                        <div class="recipe-spinner"></div>
+
+                        <strong>
+                            Memuat resep...
+                        </strong>
+
+                        <span>
+                            Mengambil data dari Supabase.
+                        </span>
+ 
+                    </div>
+
+
+                    <!-- ERROR -->
+
+                    <div
+                        id="recipeError"
+                        class="recipe-state error"
+                        hidden
+                    >
+
+                        <div class="recipe-state-icon">
+
+                            <i data-lucide="triangle-alert"></i>
+
+                        </div>
+
+                        <strong>
+                            Gagal memuat resep
+                        </strong>
+
+                        <span id="recipeErrorMessage">
+                            Terjadi kesalahan saat mengambil data.
+                        </span>
+
+                        <button
+                            type="button"
+                            class="page-btn secondary"
+                            id="recipeRetryButton"
+                        >
+
+                            <i data-lucide="refresh-cw"></i>
+
+                            Coba Lagi
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- EMPTY -->
+
+                    <div
+                        id="recipeEmpty"
+                        class="recipe-state"
+                        hidden
+                    >
+
+                        <div class="recipe-state-icon">
+
+                            <i data-lucide="book-open"></i>
+
+                        </div>
+
+                        <strong>
+                            Belum ada resep
+                        </strong>
+
+                        <span>
+                            Belum ada recipe yang tersimpan
+                            di database MERAMU.
+                        </span>
+
+                    </div>
+
+
+                    <!-- LIST -->
+
+                    <section
+                        id="recipeList"
+                        class="recipe-list-page"
+                        hidden
+                    ></section>
+
+                    <!-- =====================================================
+     CREATE RECIPE MODAL
+===================================================== -->
+
+<div
+    id="recipeModal"
+    class="recipe-modal"
+    hidden
+>
+
+    <div class="recipe-modal-backdrop"></div>
+
+
+    <div
+        class="recipe-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recipeModalTitle"
+    >
+
+
+        <!-- HEADER -->
+
+        <div class="recipe-modal-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+
+                    <span class="live-dot"></span>
+
+                    RECIPE STUDIO
+
+                </div>
+
+                <h2 id="recipeModalTitle">
+                    Buat Recipe
+                </h2>
+
+                <p>
+                    Buat master formula baru untuk digunakan
+                    sebagai template Production.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="recipe-modal-close"
+                id="closeRecipeModal"
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+            id="createRecipeForm"
+            class="recipe-form"
+        >
+
+
+            <!-- BASIC INFORMATION -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="book-open"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Informasi Recipe
+                        </strong>
+
+                        <span>
+                            Identitas master formula
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeName">
+
+                            Nama Recipe
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeName"
+                            name="name"
+                            type="text"
+                            placeholder="Contoh: Telang Kombucha"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeCode">
+
+                            Recipe Code
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeCode"
+                            name="code"
+                            type="text"
+                            placeholder="REC-TELANG"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeProduct">
+
+                            Product
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeProduct"
+                            name="product_id"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih Product
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeType">
+
+                            Recipe Type
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeType"
+                            name="recipe_type"
+                            required
+                        >
+
+                            <option value="fermentation">
+                                Fermentation
+                            </option>
+
+                            <option value="direct">
+                                Direct
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="recipe-field full">
+
+                        <label for="recipeDescription">
+
+                            Deskripsi
+
+                        </label>
+
+                        <textarea
+                            id="recipeDescription"
+                            name="description"
+                            rows="3"
+                            placeholder="Catatan atau deskripsi recipe..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =========================
+                 RECIPE VERSION INFO
+            ========================= -->
+            <div class="recipe-form-note">
+                <i data-lucide="info"></i>
+            
+                <div>
+                    <strong>
+                        Formula dikelola melalui Recipe Version
+                    </strong>
+            
+                    <p>
+                        Informasi Recipe mengatur master recipe.
+                        Yield, ingredients, fermentation, F1, F2,
+                        shelf life, dan notes merupakan bagian dari
+                        Recipe Version.
+                    </p>
+                </div>
+            </div>
+
+            <!-- =====================================================
+                 RECIPE VERSION
+            ===================================================== -->
+            
+            <div class="recipe-form-section">
+            
+                <div class="recipe-form-section-title">
+            
+                    <div class="recipe-form-section-icon">
+            
+                        <i data-lucide="git-branch"></i>
+            
+                    </div>
+            
+                    <div>
+            
+                        <strong>
+                            Recipe Version
+                        </strong>
+            
+                        <span>
+                            Formula yang digunakan oleh recipe
+                        </span>
+            
+                    </div>
+            
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeYield">
+
+                            Basis Yield
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            id="recipeYield"
+                            name="yield_quantity"
+                            type="number"
+                            min="0.001"
+                            step="0.001"
+                            value="1"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeYieldUnit">
+
+                            Unit
+                            <span>*</span>
+
+                        </label>
+
+                        <select
+                            id="recipeYieldUnit"
+                            name="yield_unit_id"
+                            required
+                        >
+
+                            <option value="">
+                                Pilih Unit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INGREDIENTS -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title recipe-section-with-action">
+
+                    <div class="recipe-form-section-title-left">
+
+                        <div class="recipe-form-section-icon">
+
+                            <i data-lucide="layers-3"></i>
+
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Version Ingredients
+                            </strong>
+                            
+                            <span>
+                                Formula bahan untuk version yang sedang digunakan
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="recipe-small-btn"
+                        id="addIngredientButton"
+                    >
+
+                        <i data-lucide="plus"></i>
+
+                        Tambah Bahan
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="recipeIngredients"
+                    class="recipe-ingredients"
+                ></div>
+
+
+                <div
+                    id="recipeIngredientEmpty"
+                    class="recipe-ingredient-empty"
+                >
+
+                    <i data-lucide="package-open"></i>
+
+                    <span>
+                        Belum ada bahan.
+                        Klik <strong>Tambah Bahan</strong>.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FERMENTATION -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="timer"></i>
+
+                    </div>
+
+                    <div>
+                        <strong>
+                            Fermentation Setting
+                        </strong>
+                        
+                        <span>
+                            Target fermentasi untuk Recipe Version
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <label class="recipe-toggle-row">
+
+                    <input
+                        id="fermentationRequired"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span class="recipe-toggle"></span>
+
+                    <span class="recipe-toggle-content">
+
+                        <strong>
+                            Recipe membutuhkan fermentasi
+                        </strong>
+
+                        <small>
+                            Aktifkan jika recipe memiliki F1/F2.
+                        </small>
+
+                    </span>
+
+                </label>
+
+
+                <div
+                    id="fermentationFields"
+                    class="recipe-form-grid recipe-fermentation-fields"
+                >
+
+                    <div class="recipe-field">
+
+                        <label for="f1TargetDays">
+
+                            F1 Target
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="f1TargetDays"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="7"
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="f2TargetDays">
+
+                            F2 Target
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="f2TargetDays"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="5"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SHELF LIFE -->
+
+            <div class="recipe-form-section">
+
+                <div class="recipe-form-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="calendar-clock"></i>
+
+                    </div>
+
+                    <div>
+                        <strong>
+                            Shelf Life & Notes
+                        </strong>
+                        
+                        <span>
+                            Umur simpan dan catatan untuk Recipe Version
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-form-grid">
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeShelfLife">
+
+                            Shelf Life
+                            <span>hari</span>
+
+                        </label>
+
+                        <input
+                            id="recipeShelfLife"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value="30"
+                        >
+
+                    </div>
+
+
+                    <div class="recipe-field">
+
+                        <label for="recipeNotes">
+
+                            Notes
+
+                        </label>
+
+                        <input
+                            id="recipeNotes"
+                            type="text"
+                            placeholder="Catatan internal recipe..."
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ERROR -->
+
+            <div
+                id="recipeFormError"
+                class="recipe-form-error"
+                hidden
+            >
+
+                <i data-lucide="triangle-alert"></i>
+
+                <span></span>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="recipe-modal-footer">
+
+                <button
+                    type="button"
+                    class="page-btn secondary"
+                    id="cancelRecipeButton"
+                >
+
+                    Batal
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="page-btn primary"
+                    id="saveRecipeButton"
+                >
+
+                    <i data-lucide="save"></i>
+
+                    <span>
+                        Simpan Recipe
+                    </span>
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+                    <!-- =====================================================
+     RECIPE DETAIL MODAL
+===================================================== -->
+
+<div
+    id="recipeDetailModal"
+    class="recipe-modal"
+    hidden
+>
+
+    <div class="recipe-modal-backdrop"></div>
+
+    <div
+        class="recipe-modal-dialog recipe-detail-dialog"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <!-- HEADER -->
+
+        <div class="recipe-modal-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+
+                    <span class="live-dot"></span>
+
+                    RECIPE DETAIL
+
+                </div>
+
+                <h2 id="recipeDetailTitle">
+                    Recipe
+                </h2>
+
+                <p id="recipeDetailSubtitle">
+                    Detail master formula MERAMU.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="recipe-modal-close"
+                id="closeRecipeDetail"
+                aria-label="Tutup"
+            >
+
+                <i data-lucide="x"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="recipeDetailLoading"
+            class="recipe-detail-loading"
+        >
+
+            <div class="recipe-spinner"></div>
+
+            <strong>
+                Memuat detail recipe...
+            </strong>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <div
+            id="recipeDetailContent"
+            class="recipe-detail-content"
+            hidden
+        >
+
+            <!-- IDENTITY -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-head">
+
+                    <div>
+
+                        <span>
+                            RECIPE
+                        </span>
+
+                        <h3 id="detailRecipeName">
+                            —
+                        </h3>
+
+                    </div>
+
+                    <span
+                        id="detailRecipeStatus"
+                        class="recipe-status active"
+                    >
+                        Active
+                    </span>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Recipe Code
+                        </span>
+
+                        <strong id="detailRecipeCode">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Product
+                        </span>
+
+                        <strong id="detailRecipeProduct">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Recipe Type
+                        </span>
+
+                        <strong id="detailRecipeType">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Current Version
+                        </span>
+
+                        <strong id="detailRecipeVersion">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="detailRecipeDescriptionBox"
+                    class="recipe-detail-description"
+                    hidden
+                >
+
+                    <span>
+                        Deskripsi
+                    </span>
+
+                    <p id="detailRecipeDescription"></p>
+
+                </div>
+
+            </section>
+
+
+            <!-- VERSION -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="git-branch"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Formula Version
+                        </strong>
+
+                        <span>
+                            Formula yang digunakan recipe saat ini
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Version
+                        </span>
+
+                        <strong id="detailVersionNumber">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Yield
+                        </span>
+
+                        <strong id="detailVersionYield">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Fermentation
+                        </span>
+
+                        <strong id="detailVersionFermentation">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            Shelf Life
+                        </span>
+
+                        <strong id="detailVersionShelfLife">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INGREDIENTS -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="layers-3"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Ingredients
+                        </strong>
+
+                        <span>
+                            Formula untuk basis yield
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="recipeDetailIngredients"
+                    class="recipe-detail-ingredients"
+                ></div>
+
+            </section>
+
+
+            <!-- FERMENTATION -->
+
+            <section class="recipe-detail-section">
+
+                <div class="recipe-detail-section-title">
+
+                    <div class="recipe-form-section-icon">
+
+                        <i data-lucide="timer"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Fermentation Setting
+                        </strong>
+
+                        <span>
+                            Target proses fermentasi
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recipe-detail-grid">
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            F1 Target
+                        </span>
+
+                        <strong id="detailF1">
+                            —
+                        </strong>
+
+                    </div>
+
+
+                    <div class="recipe-detail-item">
+
+                        <span>
+                            F2 Target
+                        </span>
+
+                        <strong id="detailF2">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+            <!-- =====================================================
+     VERSION HISTORY
+===================================================== -->
+
+<section class="recipe-detail-section">
+
+    <div class="recipe-detail-section-title">
+
+        <div class="recipe-form-section-icon">
+
+            <i data-lucide="history"></i>
+
+        </div>
+
+        <div>
+
+            <strong>
+                Version History
+            </strong>
+
+            <span>
+                Riwayat perubahan formula recipe
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="recipeVersionHistory"
+        class="recipe-version-history"
+    ></div>
+
+</section>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="recipeDetailError"
+            class="recipe-form-error"
+            hidden
+        >
+
+            <i data-lucide="triangle-alert"></i>
+
+            <span></span>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="recipe-modal-footer">
+
+        <button
+            type="button"
+            class="page-btn secondary"
+            id="closeRecipeDetailBottom"
+        >
+            Tutup
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn secondary"
+            id="editRecipeFromDetail"
+        >
+        
+            <i data-lucide="pencil"></i>
+        
+            Edit Recipe
+        
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn danger"
+            id="deleteRecipeFromDetail"
+        >
+        
+            <i data-lucide="trash-2"></i>
+        
+            Hapus Recipe
+        
+        </button>
+        
+        
+        <button
+            type="button"
+            class="page-btn primary"
+            id="newRecipeVersionFromDetail"
+        >
+        
+            <i data-lucide="git-branch"></i>
+        
+            Buat Versi Baru
+        
+        </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
+
+    <!-- PAGE -->
+
+    <script src="../js/recipe.js"></script>
+
+    <!-- SHARED -->
+
+    <script src="../js/component-loader.js"></script>
+
+    <script src="../js/app.js"></script>
+
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                if(window.initRecipePage){
+
+                    window.initRecipePage();
+
+                }
+
+                if(window.lucide){
+
+                    lucide.createIcons();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
