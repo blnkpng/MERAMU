@@ -4845,3 +4845,379 @@
     }
 
 }
+/* =========================================================
+   ACTUAL INGREDIENTS
+========================================================= */
+
+.production-preparation-subtitle{
+    margin: 18px 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+
+.production-preparation-actual{
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.production-preparation-actual-header{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+
+.production-preparation-actual-header > div{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.production-preparation-actual-header strong{
+    font-size: 15px;
+    font-weight: 700;
+    color: #172033;
+}
+
+
+.production-preparation-actual-header span{
+    font-size: 12px;
+    line-height: 1.5;
+    color: #94a3b8;
+}
+
+
+.production-actual-ingredients-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.production-actual-ingredient-row{
+    display: grid;
+    grid-template-columns:
+        minmax(180px, 1.4fr)
+        minmax(90px, .7fr)
+        minmax(150px, .9fr)
+        minmax(150px, 1fr);
+
+    gap: 14px;
+
+    align-items: end;
+
+    padding: 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    background: #ffffff;
+}
+
+
+.production-actual-ingredient-info{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+
+.production-actual-ingredient-number{
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #f1f5f9;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #64748b;
+}
+
+
+.production-actual-ingredient-name{
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+
+.production-actual-ingredient-name strong{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #1e293b;
+}
+
+
+.production-actual-ingredient-name span{
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+
+.production-actual-ingredient-formula{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.production-actual-label{
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: #94a3b8;
+}
+
+
+.production-actual-ingredient-formula strong{
+    font-size: 13px;
+    color: #475569;
+}
+
+
+.production-actual-ingredient-input,
+.production-actual-ingredient-notes{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.production-actual-ingredient-input label,
+.production-actual-ingredient-notes label{
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: #94a3b8;
+}
+
+
+.production-actual-input-group{
+    display: flex;
+    align-items: center;
+
+    height: 40px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+
+.production-actual-input-group:focus-within{
+    border-color: #046738;
+    box-shadow: 0 0 0 3px rgba(4,103,56,.08);
+}
+
+
+.production-actual-quantity{
+    width: 100%;
+    min-width: 0;
+
+    height: 100%;
+
+    padding: 0 10px;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #172033;
+}
+
+
+.production-actual-input-group span{
+    flex: 0 0 auto;
+
+    padding: 0 11px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    color: #64748b;
+
+    border-left: 1px solid #e5e7eb;
+
+    background: #f8fafc;
+}
+
+
+.production-actual-notes{
+    width: 100%;
+
+    height: 40px;
+
+    padding: 0 11px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+
+    outline: 0;
+
+    background: #ffffff;
+
+    font: inherit;
+    font-size: 12px;
+
+    color: #172033;
+}
+
+
+.production-actual-notes:focus{
+    border-color: #046738;
+    box-shadow: 0 0 0 3px rgba(4,103,56,.08);
+}
+
+
+.production-actual-actions{
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 16px;
+}
+
+
+#saveActualIngredientsBtn{
+    min-height: 40px;
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 0;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+#saveActualIngredientsBtn:disabled{
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+
+#saveActualIngredientsBtn svg{
+    width: 16px;
+    height: 16px;
+}
+
+
+/* =========================================================
+   ACTUAL INGREDIENTS — TABLET
+========================================================= */
+
+@media (max-width: 900px){
+
+    .production-actual-ingredient-row{
+        grid-template-columns:
+            minmax(170px, 1fr)
+            minmax(100px, .7fr);
+
+    }
+
+
+    .production-actual-ingredient-input,
+    .production-actual-ingredient-notes{
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   ACTUAL INGREDIENTS — MOBILE
+========================================================= */
+
+@media (max-width: 600px){
+
+    .production-preparation-actual{
+        margin-top: 18px;
+        padding-top: 18px;
+    }
+
+
+    .production-actual-ingredient-row{
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        padding: 12px;
+
+        border-radius: 12px;
+    }
+
+
+    .production-actual-ingredient-info{
+        align-items: flex-start;
+    }
+
+
+    .production-actual-ingredient-number{
+        margin-top: 1px;
+    }
+
+
+    .production-actual-ingredient-formula{
+        padding-left: 38px;
+    }
+
+
+    .production-actual-ingredient-input,
+    .production-actual-ingredient-notes{
+        padding-left: 38px;
+    }
+
+
+    .production-actual-actions{
+        justify-content: stretch;
+    }
+
+
+    #saveActualIngredientsBtn{
+        width: 100%;
+    }
+
+}
