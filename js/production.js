@@ -1345,6 +1345,51 @@ function resetCreateBatchForm(){
 
 }
 
+/* =========================================================
+   UNIT SELECT
+========================================================= */
+
+function populateVolumeUnitSelect(){
+
+    const select =
+        document.getElementById(
+            "batchVolumeUnit"
+        );
+
+    if(!select){
+
+        return;
+
+    }
+
+    select.innerHTML = `
+        <option value="">
+            Pilih Unit
+        </option>
+    `;
+
+    productionUnits.forEach(
+        unit => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                unit.id;
+
+            option.textContent =
+                `${unit.name} (${unit.code})`;
+
+            select.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
 
 /* =========================================================
    CREATE BATCH
