@@ -31,6 +31,7 @@ create table if not exists public.finished_batches (
 alter table public.finished_batches add column if not exists finished_code text;
 alter table public.finished_batches add column if not exists batch_id uuid;
 alter table public.finished_batches add column if not exists allocation_id uuid;
+alter table public.finished_batches add column if not exists bottling_batch_id uuid;
 alter table public.finished_batches add column if not exists product_id uuid;
 alter table public.finished_batches add column if not exists status text default 'finished';
 alter table public.finished_batches add column if not exists quantity_bottles integer;
@@ -53,6 +54,8 @@ create index if not exists idx_finished_batches_batch_id
     on public.finished_batches(batch_id);
 create index if not exists idx_finished_batches_allocation_id
     on public.finished_batches(allocation_id);
+create index if not exists idx_finished_batches_bottling_batch_id
+    on public.finished_batches(bottling_batch_id);
 create index if not exists idx_finished_batches_product_id
     on public.finished_batches(product_id);
 
@@ -184,6 +187,7 @@ declare
     v_batch public.batches%rowtype;
     v_product public.products%rowtype;
     v_finished public.finished_batches%rowtype;
+    v_bottling public.batch_bottling%rowtype;
     v_product_shelf integer;
     v_recipe_shelf integer;
     v_shelf integer;
@@ -222,6 +226,19 @@ begin
 
     if v_allocation.planned_bottles <= 0 or v_allocation.bottle_size_ml <= 0 then
         raise exception 'Data jumlah botol atau ukuran botol tidak valid.';
+    end if;
+
+    -- Compatibility with the existing MERAMU finished_batches schema.
+    -- Older versions require bottling_batch_id to be populated.
+    select * into v_bottling
+    from public.batch_bottling
+    where batch_id = v_batch.id
+      and bottling_status = 'completed'
+    order by bottling_date desc
+    limit 1;
+
+    if not found then
+        raise exception 'Bottling F2 untuk batch % belum ditemukan/selesai.', v_batch.batch_code;
     end if;
 
     select * into v_product
@@ -266,6 +283,7 @@ begin
         batch_id,
         allocation_id,
         product_id,
+        bottling_batch_id,
         status,
         quantity_bottles,
         bottle_size_ml,
@@ -283,6 +301,7 @@ begin
         v_batch.id,
         v_allocation.id,
         coalesce(v_allocation.product_id, v_batch.product_id),
+        v_bottling.id,
         'finished',
         v_allocation.planned_bottles,
         v_allocation.bottle_size_ml,
