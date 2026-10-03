@@ -5496,18 +5496,54 @@ function updateProductionFlow(
     }
 
 
+    /*
+     * Production Flow adalah indikator perjalanan batch.
+     * Stage aktif harus selalu mengikuti batches.current_stage.
+     */
+
+    const normalizedStage =
+        String(
+            currentStage ||
+            "production"
+        )
+            .trim()
+            .toLowerCase();
+
+
+    const stageAliases = {
+
+        production: "production",
+
+        f1: "f1",
+
+        f2: "f2",
+
+        harvest: "harvest",
+
+        completed: "finished",
+
+        finished: "finished"
+
+    };
+
+
+    const activeStage =
+        stageAliases[normalizedStage] ||
+        "production";
+
+
     const stageOrder = [
         "production",
         "f1",
         "f2",
         "harvest",
-        "completed"
+        "finished"
     ];
 
 
     const currentIndex =
         stageOrder.indexOf(
-            currentStage
+            activeStage
         );
 
 
@@ -5515,56 +5551,72 @@ function updateProductionFlow(
         item => {
 
             const stage =
-                item.dataset.productionFlow;
+                String(
+                    item.dataset.productionFlow ||
+                    ""
+                )
+                    .trim()
+                    .toLowerCase();
 
 
             const stageIndex =
-                stageOrder.indexOf(
-                    stage
-                );
+                stageOrder.indexOf(stage);
 
+
+            /* CSS production.css menggunakan
+             * .active dan .completed. */
 
             item.classList.remove(
+                "active",
+                "completed",
                 "is-active",
                 "is-complete"
             );
 
 
             if(
-                currentIndex >= 0 &&
-                stageIndex >= 0
+                currentIndex < 0 ||
+                stageIndex < 0
             ){
 
-                if(
-                    stageIndex <
-                    currentIndex
-                ){
+                return;
 
-                    item.classList.add(
-                        "is-complete"
-                    );
-
-                }
+            }
 
 
-                if(
-                    stageIndex ===
-                    currentIndex
-                ){
+            if(
+                stageIndex <
+                currentIndex
+            ){
 
-                    item.classList.add(
-                        "is-active"
-                    );
+                item.classList.add(
+                    "completed"
+                );
 
-                }
+            }
+
+            else if(
+                stageIndex ===
+                currentIndex
+            ){
+
+                item.classList.add(
+                    "active"
+                );
 
             }
 
         }
     );
 
-}
 
+    if(window.lucide){
+
+        lucide.createIcons();
+
+    }
+
+}
 
 /* =========================================================
    SUMMARY
