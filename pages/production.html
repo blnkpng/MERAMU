@@ -1077,6 +1077,185 @@
                     </div>
 
                 </div>
+                
+                                <!-- =====================================================
+                     PREPARATION / ACTUAL INGREDIENTS
+                ====================================================== -->
+
+                <div class="production-detail-section">
+
+                    <div class="production-detail-section-title">
+
+                        <i
+                            data-lucide="clipboard-list"
+                        ></i>
+
+                        <div>
+
+                            <strong>
+                                Preparation
+                            </strong>
+
+                            <span>
+                                Formula Recipe dan bahan aktual
+                                yang digunakan pada batch ini.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="production-preparation-card"
+                        id="productionPreparationCard"
+                    >
+
+                        <div
+                            class="production-preparation-loading"
+                            id="detailPreparationLoading"
+                        >
+
+                            <span
+                                class="production-inline-spinner"
+                            ></span>
+
+                            <span>
+                                Memuat formula Recipe...
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="production-preparation-error hidden"
+                            id="detailPreparationError"
+                        >
+
+                            <i
+                                data-lucide="alert-circle"
+                            ></i>
+
+                            <span
+                                id="detailPreparationErrorMessage"
+                            >
+                                Gagal memuat formula Recipe.
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="production-ingredients-wrap hidden"
+                            id="detailPreparationIngredients"
+                        ></div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     INITIAL QC
+                ====================================================== -->
+
+                <div class="production-detail-section">
+
+                    <div class="production-detail-section-title">
+
+                        <i
+                            data-lucide="clipboard-check"
+                        ></i>
+
+                        <div>
+
+                            <strong>
+                                Initial QC
+                            </strong>
+
+                            <span>
+                                Pemeriksaan batch sebelum
+                                dapat dimulai ke F1.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="production-qc-card"
+                        id="detailInitialQCCard"
+                    >
+
+                        <div class="production-qc-status-row">
+
+                            <div>
+
+                                <span class="production-qc-label">
+                                    STATUS
+                                </span>
+
+                                <strong
+                                    id="detailInitialQCStatus"
+                                    class="production-qc-status-value"
+                                >
+                                    Belum diperiksa
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="production-qc-label">
+                                    DECISION TERAKHIR
+                                </span>
+
+                                <strong
+                                    id="detailInitialQCDecision"
+                                    class="production-qc-decision-value"
+                                >
+                                    —
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="production-qc-meta"
+                            id="detailInitialQCMeta"
+                        >
+                            Initial QC belum dilakukan untuk batch ini.
+                        </div>
+
+
+                        <div class="production-qc-actions">
+
+                            <button
+                                type="button"
+                                class="production-btn production-btn-secondary"
+                                id="openInitialQCBtn"
+                            >
+
+                                <i
+                                    data-lucide="clipboard-check"
+                                ></i>
+
+                                <span>
+                                    Initial QC
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
 
                 <!-- FUTURE FLOW -->
@@ -1191,32 +1370,354 @@
             </div>
 
             <div class="production-modal-footer">
-            
+
+                <button
+                    type="button"
+                    class="production-btn production-btn-primary hidden"
+                    id="startF1FromDetailBtn"
+                >
+
+                    <i
+                        data-lucide="play-circle"
+                    ></i>
+
+                    <span>
+                        Mulai F1
+                    </span>
+
+                </button>
+
+
                 <button
                     type="button"
                     class="production-btn production-btn-secondary"
                     id="closeBatchDetailBottomBtn"
                 >
+
                     Tutup
+
                 </button>
-            
-                <button
-                    type="button"
-                    class="production-btn production-btn-primary"
-                    id="startF1FromDetailBtn"
-                >
-                    <i data-lucide="play-circle"></i>
-            
-                    <span>
-                        Mulai F1
-                    </span>
-                </button>
-            
+
             </div>
 
         </div>
 
     </div>
+
+        <!-- =====================================================
+         INITIAL QC MODAL
+    ====================================================== -->
+
+    <div
+        class="production-modal-backdrop hidden"
+        id="initialQCModal"
+    >
+
+        <div
+            class="production-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="initialQCModalTitle"
+        >
+
+            <div class="production-modal-header">
+
+                <div>
+
+                    <div class="production-modal-kicker">
+
+                        <span></span>
+
+                        INITIAL QUALITY CONTROL
+
+                    </div>
+
+                    <h2 id="initialQCModalTitle">
+                        Initial QC
+                    </h2>
+
+                    <p>
+                        Pemeriksaan batch sebelum
+                        dimulai ke F1.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="production-modal-close"
+                    id="closeInitialQCBtn"
+                    aria-label="Tutup"
+                >
+
+                    <i
+                        data-lucide="x"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <form
+                id="initialQCForm"
+                class="production-form"
+                novalidate
+            >
+
+                <!-- BATCH -->
+
+                <div class="production-form-row">
+
+                    <div class="production-form-field">
+
+                        <label>
+                            Batch
+                        </label>
+
+                        <input
+                            type="text"
+                            id="initialQCBatchCode"
+                            readonly
+                        >
+
+                        <input
+                            type="hidden"
+                            id="initialQCBatchId"
+                        >
+
+                    </div>
+
+
+                    <div class="production-form-field">
+
+                        <label for="initialQCCheckedAt">
+                            Checked At
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            id="initialQCCheckedAt"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PH / BRIX -->
+
+                <div class="production-form-row">
+
+                    <div class="production-form-field">
+
+                        <label for="initialQCPh">
+                            pH
+                        </label>
+
+                        <input
+                            type="number"
+                            id="initialQCPh"
+                            step="0.01"
+                            min="0"
+                            max="14"
+                            placeholder="Contoh: 3.20"
+                        >
+
+                    </div>
+
+
+                    <div class="production-form-field">
+
+                        <label for="initialQCBrix">
+                            Brix
+                        </label>
+
+                        <input
+                            type="number"
+                            id="initialQCBrix"
+                            step="0.01"
+                            min="0"
+                            placeholder="Contoh: 8.50"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- TEMPERATURE / VOLUME -->
+
+                <div class="production-form-row">
+
+                    <div class="production-form-field">
+
+                        <label for="initialQCTemperature">
+                            Temperature
+                        </label>
+
+                        <input
+                            type="number"
+                            id="initialQCTemperature"
+                            step="0.1"
+                            placeholder="Contoh: 28"
+                        >
+
+                        <small>
+                            °C
+                        </small>
+
+                    </div>
+
+
+                    <div class="production-form-field">
+
+                        <label for="initialQCVolume">
+                            Volume
+                        </label>
+
+                        <input
+                            type="number"
+                            id="initialQCVolume"
+                            step="0.001"
+                            min="0"
+                            placeholder="Contoh: 20"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- DECISION -->
+
+                <div class="production-form-field">
+
+                    <label for="initialQCDecision">
+
+                        Decision
+
+                        <span>*</span>
+
+                    </label>
+
+                    <select
+                        id="initialQCDecision"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Decision
+                        </option>
+
+                        <option value="passed">
+                            PASS — Siap F1
+                        </option>
+
+                        <option value="not_ready">
+                            NOT READY
+                        </option>
+
+                        <option value="hold">
+                            HOLD
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- OPERATOR -->
+
+                <div class="production-form-field">
+
+                    <label for="initialQCOperator">
+                        Operator
+                    </label>
+
+                    <input
+                        type="text"
+                        id="initialQCOperator"
+                        placeholder="Nama operator"
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="production-form-field">
+
+                    <label for="initialQCNotes">
+                        Notes
+                    </label>
+
+                    <textarea
+                        id="initialQCNotes"
+                        rows="4"
+                        maxlength="1000"
+                        placeholder="Catatan hasil Initial QC..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- ERROR -->
+
+                <div
+                    class="production-form-error hidden"
+                    id="initialQCError"
+                >
+
+                    <i
+                        data-lucide="alert-circle"
+                    ></i>
+
+                    <span
+                        id="initialQCErrorMessage"
+                    ></span>
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="production-modal-footer">
+
+                    <button
+                        type="button"
+                        class="production-btn production-btn-secondary"
+                        id="cancelInitialQCBtn"
+                    >
+                        Batal
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="production-btn production-btn-primary"
+                        id="saveInitialQCBtn"
+                    >
+
+                        <i
+                            data-lucide="save"
+                        ></i>
+
+                        <span>
+                            Simpan Initial QC
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 
 
     <!-- =====================================================
