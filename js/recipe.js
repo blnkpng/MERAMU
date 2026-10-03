@@ -9081,23 +9081,29 @@ function bindRecipeVersionModalEvents() {
 ===================================================== */
 
 async function deleteRecipeVersion(
+    recipeId,
     versionId,
     versionNumber
 ) {
 
-    if (!versionId) {
-        return;
-    }
-
-    const recipeId = activeDetailRecipeId;
-
-    if (!recipeId) {
-        window.alert("Recipe aktif tidak ditemukan.");
+    if (!recipeId || !versionId) {
         return;
     }
 
     const versionLabel =
         `V${versionNumber || "?"}`;
+
+    const confirmed = window.confirm(
+        `Hapus Recipe Version ${versionLabel}?\n\n` +
+        `Version hanya akan dihapus jika belum menjadi Current, ` +
+        `belum digunakan Batch / Production, dan belum digunakan ` +
+        `oleh Allocation / HPP.\n\n` +
+        `Tindakan ini tidak dapat dibatalkan.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
 
     waitForSupabase(
         async supabase => {
@@ -9105,209 +9111,78 @@ async function deleteRecipeVersion(
             try {
 
                 /*
-                =========================================
-                1. LOAD VERSION
-                =========================================
+                =================================================
+                SAFE DELETE VIA DATABASE FUNCTION
+                =================================================
+
+                Jangan membaca / menghapus allocation_components
+                langsung dari browser.
+
+                Tabel tersebut dilindungi RLS/permission dan juga
+                merupakan histori Allocation / HPP.
+
+                Function database melakukan seluruh pengecekan dan
+                penghapusan dalam satu transaction.
+                =================================================
                 */
 
                 const {
-                    data: version,
-                    error: versionLoadError
-                } = await supabase
-                    .from("recipe_versions")
-                    .select(`
-                        id,
-                        recipe_id,
-                        version_number
-                    `)
-                    .eq("id", versionId)
-                    .eq("recipe_id", recipeId)
-                    .single();
-
-                if (versionLoadError) {
-                    throw versionLoadError;
-                }
-
-                /*
-                =========================================
-                2. CURRENT VERSION CANNOT BE DELETED
-                =========================================
-                */
-
-                const {
-                    data: recipe,
-                    error: recipeLoadError
-                } = await supabase
-                    .from("recipes")
-                    .select(`
-                        id,
-                        name,
-                        current_version_number
-                    `)
-                    .eq("id", recipeId)
-                    .single();
-
-                if (recipeLoadError) {
-                    throw recipeLoadError;
-                }
-
-                if (
-                    Number(recipe?.current_version_number) ===
-                    Number(version?.version_number)
-                ) {
-                    window.alert(
-                        `${versionLabel} tidak dapat dihapus karena merupakan Current Version.\n\n` +
-                        `Buat Version baru terlebih dahulu agar Version ini tidak lagi menjadi Current.`
-                    );
-                    return;
-                }
-
-                /*
-                =========================================
-                3. CHECK BATCH USAGE
-                =========================================
-                */
-
-                const {
-                    data: usedBatches,
-                    error: batchCheckError
-                } = await supabase
-                    .from("batches")
-                    .select(`
-                        id,
-                        batch_code
-                    `)
-                    .eq("recipe_version_id", versionId)
-                    .limit(20);
-
-                if (batchCheckError) {
-                    throw batchCheckError;
-                }
-
-                if (
-                    Array.isArray(usedBatches) &&
-                    usedBatches.length
-                ) {
-
-                    const batchList = usedBatches
-                        .map(batch => batch.batch_code || batch.id)
-                        .join(", ");
-
-                    window.alert(
-                        `${versionLabel} tidak dapat dihapus.\n\n` +
-                        `Version ini sudah digunakan oleh Batch / Production:` +
-                        `\n${batchList}` +
-                        `${usedBatches.length >= 20 ? "\n...dan batch lainnya." : ""}\n\n` +
-                        `Histori produksi tetap dipertahankan.`
-                    );
-
-                    return;
-                }
-
-                /*
-                =========================================
-                4. CHECK ALLOCATION COMPONENT USAGE
-                =========================================
-
-                allocation_components adalah data histori / proses
-                Allocation yang memiliki FK ke recipe_versions.
-
-                Jangan mencoba DELETE dari browser karena tabel ini
-                memiliki permission/RLS yang tidak mengizinkan client
-                menghapus data tersebut.
-
-                Jika masih ada row, Version dianggap masih digunakan
-                dan harus dipertahankan.
-                =========================================
-                */
-
-                const {
-                    data: allocationComponents,
-                    error: allocationCheckError
-                } = await supabase
-                    .from("allocation_components")
-                    .select("recipe_version_id")
-                    .eq("recipe_version_id", versionId)
-                    .limit(1);
-
-                if (allocationCheckError) {
-                    throw allocationCheckError;
-                }
-
-                if (
-                    Array.isArray(allocationComponents) &&
-                    allocationComponents.length
-                ) {
-                    window.alert(
-                        `${versionLabel} tidak dapat dihapus.\n\n` +
-                        `Version ini masih digunakan oleh data Allocation / HPP. ` +
-                        `Data tersebut dipertahankan agar histori tetap aman.`
-                    );
-                    return;
-                }
-
-                /*
-                =========================================
-                5. CONFIRM
-                =========================================
-                */
-
-                const confirmed = window.confirm(
-                    `Hapus Recipe Version ${versionLabel}?\n\n` +
-                    `Version ini belum digunakan oleh Batch / Production ` +
-                    `dan belum memiliki data Allocation / HPP.\n` +
-                    `Tindakan ini tidak dapat dibatalkan.`
+                    data,
+                    error
+                } = await supabase.rpc(
+                    "delete_recipe_version_safe",
+                    {
+                        p_recipe_id: recipeId,
+                        p_version_id: versionId
+                    }
                 );
 
-                if (!confirmed) {
-                    return;
+                if (error) {
+                    throw error;
                 }
 
-                /*
-                =========================================
-                6. DELETE VERSION INGREDIENTS FIRST
-                =========================================
+                const result =
+                    Array.isArray(data)
+                        ? data[0]
+                        : data;
 
-                recipe_ingredients adalah child langsung dari
-                recipe_versions. Hanya child milik Version ini yang
-                dihapus setelah seluruh dependency historis lolos.
-                =========================================
-                */
+                if (!result?.success) {
 
-                const {
-                    error: ingredientDeleteError
-                } = await supabase
-                    .from("recipe_ingredients")
-                    .delete()
-                    .eq("recipe_version_id", versionId);
+                    const code =
+                        result?.code ||
+                        "DELETE_BLOCKED";
 
-                if (ingredientDeleteError) {
-                    throw ingredientDeleteError;
+                    if (code === "CURRENT_VERSION") {
+                        window.alert(
+                            `${versionLabel} tidak dapat dihapus karena merupakan Current Version.\n\n` +
+                            `Buat Version baru terlebih dahulu.`
+                        );
+                        return;
+                    }
+
+                    if (code === "BATCH_IN_USE") {
+                        window.alert(
+                            `${versionLabel} tidak dapat dihapus.\n\n` +
+                            `${result?.message || "Version sudah digunakan oleh Batch / Production."}` +
+                            `\n\nHistori produksi tetap dipertahankan.`
+                        );
+                        return;
+                    }
+
+                    if (code === "ALLOCATION_IN_USE") {
+                        window.alert(
+                            `${versionLabel} tidak dapat dihapus.\n\n` +
+                            `Version ini masih digunakan oleh data Allocation / HPP. ` +
+                            `Data tersebut dipertahankan agar histori tetap aman.`
+                        );
+                        return;
+                    }
+
+                    throw new Error(
+                        result?.message ||
+                        "Version tidak dapat dihapus."
+                    );
                 }
-
-                /*
-                =========================================
-                7. DELETE VERSION
-                =========================================
-                */
-
-                const {
-                    error: deleteError
-                } = await supabase
-                    .from("recipe_versions")
-                    .delete()
-                    .eq("id", versionId)
-                    .eq("recipe_id", recipeId);
-
-                if (deleteError) {
-                    throw deleteError;
-                }
-
-                /*
-                =========================================
-                8. REFRESH DETAIL
-                =========================================
-                */
 
                 await openRecipeDetail(recipeId);
 
@@ -9323,13 +9198,24 @@ async function deleteRecipeVersion(
                     error
                 );
 
+                let message =
+                    error?.message ||
+                    "Terjadi kesalahan saat menghapus Version.";
+
+                if (
+                    message.includes("delete_recipe_version_safe") &&
+                    message.includes("does not exist")
+                ) {
+                    message =
+                        "Fungsi database delete_recipe_version_safe belum dibuat di Supabase. " +
+                        "Jalankan SQL migration yang disertakan pada paket V4 terlebih dahulu.";
+                }
+
                 window.alert(
                     `Recipe Version ${versionLabel} gagal dihapus.\n\n` +
-                    `${error?.message || "Terjadi kesalahan saat menghapus Version."}`
+                    message
                 );
-
             }
-
         }
     );
 }
