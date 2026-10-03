@@ -9219,7 +9219,36 @@ async function deleteRecipeVersion(
 
                 /*
                 =========================================
-                5. DELETE VERSION INGREDIENTS FIRST
+                5. DELETE VERSION ALLOCATION COMPONENTS FIRST
+                =========================================
+
+                allocation_components memiliki FK langsung
+                ke recipe_versions.
+
+                Jika row allocation masih tersimpan, Supabase
+                akan menolak penghapusan Version walaupun
+                Version tersebut belum pernah dipakai Batch.
+
+                Karena Version sudah lolos pemeriksaan Batch
+                di atas, allocation component milik Version ini
+                aman dibersihkan sebagai data turunan Version.
+                =========================================
+                */
+
+                const {
+                    error: allocationDeleteError
+                } = await supabase
+                    .from("allocation_components")
+                    .delete()
+                    .eq("recipe_version_id", versionId);
+
+                if (allocationDeleteError) {
+                    throw allocationDeleteError;
+                }
+
+                /*
+                =========================================
+                6. DELETE VERSION INGREDIENTS FIRST
                 =========================================
 
                 Karena recipe_ingredients adalah child
@@ -9241,7 +9270,7 @@ async function deleteRecipeVersion(
 
                 /*
                 =========================================
-                6. DELETE VERSION
+                7. DELETE VERSION
                 =========================================
                 */
 
@@ -9259,7 +9288,7 @@ async function deleteRecipeVersion(
 
                 /*
                 =========================================
-                7. REFRESH DETAIL
+                8. REFRESH DETAIL
                 =========================================
                 */
 
