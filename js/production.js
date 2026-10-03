@@ -1334,14 +1334,17 @@ function resetCreateBatchForm(){
             "batchProductionDate"
         );
 
-    if(productionDate){
+if(productionDate){
 
-        setDefaultProductionDate();
+    setDefaultProductionDate();
 
-    }
+}
 
 
-    clearCreateBatchError();
+populateVolumeUnitSelect();
+
+
+clearCreateBatchError();
 
 }
 
