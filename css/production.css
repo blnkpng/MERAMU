@@ -5221,3 +5221,49 @@
     }
 
 }
+/* =========================================================
+   ACTUAL INGREDIENTS — VARIANCE
+========================================================= */
+
+.production-actual-ingredient-variance{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.production-actual-ingredient-variance label{
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    color: #94a3b8;
+}
+
+
+.production-actual-variance-value{
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.production-actual-variance-value.is-positive{
+    color: #b45309;
+}
+
+
+.production-actual-variance-value.is-negative{
+    color: #64748b;
+}
+
+
+.production-actual-variance-value.is-zero{
+    color: #046738;
+}
+
+
+.production-actual-variance-value.is-empty{
+    color: #94a3b8;
+}
