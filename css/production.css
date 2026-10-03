@@ -493,17 +493,12 @@
 ========================================================= */
 
 .production-table-wrap{
-
-    width: 100%;
-
-    max-width: 100%;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
-
-    -webkit-overflow-scrolling: touch;
-
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
 }
 
 
@@ -3733,6 +3728,165 @@
 
         min-width: 720px;
 
+    }
+
+}
+/* =========================================================
+   PRODUCTION RESPONSIVE FIX
+========================================================= */
+
+.production-page{
+    width:100%;
+    max-width:1600px;
+    min-width:0;
+    box-sizing:border-box;
+}
+
+
+.production-page *,
+.production-page *::before,
+.production-page *::after{
+    box-sizing:border-box;
+}
+
+
+.production-card{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+
+.production-table-wrap{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+}
+
+
+.production-modal{
+    width:min(
+        780px,
+        calc(100vw - 32px)
+    );
+
+    max-width:100%;
+    min-width:0;
+}
+
+
+.production-detail-body{
+    min-width:0;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+
+.production-detail-section{
+    min-width:0;
+    max-width:100%;
+}
+
+
+.production-detail-grid{
+    min-width:0;
+    max-width:100%;
+}
+
+
+.production-preparation-card{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+
+.production-ingredients-wrap{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+
+.production-ingredients-table-wrap{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+}
+
+
+.production-ingredients-table{
+    width:100%;
+    min-width:620px;
+    border-collapse:collapse;
+}
+
+
+@media (max-width:800px){
+
+    .production-page{
+        padding-left:16px;
+        padding-right:16px;
+    }
+
+
+    .production-table-wrap{
+        border-radius:12px;
+    }
+
+
+    .production-table{
+        min-width:950px;
+    }
+
+
+    .production-modal{
+        width:calc(100vw - 20px);
+        max-width:calc(100vw - 20px);
+    }
+
+
+    .production-detail-body{
+        padding-left:16px;
+        padding-right:16px;
+    }
+
+}
+
+
+@media (max-width:560px){
+
+    .production-page{
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+
+    .production-modal{
+        width:calc(100vw - 20px);
+        max-width:calc(100vw - 20px);
+        border-radius:20px;
+    }
+
+
+    .production-detail-body{
+        padding:18px 14px;
+    }
+
+
+    .production-table{
+        min-width:900px;
+    }
+
+
+    .production-ingredients-table{
+        min-width:560px;
     }
 
 }
