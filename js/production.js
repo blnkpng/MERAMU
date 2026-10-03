@@ -798,7 +798,6 @@ function handleProductionKeydown(
 
     }
 
-
     const createModal =
         document.getElementById(
             "createBatchModal"
@@ -807,6 +806,11 @@ function handleProductionKeydown(
     const detailModal =
         document.getElementById(
             "batchDetailModal"
+        );
+
+    const initialQCModal =
+        document.getElementById(
+            "initialQCModal"
         );
 
 
@@ -823,6 +827,18 @@ function handleProductionKeydown(
 
     }
 
+       if(
+        initialQCModal &&
+        !initialQCModal.classList.contains(
+            "hidden"
+        )
+    ){
+
+        closeInitialQCModal();
+
+        return;
+
+    }
 
     if(
         detailModal &&
@@ -1762,11 +1778,18 @@ async function handleCreateBatch(
         );
 
 
-    setButtonLoading(
-        saveButton,
-        true,
-        "Menyimpan..."
-    );
+    if(saveButton){
+
+        saveButton.disabled =
+            true;
+
+        saveButton.innerHTML =
+            `
+                <span class="production-button-loader"></span>
+                <span>Menyimpan...</span>
+            `;
+
+    }
 
 
     try{
