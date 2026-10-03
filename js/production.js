@@ -3870,25 +3870,25 @@ function updateProductionSummary(){
         ).length;
 
 
-    setSummaryValue(
+    setText(
         "summaryTotal",
         total
     );
 
 
-    setSummaryValue(
+    setText(
         "summaryActive",
         active
     );
 
 
-    setSummaryValue(
+    setText(
         "summaryProduction",
         production
     );
 
 
-    setSummaryValue(
+    setText(
         "summaryCompleted",
         completed
     );
