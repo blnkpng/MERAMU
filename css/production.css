@@ -2913,3 +2913,549 @@
     }
 
 }
+
+/* =========================================================
+   P1.5 — PREPARATION / ACTUAL INGREDIENTS
+========================================================= */
+
+.production-preparation-card{
+
+    width: 100%;
+
+    border:
+        1px solid rgba(15,23,42,.08);
+
+    border-radius: 16px;
+
+    background:
+        rgba(248,250,252,.75);
+
+    overflow: hidden;
+
+}
+
+
+.production-preparation-loading{
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 18px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+.production-inline-spinner{
+
+    width: 16px;
+
+    height: 16px;
+
+    border:
+        2px solid rgba(15,23,42,.12);
+
+    border-top-color:
+        currentColor;
+
+    border-radius: 50%;
+
+    animation:
+        productionP15Spin
+        .7s linear infinite;
+
+}
+
+
+.production-preparation-error{
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 16px;
+
+    color: #b91c1c;
+
+    background:
+        rgba(254,226,226,.55);
+
+    font-size: 13px;
+
+}
+
+
+.production-preparation-error svg{
+
+    width: 17px;
+
+    height: 17px;
+
+    flex-shrink: 0;
+
+}
+
+
+.production-ingredients-wrap{
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+.production-ingredients-table{
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 620px;
+
+}
+
+
+.production-ingredients-table th{
+
+    padding: 12px 14px;
+
+    text-align: left;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .05em;
+
+    text-transform: uppercase;
+
+    color: #64748b;
+
+    background:
+        rgba(241,245,249,.8);
+
+    border-bottom:
+        1px solid rgba(15,23,42,.08);
+
+}
+
+
+.production-ingredients-table td{
+
+    padding: 13px 14px;
+
+    border-bottom:
+        1px solid rgba(15,23,42,.06);
+
+    font-size: 13px;
+
+    color: #334155;
+
+}
+
+
+.production-ingredients-table tbody tr:last-child td{
+
+    border-bottom: 0;
+
+}
+
+
+.production-ingredient-name{
+
+    font-weight: 600;
+
+    color: #0f172a;
+
+}
+
+
+.production-ingredient-code{
+
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    color: #94a3b8;
+
+}
+
+
+.production-ingredient-formula{
+
+    font-weight: 600;
+
+    color: #475569;
+
+}
+
+
+.production-ingredient-actual{
+
+    width: 120px;
+
+    padding: 9px 10px;
+
+    border:
+        1px solid rgba(15,23,42,.14);
+
+    border-radius: 10px;
+
+    background: #fff;
+
+    outline: none;
+
+    font-family:
+        Poppins,
+        sans-serif;
+
+    font-size: 12px;
+
+}
+
+
+.production-ingredient-actual:focus{
+
+    border-color:
+        rgba(4,103,56,.45);
+
+    box-shadow:
+        0 0 0 3px rgba(4,103,56,.08);
+
+}
+
+
+.production-ingredient-unit{
+
+    color: #64748b;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   P1.5 — INITIAL QC
+========================================================= */
+
+.production-qc-card{
+
+    border:
+        1px solid rgba(15,23,42,.08);
+
+    border-radius: 16px;
+
+    padding: 18px;
+
+    background: #fff;
+
+}
+
+
+.production-qc-status-row{
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        );
+
+    gap: 16px;
+
+}
+
+
+.production-qc-label{
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: .08em;
+
+    color: #94a3b8;
+
+}
+
+
+.production-qc-status-value{
+
+    display: block;
+
+    font-size: 15px;
+
+    color: #0f172a;
+
+}
+
+
+.production-qc-decision-value{
+
+    display: block;
+
+    font-size: 15px;
+
+    color: #475569;
+
+}
+
+
+.production-qc-meta{
+
+    margin-top: 14px;
+
+    padding-top: 14px;
+
+    border-top:
+        1px solid rgba(15,23,42,.07);
+
+    font-size: 12px;
+
+    color: #64748b;
+
+}
+
+
+.production-qc-actions{
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 16px;
+
+}
+
+
+.production-qc-card .production-btn{
+
+    min-width: 140px;
+
+}
+
+
+.production-qc-status-value{
+
+    line-height: 1.4;
+
+}
+
+
+.production-ready-f1{
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    background:
+        rgba(22,163,74,.10);
+
+    color: #15803d;
+
+}
+
+
+.production-ready-f1::before{
+
+    content: "";
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+
+}
+
+
+.production-qc-card
+.production-btn-primary{
+
+    box-shadow:
+        0 6px 16px rgba(4,122,70,.12);
+
+}
+
+
+/* =========================================================
+   P1.5 — F1 ACTION
+========================================================= */
+
+.production-action-btn-f1{
+
+    min-height: 34px;
+
+    padding: 0 11px;
+
+    border:
+        1px solid #cfe8da;
+
+    border-radius: 9px;
+
+    background: #edf8f2;
+
+    color: #047a46;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    font-family:
+        Poppins,
+        sans-serif;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .15s ease;
+
+}
+
+
+.production-action-btn-f1:hover{
+
+    background: #e1f3e9;
+
+    border-color: #b9ddc9;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.production-action-btn-f1:disabled{
+
+    opacity: .55;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+}
+
+
+.production-action-btn-f1 svg{
+
+    width: 15px;
+
+    height: 15px;
+
+}
+
+
+.production-action-btn-f1.is-loading{
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   P1.5 — SPINNER
+========================================================= */
+
+@keyframes productionP15Spin{
+
+    from{
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to{
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   P1.5 — RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px){
+
+    .production-qc-status-row{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .production-qc-actions{
+
+        justify-content:
+            stretch;
+
+    }
+
+
+    .production-qc-actions
+    .production-btn{
+
+        width: 100%;
+
+    }
+
+
+    .production-ingredient-actual{
+
+        width: 100px;
+
+    }
+
+}
+/* =========================================================
+   INITIAL QC MODAL LAYER
+========================================================= */
+
+#initialQCModal{
+
+    z-index: 1100;
+
+}
