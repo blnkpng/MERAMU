@@ -4672,3 +4672,176 @@
     }
 
 }
+/* =========================================================
+   FINAL PREPARATION UI
+========================================================= */
+
+.production-preparation-header{
+    min-height: 58px;
+    padding: 14px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    background: #f8fafc;
+    border-bottom: 1px solid #e7ecf1;
+}
+
+.production-preparation-title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.production-preparation-title strong{
+    color: #172033;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+.production-preparation-count{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 25px;
+    padding: 0 10px;
+
+    border-radius: 999px;
+
+    background: #eaf7f0;
+    color: #047a46;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* TABLE */
+
+.production-ingredients-wrap{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.production-ingredients-table{
+    width: 100%;
+    min-width: 620px;
+
+    border-collapse: collapse;
+}
+
+.production-ingredients-table th{
+    height: 44px;
+
+    padding: 0 14px;
+
+    background: #f5f7f9;
+
+    border-bottom: 1px solid #e4e9ef;
+
+    color: #748095;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-align: left;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    white-space: nowrap;
+}
+
+.production-ingredients-table td{
+    padding: 14px;
+
+    border-bottom: 1px solid #edf1f5;
+
+    color: #4f5c70;
+
+    font-size: 12px;
+
+    vertical-align: middle;
+}
+
+.production-ingredients-table tbody tr:last-child td{
+    border-bottom: 0;
+}
+
+.production-ingredient-number{
+    width: 42px;
+
+    color: #8a96a9;
+    font-weight: 600;
+}
+
+.production-ingredient-name{
+    color: #263248;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.production-ingredient-code{
+    display: block;
+
+    margin-top: 3px;
+
+    color: #9aa6b7;
+
+    font-size: 10px;
+}
+
+.production-ingredient-quantity{
+    color: #263248;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.production-ingredient-unit{
+    color: #526075;
+
+    font-weight: 600;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 560px){
+
+    .production-preparation-header{
+        padding: 13px 14px;
+    }
+
+    .production-preparation-title strong{
+        font-size: 13px;
+    }
+
+    .production-preparation-count{
+        min-height: 23px;
+        padding: 0 8px;
+
+        font-size: 9px;
+    }
+
+    .production-ingredients-table{
+        min-width: 560px;
+    }
+
+}
