@@ -2170,52 +2170,62 @@ function createProductionRow(
 
             <!-- ACTION -->
 
-            <td>
+<td class="production-action-cell">
 
-                <div class="production-action-group">
+    <div class="production-action-group">
 
+        <!-- DETAIL -->
+
+        <button
+            type="button"
+            class="production-action-btn production-action-btn-detail"
+            data-production-action="detail"
+            data-batch-id="${escapeHtml(
+                batch.id
+            )}"
+            title="Lihat Detail Batch"
+            aria-label="Lihat detail batch"
+        >
+
+            <i data-lucide="eye"></i>
+
+            <span class="production-action-label">
+                Detail
+            </span>
+
+        </button>
+
+
+        <!-- START F1 -->
+
+        ${
+            canStartF1
+                ? `
                     <button
                         type="button"
-                        class="production-action-btn"
-                        data-production-action="detail"
+                        class="production-action-btn production-action-btn-f1"
+                        data-production-action="start-f1"
                         data-batch-id="${escapeHtml(
                             batch.id
                         )}"
-                        title="Detail Batch"
+                        title="Mulai F1"
+                        aria-label="Mulai F1"
                     >
 
-                        <i data-lucide="eye"></i>
+                        <i data-lucide="play"></i>
+
+                        <span>
+                            Mulai F1
+                        </span>
 
                     </button>
+                  `
+                : ""
+        }
 
+    </div>
 
-                    ${
-                        canStartF1
-                            ? `
-                                <button
-                                    type="button"
-                                    class="production-action-btn production-action-btn-f1"
-                                    data-production-action="start-f1"
-                                    data-batch-id="${escapeHtml(
-                                        batch.id
-                                    )}"
-                                    title="Mulai F1"
-                                >
-
-                                    <i data-lucide="play"></i>
-
-                                    <span>
-                                        Mulai F1
-                                    </span>
-
-                                </button>
-                              `
-                            : ""
-                    }
-
-                </div>
-
-            </td>
+</td>
 
         </tr>
     `;
