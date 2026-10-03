@@ -9863,6 +9863,7 @@ document
                     button.dataset.versionNumber;
 
                 deleteRecipeVersion(
+                    activeDetailRecipeId,
                     versionId,
                     versionNumber
                 );
