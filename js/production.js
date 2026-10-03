@@ -3262,16 +3262,30 @@ async function loadBatchRecipePreparation(
             );
 
 
-        /*
-         * =====================================================
-         * 8. RENDER
-         * =====================================================
-         */
+/*
+ * =====================================================
+ * 8. LOAD ACTUAL INGREDIENTS
+ * =====================================================
+ */
 
-        renderBatchRecipePreparation(
-            version,
-            preparedRows
-        );
+const actualRows =
+    await loadBatchActualIngredients(
+        batch,
+        version,
+        preparedRows
+    );
+
+
+/*
+ * =====================================================
+ * 9. RENDER
+ * =====================================================
+ */
+
+renderBatchRecipePreparation(
+    version,
+    actualRows
+);
 
     }
     catch(error){
@@ -3381,7 +3395,130 @@ function showBatchRecipePreparationError(
     }
 
 }
+/* =========================================================
+   ACTUAL INGREDIENTS
+========================================================= */
 
+async function loadBatchActualIngredients(
+    batch,
+    version,
+    rows
+){
+
+    try{
+
+        if(
+            !batch ||
+            !batch.id
+        ){
+
+            return [];
+
+        }
+
+
+        /*
+         * =====================================================
+         * LOAD EXISTING ACTUAL INGREDIENTS
+         * =====================================================
+         */
+
+        const {
+            data: actualRows,
+            error: actualError
+        } = await supabaseClient
+            .from("batch_ingredients")
+            .select(`
+                id,
+                batch_id,
+                recipe_ingredient_id,
+                ingredient_id,
+                formula_quantity,
+                formula_unit_id,
+                actual_quantity,
+                actual_unit_id,
+                notes,
+                created_at,
+                updated_at
+            `)
+            .eq(
+                "batch_id",
+                batch.id
+            );
+
+
+        if(actualError){
+
+            console.error(
+                "Load batch ingredients error:",
+                actualError
+            );
+
+            throw actualError;
+
+        }
+
+
+        /*
+         * =====================================================
+         * MAP EXISTING DATA
+         * =====================================================
+         */
+
+        const actualMap =
+            new Map(
+                (actualRows || []).map(
+                    item => [
+                        item.recipe_ingredient_id,
+                        item
+                    ]
+                )
+            );
+
+
+        /*
+         * =====================================================
+         * MERGE FORMULA + ACTUAL
+         * =====================================================
+         */
+
+        const mergedRows =
+            (rows || []).map(
+                item => {
+
+                    const actual =
+                        actualMap.get(
+                            item.id
+                        ) || null;
+
+
+                    return {
+
+                        ...item,
+
+                        actual: actual
+
+                    };
+
+                }
+            );
+
+
+        return mergedRows;
+
+    }
+    catch(error){
+
+        console.error(
+            "loadBatchActualIngredients failed:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
 
 /* =========================================================
    RECIPE PREPARATION RENDER
