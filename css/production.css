@@ -4033,11 +4033,14 @@
 }
 
 .production-modal{
-    width: min(620px, calc(100vw - 32px));
-
+    width: min(780px, calc(100vw - 32px));
     max-width: calc(100vw - 32px);
-
     min-width: 0;
+
+    max-height: calc(100vh - 48px);
+
+    display: flex;
+    flex-direction: column;
 
     overflow: hidden;
 }
@@ -4084,8 +4087,13 @@
     max-width: 100%;
     min-width: 0;
 
-    overflow-x: hidden;
+    flex: 1 1 auto;
+    min-height: 0;
+
     overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
 }
 
 .production-detail-grid{
@@ -4566,6 +4574,101 @@
 
     .production-action-btn-f1 span{
         display: none;
+    }
+
+}
+/* =========================================================
+   FINAL MODAL SCROLL FIX
+========================================================= */
+
+.production-modal{
+    width: min(780px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+    min-width: 0;
+
+    max-height: calc(100vh - 48px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.production-modal-header{
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.production-detail-body{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.production-form{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.production-modal-footer{
+    flex: 0 0 auto;
+}
+
+
+/* =========================================================
+   MOBILE MODAL
+========================================================= */
+
+@media (max-width: 560px){
+
+    .production-modal-backdrop{
+        padding: 8px;
+        align-items: flex-end;
+        overflow: hidden;
+    }
+
+    .production-modal,
+    .production-modal-detail{
+        width: 100%;
+        max-width: 100%;
+
+        height: calc(100dvh - 16px);
+        max-height: calc(100dvh - 16px);
+
+        border-radius: 20px;
+    }
+
+    .production-detail-body{
+        flex: 1 1 auto;
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .production-form{
+        flex: 1 1 auto;
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
 }
