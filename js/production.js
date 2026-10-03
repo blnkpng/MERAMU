@@ -3883,7 +3883,6 @@ async function saveBatchActualIngredients(){
             });
 
         }
-    );
 
 
     /*
