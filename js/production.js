@@ -3405,118 +3405,156 @@ async function loadBatchActualIngredients(
     rows
 ){
 
-    try{
+    /*
+     * =====================================================
+     * VALIDATION
+     * =====================================================
+     */
 
-        if(
-            !batch ||
-            !batch.id
-        ){
+    if(
+        !batch ||
+        !batch.id
+    ){
 
-            return [];
-
-        }
-
-
-        /*
-         * =====================================================
-         * LOAD EXISTING ACTUAL INGREDIENTS
-         * =====================================================
-         */
-
-        const {
-            data: actualRows,
-            error: actualError
-        } = await supabaseClient
-            .from("batch_ingredients")
-            .select(`
-                id,
-                batch_id,
-                recipe_ingredient_id,
-                ingredient_id,
-                formula_quantity,
-                formula_unit_id,
-                actual_quantity,
-                actual_unit_id,
-                notes,
-                created_at,
-                updated_at
-            `)
-            .eq(
-                "batch_id",
-                batch.id
-            );
-
-
-        if(actualError){
-
-            console.error(
-                "Load batch ingredients error:",
-                actualError
-            );
-
-            throw actualError;
-
-        }
-
-
-        /*
-         * =====================================================
-         * MAP EXISTING DATA
-         * =====================================================
-         */
-
-        const actualMap =
-            new Map(
-                (actualRows || []).map(
-                    item => [
-                        item.recipe_ingredient_id,
-                        item
-                    ]
-                )
-            );
-
-
-        /*
-         * =====================================================
-         * MERGE FORMULA + ACTUAL
-         * =====================================================
-         */
-
-        const mergedRows =
-            (rows || []).map(
-                item => {
-
-                    const actual =
-                        actualMap.get(
-                            item.id
-                        ) || null;
-
-
-                    return {
-
-                        ...item,
-
-                        actual: actual
-
-                    };
-
-                }
-            );
-
-
-        return mergedRows;
-
-    }
-    catch(error){
-
-        console.error(
-            "loadBatchActualIngredients failed:",
-            error
+        throw new Error(
+            "Batch tidak ditemukan."
         );
 
-        return [];
+    }
+
+
+    /*
+     * =====================================================
+     * GET SUPABASE CLIENT
+     * =====================================================
+     *
+     * Gunakan client yang sama dengan
+     * loadBatchRecipePreparation().
+     */
+
+    const supabase =
+        await waitForProductionSupabase();
+
+
+    /*
+     * =====================================================
+     * LOAD EXISTING ACTUAL INGREDIENTS
+     * =====================================================
+     */
+
+    const {
+        data: actualRows,
+        error: actualError
+    } = await supabase
+
+        .from(
+            "batch_ingredients"
+        )
+
+        .select(`
+            id,
+            batch_id,
+            recipe_ingredient_id,
+            ingredient_id,
+            formula_quantity,
+            formula_unit_id,
+            actual_quantity,
+            actual_unit_id,
+            notes,
+            created_at,
+            updated_at
+        `)
+
+        .eq(
+            "batch_id",
+            batch.id
+        );
+
+
+    /*
+     * =====================================================
+     * ERROR
+     * =====================================================
+     */
+
+    if(actualError){
+
+        console.error(
+            "Load batch ingredients error:",
+            actualError
+        );
+
+        throw actualError;
 
     }
+
+
+    /*
+     * =====================================================
+     * MAP EXISTING DATA
+     * =====================================================
+     */
+
+    const actualMap =
+        new Map(
+            (
+                actualRows ||
+                []
+            ).map(
+                item => [
+
+                    String(
+                        item.recipe_ingredient_id
+                    ),
+
+                    item
+
+                ]
+            )
+        );
+
+
+    /*
+     * =====================================================
+     * MERGE FORMULA + ACTUAL
+     * =====================================================
+     */
+
+    const mergedRows =
+        (
+            rows ||
+            []
+        ).map(
+            item => {
+
+                const actual =
+                    actualMap.get(
+                        String(
+                            item.id
+                        )
+                    ) ||
+                    null;
+
+
+                return {
+
+                    ...item,
+
+                    actual
+
+                };
+
+            }
+        );
+
+
+    /*
+     * =====================================================
+     * RETURN
+     * =====================================================
+     */
+
+    return mergedRows;
 
 }
 
