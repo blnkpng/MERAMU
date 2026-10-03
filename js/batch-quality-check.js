@@ -167,7 +167,48 @@
 
         if(stage){
 
-            stage.value = "f2";
+            /* -----------------------------------------
+               DEFAULT QC STAGE = CURRENT BATCH STAGE
+               Jangan selalu default ke F2.
+               Jika batch masih F1, QC harus dibuka sebagai F1
+               agar tombol transisi F1 → F2 dapat bekerja.
+            ----------------------------------------- */
+
+            const batchId =
+                new URLSearchParams(
+                    window.location.search
+                ).get("id");
+
+            const currentBatch =
+                typeof batchDetailData !== "undefined" &&
+                batchId
+                    ? batchDetailData[batchId]
+                    : null;
+
+            const currentStage =
+                String(
+                    currentBatch?.stage ||
+                    currentBatch?.current_stage ||
+                    ""
+                ).toLowerCase();
+
+            if(currentStage.includes("f1")){
+
+                stage.value = "f1";
+
+            }else if(currentStage.includes("f2")){
+
+                stage.value = "f2";
+
+            }else if(currentStage.includes("harvest")){
+
+                stage.value = "harvest";
+
+            }else{
+
+                stage.value = "production";
+
+            }
 
         }
 
