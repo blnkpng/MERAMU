@@ -225,6 +225,14 @@ function navigateToRoute(route){
 
             break;
 
+          case "allocation":
+
+             window.location.href =
+                 "/pages/allocation.html";
+
+          break;
+
+
           case "finished":
 
              window.location.href =
@@ -347,6 +355,9 @@ function setActiveMenu(){
 
             "harvest":
                 "/pages/harvest.html",
+
+            "allocation":
+                "/pages/allocation.html",
 
             "finished":
                   "/pages/finished.html",

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alokasi • MERAMU</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/branding/favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="../css/allocation.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <div id="appShell" class="app-shell">
+        <aside id="sidebar-container"></aside>
+        <main class="content">
+            <div id="topbar-container"></div>
+            <section class="allocation-page">
+                <header class="allocation-header">
+                    <div>
+                        <div class="allocation-eyebrow"><span></span> HARVEST / ALOKASI</div>
+                        <h1>Alokasi Hasil Panen</h1>
+                        <p>Bagi hasil Actual Harvest menjadi rencana produk dan ukuran kemasan sebelum masuk Produk Jadi.</p>
+                    </div>
+                    <button class="allocation-btn secondary" id="refreshAllocationBtn" type="button">
+                        <i data-lucide="refresh-cw"></i> Refresh
+                    </button>
+                </header>
+
+                <div class="allocation-kpis">
+                    <article><span>READY ALOKASI</span><strong id="allocationReady">0</strong><small>Batch sudah panen dan punya sisa volume</small></article>
+                    <article><span>VOLUME HARVEST</span><strong id="allocationHarvestVolume">0 L</strong><small>Total Actual Harvest</small></article>
+                    <article><span>VOLUME TERALOKASI</span><strong id="allocationUsedVolume">0 L</strong><small>Total alokasi aktif</small></article>
+                    <article><span>SISA VOLUME</span><strong id="allocationRemainingVolume">0 L</strong><small>Masih tersedia untuk alokasi</small></article>
+                </div>
+
+                <div class="allocation-layout">
+                    <section class="allocation-card">
+                        <div class="allocation-card-head">
+                            <div>
+                                <span>STEP 1</span>
+                                <h2>Pilih Batch Harvest</h2>
+                            </div>
+                            <span class="allocation-count" id="harvestBatchCount">0 batch</span>
+                        </div>
+                        <div id="allocationState" class="allocation-state">Memuat batch Harvest...</div>
+                        <div id="allocationBatchList" class="allocation-batch-list"></div>
+                    </section>
+
+                    <section class="allocation-card allocation-form-card">
+                        <div class="allocation-card-head">
+                            <div>
+                                <span>STEP 2</span>
+                                <h2>Buat Alokasi</h2>
+                            </div>
+                        </div>
+                        <div id="allocationSelected" class="allocation-selected empty">Pilih batch di sebelah kiri.</div>
+                        <form id="allocationForm" class="allocation-form" novalidate>
+                            <input type="hidden" id="allocationBatchId">
+                            <div class="allocation-grid">
+                                <label>Volume Alokasi (L)<input id="allocatedVolume" type="number" min="0.001" step="0.001" placeholder="13.75" required></label>
+                                <label>Ukuran Botol (ml)<input id="bottleSizeMl" type="number" min="1" step="1" value="250" required></label>
+                                <label>Rencana Botol<input id="plannedBottles" type="number" min="1" step="1" placeholder="55" required></label>
+                                <label>Varian / Flavor<input id="variantName" type="text" placeholder="Original"></label>
+                                <label>Operator<input id="operatorName" type="text" value="Arif" required></label>
+                                <label>Tanggal Alokasi<input id="allocationDate" type="datetime-local" required></label>
+                            </div>
+                            <label>Catatan<textarea id="allocationNotes" rows="3" placeholder="Catatan alokasi... "></textarea></label>
+                            <div class="allocation-calc">
+                                <div><span>Output rencana</span><strong id="allocationOutput">0 L</strong></div>
+                                <div><span>Sisa setelah alokasi</span><strong id="allocationRemaining">—</strong></div>
+                            </div>
+                            <button class="allocation-btn primary" id="saveAllocationBtn" type="submit" disabled>
+                                <i data-lucide="save"></i> Simpan Alokasi
+                            </button>
+                        </form>
+                    </section>
+                </div>
+
+                <section class="allocation-card">
+                    <div class="allocation-card-head">
+                        <div><span>STEP 3</span><h2>Riwayat Alokasi</h2></div>
+                    </div>
+                    <div id="allocationHistoryState" class="allocation-state">Pilih batch untuk melihat alokasi.</div>
+                    <div id="allocationHistory" class="allocation-history"></div>
+                </section>
+            </section>
+        </main>
+    </div>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/component-loader.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/allocation.js"></script>
+</body>
+</html>
