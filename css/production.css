@@ -3890,3 +3890,682 @@
     }
 
 }
+/* =========================================================
+   MERAMU PRODUCTION — RESPONSIVE PATCH
+========================================================= */
+
+/* ---------- GLOBAL WIDTH SAFETY ---------- */
+
+.production-page,
+.production-page *,
+.production-modal,
+.production-modal *{
+    box-sizing: border-box;
+}
+
+.production-page{
+    width: 100%;
+    min-width: 0;
+    max-width: 1600px;
+}
+
+.production-page-header,
+.production-toolbar,
+.production-card,
+.production-summary-grid,
+.production-detail-body,
+.production-detail-grid,
+.production-detail-section{
+    min-width: 0;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.production-table-wrap{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.production-table{
+    width: 100%;
+    min-width: 1050px;
+}
+
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.production-table-action-head{
+    min-width: 150px;
+    text-align: right !important;
+}
+
+.production-action-group{
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    min-width: 0;
+
+    white-space: nowrap;
+}
+
+.production-action-btn{
+    min-width: 36px;
+    height: 36px;
+
+    padding: 0 10px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: #fff;
+    color: #64748b;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    font-family: Poppins, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease,
+        transform .15s ease;
+}
+
+.production-action-btn:hover{
+    background: #f7faf8;
+    border-color: #cde6d8;
+    color: #047a46;
+    transform: translateY(-1px);
+}
+
+.production-action-btn svg{
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+}
+
+.production-action-btn-f1{
+    color: #047a46;
+    border-color: #cfe7da;
+    background: #f4fbf7;
+}
+
+.production-action-btn-f1:hover{
+    background: #eaf7ef;
+}
+
+
+/* =========================================================
+   DETAIL MODAL — WIDTH SAFETY
+========================================================= */
+
+.production-modal-backdrop{
+    width: 100%;
+    max-width: 100vw;
+
+    overflow: hidden;
+}
+
+.production-modal{
+    width: min(620px, calc(100vw - 32px));
+
+    max-width: calc(100vw - 32px);
+
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.production-modal-detail{
+    width: min(780px, calc(100vw - 32px));
+
+    max-width: calc(100vw - 32px);
+}
+
+
+/* =========================================================
+   DETAIL HEADER
+========================================================= */
+
+.production-modal-header{
+    min-width: 0;
+}
+
+.production-modal-header > div{
+    min-width: 0;
+    max-width: 100%;
+}
+
+.production-modal-header h2,
+.production-modal-header p{
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.production-modal-header h2{
+    line-height: 1.25;
+}
+
+
+/* =========================================================
+   DETAIL BODY
+========================================================= */
+
+.production-detail-body{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.production-detail-grid{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.production-detail-item{
+    width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.production-detail-item strong{
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   DETAIL SECTION TITLE
+========================================================= */
+
+.production-detail-section-title{
+    width: 100%;
+    min-width: 0;
+}
+
+.production-detail-section-title > div{
+    min-width: 0;
+    flex: 1;
+}
+
+.production-detail-section-title strong,
+.production-detail-section-title span{
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+.production-detail-notes{
+    width: 100%;
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   PREPARATION
+========================================================= */
+
+.production-preparation-card{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    border: 1px solid #e5eaf0;
+    border-radius: 16px;
+
+    background: #fff;
+
+    overflow: hidden;
+}
+
+.production-preparation-loading{
+    min-height: 90px;
+
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    color: #8a96a9;
+
+    font-size: 11px;
+}
+
+.production-preparation-error{
+    padding: 14px 16px;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 9px;
+
+    color: #b91c1c;
+
+    background: #fff7f7;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.production-preparation-error svg{
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+}
+
+.production-ingredients-wrap{
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   PREPARATION HEADER
+========================================================= */
+
+.production-preparation-header{
+    width: 100%;
+    min-width: 0;
+
+    padding: 16px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    border-bottom: 1px solid #edf1f5;
+
+    background: #fbfcfd;
+}
+
+.production-preparation-title{
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.production-preparation-title strong{
+    color: #273349;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.production-preparation-count{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 24px;
+
+    padding: 0 9px;
+
+    border-radius: 999px;
+
+    background: #edf8f2;
+    color: #047a46;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   PREPARATION TABLE
+========================================================= */
+
+.production-ingredients-table{
+    width: 100%;
+
+    min-width: 650px;
+
+    border-collapse: collapse;
+}
+
+.production-ingredients-table th{
+    height: 48px;
+
+    padding: 0 16px;
+
+    background: #f5f7f9;
+
+    border-bottom: 1px solid #e4e9ef;
+
+    color: #66748a;
+
+    text-align: left;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .06em;
+
+    white-space: nowrap;
+}
+
+.production-ingredients-table td{
+    padding: 13px 16px;
+
+    border-bottom: 1px solid #edf1f5;
+
+    color: #4f5c70;
+
+    font-size: 11px;
+
+    vertical-align: middle;
+}
+
+.production-ingredients-table tbody tr:last-child td{
+    border-bottom: 0;
+}
+
+.production-ingredients-table tbody tr:hover{
+    background: #fbfdfc;
+}
+
+.production-ingredient-number{
+    width: 40px;
+
+    color: #7e8a9d;
+
+    font-weight: 600;
+}
+
+.production-ingredient-name{
+    color: #263248;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.production-ingredient-code{
+    color: #98a3b3;
+
+    font-size: 10px;
+}
+
+.production-ingredient-quantity{
+    color: #263248;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.production-ingredient-unit{
+    color: #526075;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   MOBILE — TABLE
+========================================================= */
+
+@media (max-width: 800px){
+
+    .production-page{
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .production-card{
+        width: 100%;
+        min-width: 0;
+    }
+
+    .production-table-wrap{
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .production-table{
+        min-width: 920px;
+    }
+
+    .production-table-action-head{
+        min-width: 145px;
+    }
+
+    .production-action-group{
+        justify-content: flex-start;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE — MODAL
+========================================================= */
+
+@media (max-width: 560px){
+
+    .production-modal-backdrop{
+        padding: 8px;
+
+        align-items: flex-end;
+    }
+
+    .production-modal,
+    .production-modal-detail{
+        width: 100%;
+        max-width: 100%;
+
+        max-height: calc(100dvh - 16px);
+
+        border-radius: 20px;
+
+        overflow: hidden;
+    }
+
+    .production-modal-header{
+        padding: 17px 16px 15px;
+
+        gap: 12px;
+    }
+
+    .production-modal-header h2{
+        font-size: 19px;
+
+        line-height: 1.3;
+    }
+
+    .production-modal-header p{
+        font-size: 11px;
+    }
+
+    .production-modal-close{
+        width: 36px;
+        height: 36px;
+    }
+
+    .production-detail-body{
+        padding: 16px;
+
+        max-height: calc(100dvh - 105px);
+
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .production-detail-grid{
+        grid-template-columns: 1fr;
+
+        gap: 9px;
+    }
+
+    .production-detail-item{
+        padding: 13px 14px;
+
+        border-radius: 13px;
+    }
+
+    .production-detail-item span{
+        margin-bottom: 4px;
+
+        font-size: 9px;
+    }
+
+    .production-detail-item strong{
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .production-detail-section{
+        margin-top: 18px;
+        padding-top: 16px;
+    }
+
+    .production-detail-section-title{
+        gap: 8px;
+
+        margin-bottom: 10px;
+    }
+
+    .production-detail-section-title > svg{
+        width: 17px;
+        height: 17px;
+    }
+
+    .production-detail-section-title strong{
+        font-size: 12px;
+    }
+
+    .production-detail-section-title span{
+        font-size: 9px;
+    }
+
+    .production-preparation-header{
+        padding: 13px 14px;
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 7px;
+    }
+
+    .production-preparation-title{
+        width: 100%;
+    }
+
+    .production-preparation-title strong{
+        font-size: 12px;
+    }
+
+    .production-ingredients-table{
+        min-width: 620px;
+    }
+
+    .production-ingredients-table th{
+        height: 44px;
+
+        padding: 0 12px;
+    }
+
+    .production-ingredients-table td{
+        padding: 11px 12px;
+    }
+
+    .production-ingredient-name{
+        font-size: 11px;
+    }
+
+    .production-ingredient-code{
+        font-size: 9px;
+    }
+
+}
+
+
+/* =========================================================
+   EXTRA SMALL
+========================================================= */
+
+@media (max-width: 380px){
+
+    .production-page{
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .production-modal-backdrop{
+        padding: 5px;
+    }
+
+    .production-modal,
+    .production-modal-detail{
+        border-radius: 18px;
+    }
+
+    .production-detail-body{
+        padding: 13px;
+    }
+
+    .production-action-btn-f1 span{
+        display: none;
+    }
+
+}
