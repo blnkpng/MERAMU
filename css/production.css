@@ -6616,3 +6616,781 @@
     }
 
 }
+/* =========================================================
+   MERAMU PRODUCTION
+   FINAL RESPONSIVE PATCH v2
+   ---------------------------------------------------------
+   FIX:
+   1. Batch detail cards tetap compact
+   2. Tablet = 2 kolom
+   3. Mobile = 2 kolom
+   4. Modal = HEADER / BODY / FOOTER
+   5. Footer selalu terlihat
+   6. Body modal yang melakukan scrolling
+========================================================= */
+
+
+/* =========================================================
+   01. DETAIL MODAL — MASTER LAYOUT
+========================================================= */
+
+.production-modal.production-modal-detail{
+
+    width:
+        min(
+            780px,
+            calc(100vw - 32px)
+        );
+
+    max-width:
+        calc(100vw - 32px);
+
+    min-width: 0;
+
+    height:
+        min(
+            calc(100vh - 48px),
+            900px
+        );
+
+    max-height:
+        calc(100vh - 48px);
+
+    min-height: 0;
+
+    margin: 0;
+
+    display: grid;
+
+    grid-template-rows:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+    overflow: hidden;
+
+}
+
+
+/* =========================================================
+   02. MODAL HEADER
+========================================================= */
+
+.production-modal.production-modal-detail
+.production-modal-header{
+
+    min-width: 0;
+
+    width: 100%;
+
+    flex: none;
+
+    overflow: hidden;
+
+}
+
+
+/* =========================================================
+   03. MODAL BODY
+   ---------------------------------------------------------
+   INI SATU-SATUNYA BAGIAN YANG BOLEH SCROLL
+========================================================= */
+
+.production-modal.production-modal-detail
+.production-detail-body{
+
+    width: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    max-width: 100%;
+
+    padding:
+        24px 26px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior:
+        contain;
+
+    -webkit-overflow-scrolling:
+        touch;
+
+}
+
+
+/* =========================================================
+   04. DETAIL INFORMATION CARDS
+========================================================= */
+
+.production-modal.production-modal-detail
+.production-detail-grid{
+
+    width: 100%;
+
+    min-width: 0;
+    max-width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+
+}
+
+
+/* =========================================================
+   DETAIL CARD
+========================================================= */
+
+.production-modal.production-modal-detail
+.production-detail-item{
+
+    width: 100%;
+
+    min-width: 0;
+
+    max-width: 100%;
+
+    padding:
+        15px;
+
+    border:
+        1px solid #e8edf2;
+
+    border-radius:
+        14px;
+
+    background:
+        #fbfcfd;
+
+    overflow: hidden;
+
+}
+
+
+/* label */
+
+.production-modal.production-modal-detail
+.production-detail-item span{
+
+    display: block;
+
+    margin-bottom:
+        5px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.4;
+
+}
+
+
+/* value */
+
+.production-modal.production-modal-detail
+.production-detail-item strong{
+
+    display: block;
+
+    min-width: 0;
+    max-width: 100%;
+
+    color:
+        #273349;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.45;
+
+    overflow-wrap:
+        anywhere;
+
+    word-break:
+        break-word;
+
+}
+
+
+/* =========================================================
+   05. MODAL FOOTER
+   ---------------------------------------------------------
+   FOOTER TIDAK IKUT SCROLL
+========================================================= */
+
+.production-modal.production-modal-detail
+.production-modal-footer{
+
+    width: 100%;
+
+    min-width: 0;
+
+    min-height: 70px;
+
+    flex: none;
+
+    padding:
+        14px 26px 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    border-top:
+        1px solid #edf1f5;
+
+    background:
+        #ffffff;
+
+    position: relative;
+
+    z-index: 5;
+
+}
+
+
+/* tombol footer */
+
+.production-modal.production-modal-detail
+.production-modal-footer
+.production-btn{
+
+    flex:
+        0 0 auto;
+
+    min-height:
+        42px;
+
+}
+
+
+/* =========================================================
+   06. TABLET
+   801px — 1100px
+========================================================= */
+
+@media (min-width: 801px) and (max-width: 1100px){
+
+    .production-modal.production-modal-detail{
+
+        width:
+            calc(100vw - 40px);
+
+        max-width:
+            calc(100vw - 40px);
+
+        height:
+            calc(100vh - 40px);
+
+        max-height:
+            calc(100vh - 40px);
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-body{
+
+        padding:
+            20px;
+
+    }
+
+
+    /*
+     * TABLET:
+     * 2 CARD PER BARIS
+     */
+
+    .production-modal.production-modal-detail
+    .production-detail-grid{
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            10px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item{
+
+        min-height:
+            76px;
+
+        padding:
+            13px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-footer{
+
+        min-height:
+            66px;
+
+        padding:
+            12px 20px 15px;
+
+    }
+
+}
+
+
+/* =========================================================
+   07. MOBILE
+   <= 800px
+========================================================= */
+
+@media (max-width: 800px){
+
+    .production-modal.production-modal-detail{
+
+        width:
+            calc(100vw - 16px);
+
+        max-width:
+            calc(100vw - 16px);
+
+        height:
+            calc(100dvh - 16px);
+
+        max-height:
+            calc(100dvh - 16px);
+
+        min-height:
+            0;
+
+        border-radius:
+            20px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-header{
+
+        padding:
+            16px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-body{
+
+        padding:
+            16px;
+
+        min-height:
+            0;
+
+        overflow-y:
+            auto;
+
+        overflow-x:
+            hidden;
+
+    }
+
+
+    /*
+     * MOBILE:
+     * tetap 2 CARD PER BARIS
+     *
+     * Jadi tidak lagi:
+     *
+     * Batch
+     * Product
+     * Recipe
+     * Version
+     *
+     * satu-satu ke bawah.
+     */
+
+    .production-modal.production-modal-detail
+    .production-detail-grid{
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            8px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item{
+
+        min-height:
+            78px;
+
+        padding:
+            12px;
+
+        border-radius:
+            12px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item span{
+
+        margin-bottom:
+            4px;
+
+        font-size:
+            9px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item strong{
+
+        font-size:
+            11px;
+
+        line-height:
+            1.45;
+
+    }
+
+
+    /* ---------------------------------------------
+       FOOTER MOBILE
+    --------------------------------------------- */
+
+    .production-modal.production-modal-detail
+    .production-modal-footer{
+
+        width:
+            100%;
+
+        min-height:
+            64px;
+
+        padding:
+            10px 14px 12px;
+
+        display:
+            flex;
+
+        align-items:
+            center;
+
+        justify-content:
+            flex-end;
+
+        gap:
+            8px;
+
+        background:
+            #ffffff;
+
+        border-top:
+            1px solid #e8edf2;
+
+        z-index:
+            20;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-footer
+    .production-btn{
+
+        min-height:
+            40px;
+
+        padding:
+            0 14px;
+
+        font-size:
+            11px;
+
+        white-space:
+            nowrap;
+
+    }
+
+}
+
+
+/* =========================================================
+   08. SMALL PHONE
+   <= 560px
+========================================================= */
+
+@media (max-width: 560px){
+
+    .production-modal.production-modal-detail{
+
+        width:
+            calc(100vw - 12px);
+
+        max-width:
+            calc(100vw - 12px);
+
+        height:
+            calc(100dvh - 12px);
+
+        max-height:
+            calc(100dvh - 12px);
+
+        border-radius:
+            18px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-header{
+
+        padding:
+            14px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-header h2{
+
+        font-size:
+            18px;
+
+        line-height:
+            1.3;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-header p{
+
+        font-size:
+            10px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-body{
+
+        padding:
+            14px;
+
+    }
+
+
+    /*
+     * HP:
+     * tetap 2 kolom.
+     *
+     * 8 card = 4 baris:
+     *
+     * Batch      Product
+     * Recipe     Version
+     * Production Volume
+     * Stage      Status
+     */
+
+    .production-modal.production-modal-detail
+    .production-detail-grid{
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            8px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item{
+
+        min-height:
+            74px;
+
+        padding:
+            11px;
+
+        border-radius:
+            11px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item span{
+
+        font-size:
+            8px;
+
+        line-height:
+            1.3;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item strong{
+
+        font-size:
+            10px;
+
+        line-height:
+            1.4;
+
+    }
+
+
+    /* FOOTER */
+
+    .production-modal.production-modal-detail
+    .production-modal-footer{
+
+        min-height:
+            62px;
+
+        padding:
+            9px 12px 11px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-footer
+    .production-btn{
+
+        min-height:
+            38px;
+
+        padding:
+            0 12px;
+
+        font-size:
+            10px;
+
+    }
+
+}
+
+
+/* =========================================================
+   09. VERY SMALL PHONE
+   <= 380px
+========================================================= */
+
+@media (max-width: 380px){
+
+    .production-modal.production-modal-detail
+    .production-detail-grid{
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            7px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item{
+
+        min-height:
+            70px;
+
+        padding:
+            9px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item span{
+
+        font-size:
+            7.5px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-detail-item strong{
+
+        font-size:
+            9px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-footer{
+
+        min-height:
+            60px;
+
+        padding:
+            8px 10px 10px;
+
+    }
+
+
+    .production-modal.production-modal-detail
+    .production-modal-footer
+    .production-btn{
+
+        min-height:
+            36px;
+
+        padding:
+            0 10px;
+
+        font-size:
+            9px;
+
+    }
+
+}
