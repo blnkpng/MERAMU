@@ -15,6 +15,9 @@
 (function(){
     "use strict";
 
+    // Avoid processing the same QC PASS event twice in the same page session.
+    const handledF2HarvestEvents = new Set();
+
     function getElement(id){
         return document.getElementById(id);
     }
@@ -178,6 +181,15 @@
             );
             return;
         }
+
+        const eventKey = `${batchCode}|${detail.qualityCheck?.id || detail.qualityCheck?.checked_at || "qc"}`;
+        if(handledF2HarvestEvents.has(eventKey)){
+            console.warn(
+                `MERAMU P5: event QC F2 PASS ${eventKey} sudah diproses. Diabaikan.`
+            );
+            return;
+        }
+        handledF2HarvestEvents.add(eventKey);
 
         try{
             const supabase =

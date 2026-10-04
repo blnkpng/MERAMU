@@ -8,6 +8,9 @@
 
     "use strict";
 
+    // Prevent duplicate F1 → F2 submissions while the atomic RPC is running.
+    let f1TransitionBusy = false;
+
 
     /* =====================================================
        WAIT FOR SUPABASE
@@ -212,7 +215,7 @@
             getButton();
 
 
-        if(button?.disabled){
+        if(button?.disabled || f1TransitionBusy){
 
             return;
 
@@ -308,6 +311,8 @@
 
         }
 
+
+        f1TransitionBusy = true;
 
         try{
 
@@ -651,6 +656,8 @@
                 `QC F1 PASS. ${batchCode} berhasil masuk F2.\nTarget F2 dihitung otomatis dari recipe.`
             );
 
+            f1TransitionBusy = false;
+
 
         }catch(error){
 
@@ -676,6 +683,8 @@
                 updateF1PassButton();
 
             }
+
+            f1TransitionBusy = false;
 
         }
 
