@@ -797,3 +797,64 @@ background:#03542E;
     border-color:#B42318;
     box-shadow:0 0 0 3px rgba(180,35,24,.08);
 }
+
+/* =========================================================
+   D1 — DELETE ENTIRE PRODUCTION
+========================================================= */
+.batch-delete-preview-loading,
+.batch-delete-preview-error,
+.batch-delete-preview-note{
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8faf9;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.batch-delete-preview-title{
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #123c2b;
+}
+
+.batch-delete-preview-list{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.batch-delete-preview-list li{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.72);
+}
+
+.batch-delete-preview-list strong{
+    font-variant-numeric: tabular-nums;
+}
+
+.batch-delete-preview-total{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 9px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(4,103,56,.14);
+    font-weight: 700;
+}
+
+.batch-delete-preview-note{
+    margin-top: 10px;
+    color: #53645d;
+}
+
+.batch-delete-preview-error{
+    color: #8f2424;
+    background: #fff5f5;
+}

@@ -219,11 +219,11 @@
                                 id="deleteBatch"
                                 class="page-btn danger batch-delete-btn"
                                 type="button"
-                                aria-label="Hapus Batch"
-                                title="Hapus Batch Permanen"
+                                aria-label="Hapus Seluruh Produksi"
+                                title="Hapus Seluruh Produksi"
                             >
                                 <i data-lucide="trash-2"></i>
-                                <span>Hapus Batch</span>
+                                <span>Hapus Produksi</span>
                             </button>
 
                         </div>
@@ -2107,12 +2107,11 @@
                     </span>
 
                     <h2 id="deleteBatchTitle">
-                        Hapus Batch Permanen
+                        Hapus Seluruh Produksi
                     </h2>
 
                     <p>
-                        Data batch hanya bisa dihapus jika belum memiliki data proses yang terhubung.
-                        Jika sudah punya F1, F2, QC, bottling, allocation, atau Produk Jadi, sistem akan menolak penghapusan.
+                        Production adalah akar dari seluruh proses. Saat dihapus, seluruh data proses yang terkait dengan production ini akan ikut dihapus permanen. Master Product, Recipe, Recipe Version, Ingredient, Unit, dan master data lainnya tetap aman.
                     </p>
                 </div>
 
@@ -2137,13 +2136,13 @@
 
                 <div class="form-group">
                     <label for="deleteBatchConfirm">
-                        Ketik <strong>HAPUS</strong> untuk melanjutkan
+                        Ketik <strong>HAPUS <span id="deleteBatchConfirmCode">BATCH</span></strong> untuk melanjutkan
                     </label>
                     <input
                         id="deleteBatchConfirm"
                         type="text"
                         autocomplete="off"
-                        placeholder="HAPUS"
+                        placeholder="HAPUS KB-XXX"
                     >
                 </div>
 
@@ -2162,7 +2161,7 @@
                         class="page-btn danger"
                     >
                         <i data-lucide="trash-2"></i>
-                        Hapus Permanen
+                        Hapus Seluruh Produksi
                     </button>
                 </div>
 
