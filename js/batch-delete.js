@@ -74,6 +74,7 @@
             </div>
         `;
         box.hidden = false;
+        box.scrollTop = 0;
     }
 
     function showErrorBox(message){
@@ -86,6 +87,7 @@
             </div>
         `;
         box.hidden = false;
+        box.scrollTop = 0;
     }
 
     function openDeleteBatchModal(batchOverride){
@@ -112,6 +114,7 @@
         if(box){
             box.hidden = false;
             box.innerHTML = '<div class="batch-delete-preview-loading">Memeriksa seluruh data produksi...</div>';
+            box.scrollTop = 0;
         }
         if(submitBtn) submitBtn.disabled = true;
 

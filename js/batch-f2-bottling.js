@@ -454,7 +454,6 @@
                     supabase
                 );
 
-            // Bottling is strictly F2-only. Never write bottling data for another stage.
             if(!isF2(batch)){
                 container.innerHTML = `
                     <div class="f2-bottling-locked">
