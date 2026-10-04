@@ -7,8 +7,12 @@
     "use strict";
 
     let previewData = null;
+    let selectedBatch = null;
 
-    function getBatchCode(){
+    function getBatchCode(batchOverride){
+        const batch = batchOverride || selectedBatch;
+        if(batch?.batch_code) return batch.batch_code;
+
         const params = new URLSearchParams(window.location.search);
         return params.get("id") || params.get("batch") || params.get("code") || "";
     }
@@ -84,7 +88,13 @@
         box.hidden = false;
     }
 
-    function openDeleteBatchModal(){
+    function openDeleteBatchModal(batchOverride){
+        if(batchOverride && batchOverride.id){
+            selectedBatch = batchOverride;
+        }else{
+            selectedBatch = null;
+        }
+
         const modal = getModal();
         if(!modal) return;
 
@@ -133,6 +143,19 @@
 
     async function findBatch(){
         const supabase = await waitForSupabase();
+
+        if(selectedBatch?.id){
+            const { data: batch, error } = await supabase
+                .from("batches")
+                .select("id,batch_code,current_stage,status")
+                .eq("id", selectedBatch.id)
+                .maybeSingle();
+
+            if(error) throw error;
+            if(!batch) throw new Error(`Produksi ${selectedBatch.batch_code || ""} tidak ditemukan.`);
+            return { supabase, batch };
+        }
+
         const code = getBatchCode();
         const { data: batch, error } = await supabase
             .from("batches")

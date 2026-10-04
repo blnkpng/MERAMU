@@ -1832,6 +1832,101 @@
 
 
     <!-- =====================================================
+         DELETE PRODUCTION MODAL — D1
+    ====================================================== -->
+
+    <div
+        id="deleteBatchModal"
+        class="batch-modal"
+        aria-hidden="true"
+    >
+
+        <div
+            class="batch-modal-backdrop"
+            data-close-delete-modal
+        ></div>
+
+        <div
+            class="batch-modal-card batch-delete-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="deleteBatchTitle"
+        >
+
+            <div class="batch-modal-header">
+                <div>
+                    <span class="section-eyebrow">DANGER ZONE</span>
+
+                    <h2 id="deleteBatchTitle">
+                        Hapus Seluruh Produksi
+                    </h2>
+
+                    <p>
+                        Production adalah akar dari seluruh proses. Saat dihapus, seluruh data proses yang terkait dengan production ini akan ikut dihapus permanen. Master Product, Recipe, Recipe Version, Ingredient, Unit, dan master data lainnya tetap aman.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="batch-modal-close"
+                    data-close-delete-modal
+                    aria-label="Tutup"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form id="deleteBatchForm">
+
+                <div class="form-group">
+                    <label>Batch</label>
+                    <div id="deleteBatchCode" class="form-static-value">—</div>
+                </div>
+
+                <div
+                    id="deleteBatchDependencyBox"
+                    class="batch-delete-dependency-box"
+                    hidden
+                ></div>
+
+                <div class="form-group">
+                    <label for="deleteBatchConfirm">
+                        Ketik <strong>HAPUS <span id="deleteBatchConfirmCode">BATCH</span></strong> untuk melanjutkan
+                    </label>
+                    <input
+                        id="deleteBatchConfirm"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="HAPUS KB-XXX"
+                    >
+                </div>
+
+                <div class="batch-modal-actions">
+                    <button
+                        type="button"
+                        class="page-btn secondary"
+                        data-close-delete-modal
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        id="confirmDeleteBatchBtn"
+                        type="submit"
+                        class="page-btn danger"
+                    >
+                        <i data-lucide="trash-2"></i>
+                        Hapus Seluruh Produksi
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- =====================================================
          GLOBAL / SUPABASE
     ====================================================== -->
 
@@ -1849,6 +1944,7 @@
     ====================================================== -->
 
     <script src="../js/production.js"></script>
+    <script src="../js/batch-delete.js"></script>
 
 
     <script>

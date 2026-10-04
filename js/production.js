@@ -2204,6 +2204,28 @@ function createProductionRow(
         </button>
 
 
+        <!-- DELETE PRODUCTION -->
+
+        <button
+            type="button"
+            class="production-action-btn production-action-btn-delete"
+            data-production-action="delete"
+            data-batch-id="${escapeHtml(
+                batch.id
+            )}"
+            title="Hapus Seluruh Produksi"
+            aria-label="Hapus seluruh produksi"
+        >
+
+            <i data-lucide="trash-2"></i>
+
+            <span class="production-action-label">
+                Hapus
+            </span>
+
+        </button>
+
+
         <!-- START F1 -->
 
         ${
@@ -2296,6 +2318,22 @@ function bindProductionActionEvents(){
 
                             return;
 
+                        }
+
+
+                        if(
+                            action ===
+                            "delete"
+                        ){
+
+                            if(typeof window.openDeleteBatchModal === "function"){
+                                window.openDeleteBatchModal(batch);
+                            }else{
+                                console.error("MERAMU: Delete Production controller belum tersedia.");
+                                alert("Fitur hapus produksi belum siap. Silakan refresh halaman.");
+                            }
+
+                            return;
                         }
 
 

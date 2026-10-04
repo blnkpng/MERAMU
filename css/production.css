@@ -7630,3 +7630,32 @@
     }
 
 }
+
+
+/* =========================================================
+   D1 — DELETE PRODUCTION ACTION
+   ========================================================= */
+
+.production-action-btn-delete{
+    color:#b42318;
+    border-color:#f2b8b5;
+    background:#fff7f6;
+}
+
+.production-action-btn-delete:hover{
+    color:#8f1d17;
+    border-color:#e58b86;
+    background:#fff0ef;
+}
+
+.production-action-btn-delete svg{
+    width:16px;
+    height:16px;
+    flex:none;
+}
+
+@media (max-width: 900px){
+    .production-action-btn-delete .production-action-label{
+        display:none;
+    }
+}
