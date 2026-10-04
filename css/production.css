@@ -7659,3 +7659,366 @@
         display:none;
     }
 }
+
+
+/* =========================================================
+   MERAMU PRODUCTION — FINAL UX / RESPONSIVE PATCH v2
+   ---------------------------------------------------------
+   Fokus:
+   - Tablet tetap rapi tanpa memaksa horizontal page scroll
+   - Mobile Production berubah menjadi batch cards
+   - Kolom Aksi tetap mudah disentuh
+   - Search + filter tidak bertabrakan
+   - Tidak mengubah workflow/database
+========================================================= */
+
+.production-page{
+    overflow-x: clip;
+}
+
+.production-card,
+.production-table-wrap{
+    min-width: 0;
+}
+
+.production-toolbar{
+    min-width: 0;
+}
+
+.production-search{
+    flex: 1 1 320px;
+}
+
+.production-filters{
+    justify-content: flex-end;
+}
+
+.production-action-group{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.production-action-btn{
+    min-width: 36px;
+    min-height: 36px;
+}
+
+.production-action-btn-detail{
+    color: #475569;
+    background: #fff;
+    border-color: #e2e8f0;
+}
+
+.production-action-btn-detail:hover{
+    color: #046738;
+    background: #f4faf7;
+    border-color: #c9e5d5;
+}
+
+/* Tablet: keep the table usable, but let toolbar wrap cleanly. */
+@media (max-width: 1100px){
+    .production-page-header{
+        align-items: flex-start;
+    }
+
+    .production-page-header h1{
+        font-size: 26px;
+    }
+
+    .production-toolbar{
+        align-items: stretch;
+    }
+
+    .production-search{
+        flex: 1 1 280px;
+    }
+
+    .production-filters{
+        flex: 0 1 auto;
+        justify-content: flex-start;
+    }
+
+    .production-action-group{
+        justify-content: flex-start;
+    }
+}
+
+/* Tablet portrait / large phone: cards instead of a 760px table. */
+@media (max-width: 900px){
+
+    .production-page{
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .production-page-header{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .production-header-actions{
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .production-header-actions .production-btn{
+        flex: 1 1 0;
+    }
+
+    .production-summary-grid{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .production-toolbar{
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .production-search{
+        width: 100%;
+        flex: none;
+    }
+
+    .production-filters{
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+
+    .production-filters::-webkit-scrollbar{
+        display: none;
+    }
+
+    .production-table-wrap{
+        overflow: visible;
+    }
+
+    .production-table{
+        width: 100%;
+        min-width: 0 !important;
+        display: block;
+    }
+
+    .production-table thead{
+        display: none;
+    }
+
+    .production-table tbody{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .production-table tbody tr{
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #e7edf2;
+        border-radius: 17px;
+        background: #fff;
+        box-shadow: 0 5px 18px rgba(15,23,42,.045);
+    }
+
+    .production-table td{
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 10px;
+        width: 100%;
+        min-width: 0;
+        padding: 9px 0;
+        border-bottom: 1px solid #edf1f5;
+        align-items: center;
+    }
+
+    .production-table td:last-child{
+        border-bottom: 0;
+        padding-top: 12px;
+        padding-bottom: 0;
+    }
+
+    .production-table td::before{
+        color: #94a3b8;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        line-height: 1.3;
+    }
+
+    .production-table td:nth-child(1)::before{ content: "Batch"; }
+    .production-table td:nth-child(2)::before{ content: "Product"; }
+    .production-table td:nth-child(3)::before{ content: "Recipe"; }
+    .production-table td:nth-child(4)::before{ content: "Version"; }
+    .production-table td:nth-child(5)::before{ content: "Produksi"; }
+    .production-table td:nth-child(6)::before{ content: "Volume"; }
+    .production-table td:nth-child(7)::before{ content: "Stage"; }
+    .production-table td:nth-child(8)::before{ content: "Status"; }
+
+    .production-table td:nth-child(9){
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .production-table td:nth-child(9)::before{
+        content: "Aksi";
+        margin-right: auto;
+    }
+
+    .production-action-group{
+        flex: 0 1 auto;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .production-action-btn{
+        min-height: 38px;
+        padding: 0 10px;
+    }
+
+    .production-action-label{
+        display: inline !important;
+    }
+}
+
+@media (max-width: 600px){
+
+    .production-page{
+        padding: 14px 10px 28px;
+    }
+
+    .production-page-header h1{
+        font-size: 23px;
+    }
+
+    .production-page-header p{
+        font-size: 12px;
+    }
+
+    .production-header-actions{
+        gap: 8px;
+    }
+
+    .production-header-actions .production-btn{
+        min-height: 42px;
+        padding: 0 12px;
+    }
+
+    .production-summary-grid{
+        gap: 8px;
+    }
+
+    .production-summary-card{
+        min-height: 82px;
+        padding: 12px;
+        border-radius: 15px;
+    }
+
+    .production-summary-card span{
+        font-size: 10px;
+    }
+
+    .production-summary-card strong{
+        font-size: 19px;
+    }
+
+    .production-summary-icon{
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .production-filter{
+        height: 36px;
+        padding: 0 11px;
+        font-size: 11px;
+    }
+
+    .production-table tbody{
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .production-table tbody tr{
+        padding: 12px;
+        border-radius: 15px;
+    }
+
+    .production-table td{
+        grid-template-columns: 68px minmax(0,1fr);
+        gap: 8px;
+        font-size: 11px;
+    }
+
+    .production-table td:nth-child(9){
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .production-action-group{
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .production-action-btn{
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding: 0 9px;
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 390px){
+
+    .production-header-actions{
+        flex-direction: column;
+    }
+
+    .production-header-actions .production-btn{
+        width: 100%;
+        flex: none;
+    }
+
+    .production-summary-card{
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .production-summary-icon{
+        width: 32px;
+        height: 32px;
+    }
+
+    .production-summary-card strong{
+        font-size: 17px;
+    }
+
+    .production-table td:nth-child(9){
+        display: block;
+    }
+
+    .production-table td:nth-child(9)::before{
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .production-action-group{
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .production-action-btn{
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}

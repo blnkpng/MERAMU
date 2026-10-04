@@ -5803,10 +5803,19 @@ function setProductionLoading(
             "productionLoading"
         );
 
-
-    const tableContainer =
+    const tableWrap =
         document.getElementById(
-            "productionTableContainer"
+            "productionTableWrap"
+        );
+
+    const emptyElement =
+        document.getElementById(
+            "productionEmpty"
+        );
+
+    const errorElement =
+        document.getElementById(
+            "productionError"
         );
 
 
@@ -5820,16 +5829,16 @@ function setProductionLoading(
     }
 
 
-    if(tableContainer){
+    if(loading){
 
-        tableContainer.classList.toggle(
-            "is-loading",
-            loading
-        );
+        tableWrap?.classList.add("hidden");
+        emptyElement?.classList.add("hidden");
+        errorElement?.classList.add("hidden");
 
     }
 
 }
+
 
 
 /* =========================================================
