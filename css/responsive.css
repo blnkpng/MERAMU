@@ -1247,3 +1247,53 @@
         overflow:visible !important;
     }
 }
+
+
+/* =========================================================
+   BATCH DELETE — MOBILE ACTIONS
+========================================================= */
+
+@media(max-width:600px){
+    .batch-header-actions{
+        grid-template-columns:
+            minmax(0,1fr)
+            minmax(0,1fr)
+            48px
+            48px
+            48px !important;
+    }
+
+    .batch-header-actions #deleteBatch{
+        width:48px !important;
+        min-width:48px !important;
+        padding:0 !important;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .batch-header-actions #deleteBatch span{
+        display:none !important;
+    }
+
+    .batch-header-actions #deleteBatch i{
+        width:18px;
+        height:18px;
+    }
+}
+
+@media(max-width:430px){
+    .batch-header-actions{
+        grid-template-columns:
+            minmax(0,1fr)
+            minmax(0,1fr)
+            44px
+            44px
+            44px !important;
+    }
+
+    .batch-header-actions #deleteBatch{
+        width:44px !important;
+        min-width:44px !important;
+    }
+}

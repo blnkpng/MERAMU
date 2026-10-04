@@ -733,3 +733,67 @@ background:#03542E;
     }
 
 }
+
+
+/* =========================================================
+   DELETE BATCH — D1
+========================================================= */
+
+.batch-delete-btn{
+    background:#FFF1F2;
+    color:#B42318;
+    border-color:#FECDD3;
+}
+
+.batch-delete-btn:hover{
+    background:#FFE4E6;
+    border-color:#FDA4AF;
+}
+
+.batch-delete-modal-card{
+    border-color:#F3D0D0;
+}
+
+.batch-delete-dependency-box{
+    margin:0 0 18px;
+    padding:14px 16px;
+    border:1px solid #FECACA;
+    border-radius:14px;
+    background:#FFF7F7;
+    color:#7F1D1D;
+    font-size:13px;
+    line-height:1.55;
+}
+
+.batch-delete-dependency-box p{
+    margin:5px 0 7px;
+}
+
+.batch-delete-dependency-box ul{
+    margin:0 0 8px 18px;
+    padding:0;
+}
+
+.batch-delete-dependency-box small{
+    display:block;
+    color:#92400E;
+}
+
+#deleteBatchConfirm{
+    width:100%;
+    min-height:46px;
+    padding:0 14px;
+    border:1px solid #DDE6DF;
+    border-radius:12px;
+    outline:none;
+    font-family:inherit;
+    font-size:14px;
+    color:#17221B;
+    background:#FFFFFF;
+    box-sizing:border-box;
+}
+
+#deleteBatchConfirm:focus{
+    border-color:#B42318;
+    box-shadow:0 0 0 3px rgba(180,35,24,.08);
+}

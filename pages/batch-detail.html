@@ -214,6 +214,18 @@
                                 <span>Batalkan Batch</span>
                             </button>
 
+
+                            <button
+                                id="deleteBatch"
+                                class="page-btn danger batch-delete-btn"
+                                type="button"
+                                aria-label="Hapus Batch"
+                                title="Hapus Batch Permanen"
+                            >
+                                <i data-lucide="trash-2"></i>
+                                <span>Hapus Batch</span>
+                            </button>
+
                         </div>
 
                     </div>
@@ -2067,6 +2079,100 @@
 
 
     <!-- =====================================================
+         DELETE BATCH MODAL
+    ====================================================== -->
+
+    <div
+        id="deleteBatchModal"
+        class="batch-modal"
+        aria-hidden="true"
+    >
+
+        <div
+            class="batch-modal-backdrop"
+            data-close-delete-modal
+        ></div>
+
+        <div
+            class="batch-modal-card batch-delete-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="deleteBatchTitle"
+        >
+
+            <div class="batch-modal-header">
+                <div>
+                    <span class="section-eyebrow">
+                        DANGER ZONE
+                    </span>
+
+                    <h2 id="deleteBatchTitle">
+                        Hapus Batch Permanen
+                    </h2>
+
+                    <p>
+                        Data batch hanya bisa dihapus jika belum memiliki data proses yang terhubung.
+                        Jika sudah punya F1, F2, QC, bottling, allocation, atau Produk Jadi, sistem akan menolak penghapusan.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="batch-modal-close"
+                    data-close-delete-modal
+                    aria-label="Tutup"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form id="deleteBatchForm">
+
+                <div class="form-group">
+                    <label>Batch</label>
+                    <div id="deleteBatchCode" class="form-static-value">—</div>
+                </div>
+
+                <div id="deleteBatchDependencyBox" class="batch-delete-dependency-box" hidden></div>
+
+                <div class="form-group">
+                    <label for="deleteBatchConfirm">
+                        Ketik <strong>HAPUS</strong> untuk melanjutkan
+                    </label>
+                    <input
+                        id="deleteBatchConfirm"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="HAPUS"
+                    >
+                </div>
+
+                <div class="batch-modal-actions">
+                    <button
+                        type="button"
+                        class="page-btn secondary"
+                        data-close-delete-modal
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        id="confirmDeleteBatchBtn"
+                        type="submit"
+                        class="page-btn danger"
+                    >
+                        <i data-lucide="trash-2"></i>
+                        Hapus Permanen
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- =====================================================
          SCRIPTS
     ====================================================== -->
 
@@ -2098,6 +2204,7 @@
     <script src="../js/batch-detail-fermentation-supabase.js"></script>
 
     <script src="../js/batch-cancel.js"></script>
+    <script src="../js/batch-delete.js"></script>
 
     <!-- 5. QUALITY CHECK -->
     <script src="../js/batch-quality-check.js"></script>
