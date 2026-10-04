@@ -233,7 +233,11 @@
             }
 
             closeDeleteBatchModal();
-            alert(`Produksi ${code} berhasil dihapus beserta seluruh data prosesnya.`);
+            if(typeof window.meramuAlert === "function") {
+                await window.meramuAlert(`Produksi ${code} berhasil dihapus beserta seluruh data prosesnya.`);
+            } else {
+                alert(`Produksi ${code} berhasil dihapus beserta seluruh data prosesnya.`);
+            }
             window.location.href = "production.html";
 
         }catch(error){
