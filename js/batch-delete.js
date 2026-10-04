@@ -149,7 +149,7 @@
         const submitBtn = document.getElementById("confirmDeleteBatchBtn");
         try{
             const { supabase, batch } = await findBatch();
-            const { data, error } = await supabase.rpc("delete_meramu_production", {
+            const { data, error } = await supabase.rpc("delete_meramu_production_v2", {
                 p_batch_id: batch.id,
                 p_execute: false
             });
@@ -196,7 +196,7 @@
 
         try{
             const { supabase, batch } = await findBatch();
-            const { data, error } = await supabase.rpc("delete_meramu_production", {
+            const { data, error } = await supabase.rpc("delete_meramu_production_v2", {
                 p_batch_id: batch.id,
                 p_execute: true
             });
