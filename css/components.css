@@ -800,7 +800,92 @@ background:#03542E;
 
 /* =========================================================
    D1 — DELETE ENTIRE PRODUCTION
+   Compact modal: keep the dialog short even when dependency
+   preview contains many rows.
 ========================================================= */
+.batch-delete-modal-card{
+    width:min(480px,100%);
+    max-height:calc(100vh - 32px);
+    padding:22px;
+    overflow:hidden;
+}
+
+.batch-delete-modal-card .batch-modal-header{
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.batch-delete-modal-card .batch-modal-header h2{
+    font-size:20px;
+    margin:4px 0 5px;
+}
+
+.batch-delete-modal-card .batch-modal-header p{
+    font-size:12px;
+    line-height:1.5;
+}
+
+.batch-delete-modal-card .form-group{
+    margin-bottom:14px;
+}
+
+.batch-delete-dependency-box{
+    max-height:250px;
+    overflow-y:auto;
+    margin-bottom:14px;
+    padding:11px 12px;
+    scrollbar-width:thin;
+}
+
+.batch-delete-preview-title{
+    margin-bottom:7px;
+    font-size:12px;
+}
+
+.batch-delete-preview-list{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+}
+
+.batch-delete-preview-list li{
+    min-height:30px;
+    padding:6px 9px;
+    font-size:12px;
+}
+
+.batch-delete-preview-total{
+    margin-top:7px;
+    padding-top:8px;
+    font-size:12px;
+}
+
+.batch-delete-preview-note{
+    margin-top:8px;
+    padding:9px 10px;
+    font-size:11px;
+    line-height:1.45;
+}
+
+.batch-delete-modal-card .batch-modal-actions{
+    margin-top:16px;
+}
+
+@media(max-width:600px){
+    .batch-delete-modal-card{
+        width:100%;
+        max-height:calc(100vh - 24px);
+        padding:18px;
+    }
+
+    .batch-delete-preview-list{
+        grid-template-columns:1fr;
+    }
+
+    .batch-delete-dependency-box{
+        max-height:220px;
+    }
+}
+
 .batch-delete-preview-loading,
 .batch-delete-preview-error,
 .batch-delete-preview-note{
